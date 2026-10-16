@@ -17,15 +17,21 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
         body { background-color: var(--kof-gray-bg); color: var(--kof-black); padding-bottom: 60px; -webkit-tap-highlight-color: transparent; }
         
-        nav { background-color: var(--kof-white); border-bottom: 3px solid var(--kof-red); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,0.04); position: sticky; top: 0; z-index: 100; }
-        .logo-container { display: flex; align-items: center; gap: 12px; }
-        .logo-badge { background: linear-gradient(135deg, var(--kof-red), var(--kof-dark-red)); color: var(--kof-white); font-weight: 900; padding: 8px 14px; font-size: 1rem; letter-spacing: 1.5px; border-radius: 6px; box-shadow: 0 4px 10px rgba(230,0,0,0.3); }
-        .logo-text { font-size: 0.85rem; font-weight: 800; color: #2D3748; text-transform: uppercase; line-height: 1.2; }
-        .logo-text span { font-size: 0.65rem; color: #718096; font-weight: 500; display: block; }
+        /* Pantalla de Carga / Splash Screen */
+        #splashScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--kof-white); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.5s ease; }
+        .splash-logo { font-size: 2.2rem; font-weight: 900; color: var(--kof-red); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; animation: pulse 1.5s infinite; }
+        .splash-sub { font-size: 0.85rem; color: #718096; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
-        header.hero { background: linear-gradient(135deg, var(--kof-red), #990000); color: white; padding: 30px 20px; text-align: center; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; box-shadow: 0 4px 15px rgba(230,0,0,0.2); }
-        header.hero h1 { font-size: 1.3rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; }
-        header.hero p { font-size: 0.85rem; opacity: 0.9; margin-top: 6px; font-weight: 400; }
+        nav { background-color: var(--kof-white); border-bottom: 3px solid var(--kof-red); padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,0.04); position: sticky; top: 0; z-index: 100; }
+        .logo-container { display: flex; align-items: center; gap: 12px; }
+        .logo-badge { background: linear-gradient(135deg, var(--kof-red), var(--kof-dark-red)); color: var(--kof-white); font-weight: 900; padding: 7px 12px; font-size: 0.9rem; letter-spacing: 1px; border-radius: 6px; box-shadow: 0 4px 10px rgba(230,0,0,0.3); }
+        .user-nav-info { font-size: 0.8rem; font-weight: 800; color: #2D3748; text-transform: uppercase; line-height: 1.2; text-align: right; }
+        .user-nav-info span { font-size: 0.65rem; color: var(--kof-red); font-weight: 600; display: block; }
+
+        header.hero { background: linear-gradient(135deg, var(--kof-red), #990000); color: white; padding: 25px 20px; text-align: center; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; box-shadow: 0 4px 15px rgba(230,0,0,0.2); }
+        header.hero h1 { font-size: 1.2rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; }
+        header.hero p { font-size: 0.8rem; opacity: 0.9; margin-top: 4px; font-weight: 400; }
 
         .container { max-width: 520px; margin: 20px auto; padding: 0 15px; }
         .card { background: var(--kof-white); border-radius: 14px; padding: 22px; box-shadow: var(--kof-shadow); margin-bottom: 20px; border-top: 5px solid var(--kof-red); transition: transform 0.2s; }
@@ -58,8 +64,10 @@
         .btn-email { width: 100%; background: linear-gradient(135deg, #3182CE, #2B6CB0); color: white; border: none; padding: 12px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; cursor: pointer; margin-top: 12px; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 10px rgba(49,130,206,0.3); transition: filter 0.2s; }
         .btn-email:hover { filter: brightness(1.1); }
 
-        .history-item { padding: 14px; border: 1px solid #E2E8F0; font-size: 0.82rem; background: #FFFFFF; border-radius: 10px; margin-bottom: 10px; border-left: 4px solid var(--kof-red); box-shadow: 0 2px 5px rgba(0,0,0,0.02); transition: transform 0.2s; }
-        .history-item:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .btn-danger { width: 100%; background: #E53E3E; color: white; border: none; padding: 10px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; cursor: pointer; margin-top: 15px; text-transform: uppercase; letter-spacing: 0.5px; transition: background 0.2s; }
+        .btn-danger:hover { background: #C53030; }
+
+        .history-item { padding: 14px; border: 1px solid #E2E8F0; font-size: 0.82rem; background: #FFFFFF; border-radius: 10px; margin-bottom: 10px; border-left: 4px solid var(--kof-red); box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
         .history-info strong { display: block; color: #1A202C; font-size: 0.9rem; margin-bottom: 4px; font-weight: 700; }
         .history-info span { color: #4A5568; display: block; margin-bottom: 3px; }
         
@@ -71,10 +79,18 @@
 </head>
 <body>
 
+    <!-- Pantalla de Carga Inicial (Splash Screen) -->
+    <div id="splashScreen">
+        <div class="splash-logo">Coca-Cola FEMSA</div>
+        <div class="splash-sub">Cargando Sistema Operativo...</div>
+    </div>
+
     <nav>
         <div class="logo-container">
             <div class="logo-badge">KOF</div>
-            <div class="logo-text">Coca-Cola FEMSA<span>Venezuela • Sistema Pro</span></div>
+        </div>
+        <div class="user-nav-info" id="navUserInfo">
+            <span>Venezuela</span> Sistema Pro
         </div>
     </nav>
 
@@ -85,8 +101,8 @@
 
     <div class="container">
         
-        <!-- Tarjeta de Datos del Personal -->
-        <div class="card" id="profileCard">
+        <!-- Tarjeta de Datos del Personal (Obligatoria al principio) -->
+        <div class="card" id="profileCard" style="display: none;">
             <h2 class="section-title">👤 1. Datos del Colaborador</h2>
             <div class="form-group">
                 <label for="nombreColaborador">Nombre Completo *</label>
@@ -194,6 +210,9 @@
             <div id="historyList">
                 <div class="empty-history">No hay registros guardados aún.</div>
             </div>
+            <div id="deleteHistoryContainer" style="display: none;">
+                <button type="button" class="btn-danger" onclick="borrarHistorial()">🗑️ Borrar Todo el Historial</button>
+            </div>
         </div>
 
         <footer class="legal">
@@ -205,15 +224,29 @@
     <script>
         document.getElementById('fecha').valueAsDate = new Date();
 
+        // Ocultar pantalla de carga inicial tras un breve instante fluido
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const splash = document.getElementById('splashScreen');
+                splash.style.opacity = '0';
+                setTimeout(() => splash.style.display = 'none', 500);
+            }, 800);
+            verificarPerfil();
+        });
+
         function verificarPerfil() {
             const perfil = JSON.parse(localStorage.getItem('kof_profile'));
+            const navUserInfo = document.getElementById('navUserInfo');
+            
             if (perfil) {
                 document.getElementById('profileCard').style.display = 'none';
                 document.getElementById('formCard').style.display = 'block';
+                navUserInfo.innerHTML = `${perfil.nombre}<span>${perfil.cargo}</span>`;
                 document.getElementById('profileDisplay').innerHTML = `<span><strong>Colaborador:</strong> ${perfil.nombre}<br><small>${perfil.cargo} (${perfil.anos} años)</small></span>`;
             } else {
                 document.getElementById('profileCard').style.display = 'block';
                 document.getElementById('formCard').style.display = 'none';
+                navUserInfo.innerHTML = `Venezuela<span>Sistema Pro</span>`;
             }
         }
 
@@ -270,14 +303,18 @@
 
         const form = document.getElementById('kofForm');
         const historyList = document.getElementById('historyList');
+        const deleteHistoryContainer = document.getElementById('deleteHistoryContainer');
 
         function loadHistory() {
             const records = JSON.parse(localStorage.getItem('kof_records') || '[]');
             if (records.length === 0) {
                 historyList.innerHTML = '<div class="empty-history">No hay registros guardados aún.</div>';
+                deleteHistoryContainer.style.display = 'none';
                 return;
             }
             historyList.innerHTML = '';
+            deleteHistoryContainer.style.display = 'block';
+            
             records.forEach((rec) => {
                 const div = document.createElement('div');
                 div.className = 'history-item';
@@ -293,6 +330,15 @@
                 `;
                 historyList.appendChild(div);
             });
+        }
+
+        function borrarHistorial() {
+            const confirmar = confirm("¿Estás 100% seguro de que deseas eliminar todo el historial guardado en este dispositivo?");
+            if (confirmar) {
+                localStorage.removeItem('kof_records');
+                loadHistory();
+                alert("El historial ha sido eliminado con éxito.");
+            }
         }
 
         form.addEventListener('submit', (e) => {
@@ -379,9 +425,7 @@
             window.location.href = `mailto:?subject=${asunto}&body=${cuerpo}`;
         }
 
-        verificarPerfil();
         loadHistory();
-        calcularEnVivo();
     </script>
 </body>
 </html>
