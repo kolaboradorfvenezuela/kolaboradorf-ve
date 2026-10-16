@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Control Operativo Pro | Coca-Cola FEMSA</title>
+    <!-- Librería EmailJS para envío automático -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script type="text/javascript">
+        (function() {
+            emailjs.init({
+                publicKey: "dFQY0-PGe4GFRkjEC",
+            });
+        })();
+    </script>
     <style>
         :root {
             --kof-red: #E60000;
@@ -15,17 +24,15 @@
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
         
-        /* Fondo dinámico y colorido con temática Coca-Cola */
         body { 
             background: linear-gradient(135deg, rgba(230,0,0,0.85), rgba(18,18,18,0.9)), 
                         url('https://images.unsplash.com/photo-1622483767028-3f66f32aef97?q=80&w=1000&auto=format&fit=crop') no-repeat center center fixed;
             background-size: cover;
             color: var(--kof-black); 
-            padding-bottom: 80px; 
+            padding-bottom: 90px; 
             min-height: 100vh;
         }
         
-        /* Pantalla de Carga / Splash Screen */
         #splashScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--kof-white); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.5s ease; }
         .splash-logo { font-size: 2.2rem; font-weight: 900; color: var(--kof-red); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; animation: pulse 1.5s infinite; }
         .splash-sub { font-size: 0.85rem; color: #718096; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
@@ -41,7 +48,6 @@
         header.hero h1 { font-size: 1.2rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; }
         header.hero p { font-size: 0.8rem; opacity: 0.9; margin-top: 4px; font-weight: 400; }
 
-        /* Distribución de la página: Formulario y Tarjetas de Historial al lado */
         .main-layout { max-width: 1100px; margin: 20px auto; padding: 0 15px; display: grid; grid-template-columns: 1fr; gap: 20px; }
         @media(min-width: 850px) {
             .main-layout { grid-template-columns: 1fr 1fr; align-items: start; }
@@ -79,7 +85,6 @@
         .btn-danger { width: 100%; background: #E53E3E; color: white; border: none; padding: 10px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; cursor: pointer; margin-top: 15px; text-transform: uppercase; letter-spacing: 0.5px; transition: background 0.2s; }
         .btn-danger:hover { background: #C53030; }
 
-        /* Tarjeta de presentación para el Historial por días */
         .history-card-item { background: #FFFFFF; border-radius: 12px; padding: 16px; margin-bottom: 14px; border-left: 5px solid var(--kof-red); box-shadow: 0 4px 12px rgba(0,0,0,0.06); border-top: 1px solid #E2E8F0; border-right: 1px solid #E2E8F0; border-bottom: 1px solid #E2E8F0; }
         .history-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #EDF2F7; padding-bottom: 8px; margin-bottom: 10px; }
         .history-day { font-weight: 800; color: var(--kof-red); font-size: 0.95rem; text-transform: uppercase; }
@@ -93,15 +98,14 @@
         .empty-history { text-align: center; color: #A0AEC0; font-size: 0.85rem; padding: 30px 0; font-style: italic; }
         .profile-summary { background: #FFF5F5; border: 1px dashed var(--kof-red); padding: 12px 14px; border-radius: 8px; margin-bottom: 18px; font-size: 0.85rem; color: #2D3748; font-weight: 500; display: flex; justify-content: space-between; align-items: center; }
         
-        /* Banner inferior Coca-Cola Zero y aviso legal fijo a la izquierda */
-        .bottom-banner { background: rgba(18, 18, 18, 0.95); color: white; padding: 15px 20px; display: flex; flex-direction: column; md-flex-direction: row; justify-content: space-between; align-items: center; border-top: 3px solid var(--kof-red); position: fixed; bottom: 0; left: 0; width: 100%; z-index: 99; gap: 10px; }
-        .zero-tag { background: var(--kof-red); color: white; font-weight: 900; font-size: 0.75rem; padding: 4px 8px; border-radius: 4px; letter-spacing: 1px; }
-        footer.legal { font-size: 0.68rem; color: #E2E8F0; text-align: left; max-width: 600px; line-height: 1.3; }
+        .bottom-banner { background: rgba(18, 18, 18, 0.95); color: white; padding: 12px 20px; display: flex; flex-direction: column; justify-content: space-between; align-items: center; border-top: 3px solid var(--kof-red); position: fixed; bottom: 0; left: 0; width: 100%; z-index: 99; gap: 6px; }
+        @media(min-width: 600px) { .bottom-banner { flex-direction: row; } }
+        .zero-tag { background: var(--kof-red); color: white; font-weight: 900; font-size: 0.7rem; padding: 4px 8px; border-radius: 4px; letter-spacing: 1px; }
+        footer.legal { font-size: 0.65rem; color: #E2E8F0; text-align: left; max-width: 700px; line-height: 1.3; }
     </style>
 </head>
 <body>
 
-    <!-- Pantalla de Carga Inicial (Splash Screen) -->
     <div id="splashScreen">
         <div class="splash-logo">Coca-Cola FEMSA</div>
         <div class="splash-sub">Cargando Sistema Operativo...</div>
@@ -123,9 +127,7 @@
 
     <div class="main-layout">
         
-        <!-- COLUMNA IZQUIERDA: Formulario de Datos Personales y Registro -->
         <div>
-            <!-- Tarjeta de Datos del Personal (Obligatoria al principio) -->
             <div class="card" id="profileCard" style="display: none;">
                 <h2 class="section-title">👤 1. Datos del Colaborador</h2>
                 <div class="form-group">
@@ -145,7 +147,6 @@
                 <button type="button" class="btn-primary" onclick="guardarPerfil()">Fijar Datos Personales</button>
             </div>
 
-            <!-- Tarjeta de Registro Diario e Interactivo -->
             <div class="card" id="formCard" style="display: none;">
                 <div class="profile-summary" id="profileDisplay"></div>
                 <h2 class="section-title">📋 2. Registro y Carga Operativa</h2>
@@ -169,13 +170,11 @@
                         <input type="text" id="nroRuta" placeholder="Ej. R-402" required>
                     </div>
 
-                    <!-- Opción No Tengo Carga -->
                     <div class="checkbox-group">
                         <input type="checkbox" id="sinCarga" onchange="toggleCargas()">
                         <label for="sinCarga">No tengo carga asignada hoy</label>
                     </div>
 
-                    <!-- Sección de Cargas F1, F2, G1, G2 -->
                     <div id="seccionCargas">
                         <h3 style="font-size: 0.82rem; color:#4A5568; margin-bottom: 10px; text-transform: uppercase; font-weight: 700;">Desglose de Cargas</h3>
                         <div class="grid-2">
@@ -205,7 +204,6 @@
                         <input type="number" id="cajasDevueltas" min="0" value="0" oninput="calcularEnVivo()" required>
                     </div>
 
-                    <!-- Panel de Cálculo Interactivo en Vivo -->
                     <div class="live-calc-panel">
                         <div class="calc-box">
                             <span>Carga Total</span>
@@ -224,12 +222,11 @@
 
                     <button type="submit" class="btn-primary">Guardar Registro del Día</button>
                 </form>
-                <button type="button" class="btn-email" onclick="enviarCorreo()">✉️ Enviar Reporte por Correo</button>
+                <button type="button" class="btn-email" onclick="enviarCorreoAutomatico()">✉️ Enviar Reporte por Correo Automático</button>
                 <button type="button" style="background:none; border:none; color:#718096; font-size:0.75rem; width:100%; margin-top:12px; cursor:pointer; text-decoration:underline;" onclick="cambiarPerfil()">Modificar mis datos personales</button>
             </div>
         </div>
 
-        <!-- COLUMNA DERECHA: Historial Organizado por Tarjetas de Presentación (Días) -->
         <div>
             <div class="card">
                 <h2 class="section-title">📂 Historial por Días</h2>
@@ -244,7 +241,6 @@
 
     </div>
 
-    <!-- Banner Inferior Fijo con Producto Principal (Coca-Cola Zero) y Aviso Legal en Negritas a la Izquierda -->
     <div class="bottom-banner">
         <div>
             <span class="zero-tag">PRODUCTO PRINCIPAL: COCA-COLA ZERO</span>
@@ -437,7 +433,8 @@
             alert(`¡Registro guardado con éxito!\nCarga Total: ${cargaTotal} | Total Entregado: ${newRecord.totalEntregado}`);
         });
 
-        function enviarCorreo() {
+        // Función de Envío Automático Invisible con EmailJS
+        function enviarCorreoAutomatico() {
             const records = JSON.parse(localStorage.getItem('kof_records') || '[]');
             if (records.length === 0) {
                 alert('No hay registros en el historial para enviar.');
@@ -445,29 +442,41 @@
             }
 
             const ultimo = records[0];
-            const asunto = encodeURIComponent(`Reporte Operativo KOF - Ruta ${ultimo.nroRuta} (${ultimo.fecha})`);
-            const cuerpo = encodeURIComponent(
-                `REPORTE DE OPERACIONES - COCA-COLA FEMSA VENEZUELA\n\n` +
-                `Colaborador: ${ultimo.nombre}\n` +
-                `Cargo: ${ultimo.cargo} (${ultimo.anos} años de servicio)\n\n` +
-                `Fecha: ${ultimo.fecha}\n` +
-                `Número de Ruta: ${ultimo.nroRuta}\n` +
-                `Hora de Entrada: ${ultimo.horaEntrada} | Hora de Salida: ${ultimo.horaSalida}\n\n` +
-                `--- DESGLOSE DE CARGAS ---\n` +
-                `Carga F1: ${ultimo.f1}\n` +
-                `Carga F2: ${ultimo.f2}\n` +
-                `Carga G1: ${ultimo.g1}\n` +
-                `Carga G2: ${ultimo.g2}\n` +
-                `Carga Total General: ${ultimo.cargaTotal}\n\n` +
-                `--- BALANCE Y RESULTADOS ---\n` +
-                `Total Entregado Efectivo: ${ultimo.totalEntregado}\n` +
-                `Cajas Devueltas: ${ultimo.cajasDevueltas}\n\n` +
-                `--- PRODUCTOS PENDIENTES POR ENTREGAR ---\n` +
-                `${ultimo.productosPendientes || 'Ninguno'}\n\n` +
-                `[Aviso Legal: Documento generado para uso operativo interno de Coca-Cola FEMSA Venezuela. Todos los derechos reservados © 2026]`
-            );
 
-            window.location.href = `mailto:?subject=${asunto}&body=${cuerpo}`;
+            const templateParams = {
+                colaborador_nombre: ultimo.nombre,
+                cargo_colaborador: ultimo.cargo,
+                anos_servicio: ultimo.anos,
+                fecha: ultimo.fecha,
+                nro_ruta: ultimo.nroRuta,
+                hora_entrada: ultimo.horaEntrada,
+                hora_salida: ultimo.horaSalida,
+                carga_f1: ultimo.f1,
+                carga_f2: ultimo.f2,
+                carga_g1: ultimo.g1,
+                carga_g2: ultimo.g2,
+                carga_total: ultimo.cargaTotal,
+                total_entregado: ultimo.totalEntregado,
+                cajas_devueltas: ultimo.cajasDevueltas,
+                productos_pendientes: ultimo.productosPendientes || 'Ninguno'
+            };
+
+            // Deshabilitar botón temporalmente para evitar doble clic
+            const btn = event.target;
+            btn.innerText = "Enviando reporte...";
+            btn.disabled = true;
+
+            emailjs.send('service_khebtmo', 'template_bmxna4o', templateParams)
+                .then(function(response) {
+                    alert('¡Reporte enviado por correo con éxito de forma automática!');
+                    btn.innerText = "✉️ Enviar Reporte por Correo Automático";
+                    btn.disabled = false;
+                }, function(error) {
+                    alert('Error al enviar el correo. Verifica tu conexión a internet.');
+                    console.error('FAILED...', error);
+                    btn.innerText = "✉️ Enviar Reporte por Correo Automático";
+                    btn.disabled = false;
+                });
         }
 
         loadHistory();
