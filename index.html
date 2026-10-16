@@ -78,9 +78,6 @@
         .calc-box.highlight { background: #FFF5F5; border: 1px solid #FEB2B2; }
         .calc-box.highlight strong { color: var(--kof-red); }
 
-        .btn-primary { width: 100%; background: linear-gradient(135deg, var(--kof-red), var(--kof-dark-red)); color: white; border: none; padding: 14px; border-radius: 8px; font-size: 0.95rem; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 0.8px; box-shadow: 0 4px 12px rgba(230,0,0,0.3); transition: transform 0.1s, filter 0.2s; margin-top: 5px; }
-        .btn-primary:active { transform: scale(0.98); filter: brightness(0.9); }
-
         .btn-email { width: 100%; background: linear-gradient(135deg, #3182CE, #2B6CB0); color: white; border: none; padding: 14px; border-radius: 8px; font-size: 0.9rem; font-weight: 700; cursor: pointer; margin-top: 12px; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 10px rgba(49,130,206,0.3); transition: filter 0.2s; }
         .btn-email:hover { filter: brightness(1.1); }
 
@@ -159,13 +156,13 @@
                         </select>
                     </div>
                 </div>
-                <button type="button" class="btn-primary" onclick="guardarPerfil()">Fijar Datos Personales</button>
+                <button type="button" class="btn-email" onclick="guardarPerfil()">Fijar Datos Personales</button>
             </div>
 
             <div class="card" id="formCard" style="display: none;">
                 <div class="profile-summary" id="profileDisplay"></div>
                 <h2 class="section-title">📋 2. Registro y Carga Operativa</h2>
-                <form id="kofForm">
+                <form id="kofForm" onsubmit="event.preventDefault();">
                     <div class="form-group">
                         <label for="fecha">Fecha</label>
                         <input type="date" id="fecha" required>
@@ -234,12 +231,10 @@
                         <label for="productosPendientes">Productos por Entregar a Cliente (Pendientes)</label>
                         <textarea id="productosPendientes" placeholder="Ej. 1 unidad de 2L Coca-Cola negra, Bodega María, o por caja..."></textarea>
                     </div>
-
-                    <button type="submit" class="btn-primary" style="display:none;">Guardar (Oculto)</button>
                 </form>
                 
-                <!-- BOTÓN UNIFICADO: Guarda el registro y envía el correo de inmediato -->
-                <button type="button" class="btn-email" onclick="guardarYEnviarCorreo()">✉️ Enviar a Correo Electrónico y Guardar</button>
+                <!-- BOTÓN UNIFICADO DIRECTO -->
+                <button type="button" class="btn-email" onclick="guardarYEnviarCorreo()">✉️ Guardar y Enviar Correo a la Vez</button>
                 
                 <button type="button" style="background:none; border:none; color:#718096; font-size:0.75rem; width:100%; margin-top:12px; cursor:pointer; text-decoration:underline;" onclick="cambiarPerfil()">Modificar mis datos personales</button>
             </div>
@@ -403,7 +398,7 @@
             }
         }
 
-        // FUNCIÓN ÚNICA: Guarda el formulario y envía el correo automáticamente al mismo tiempo
+        // FUNCIÓN UNIFICADA DIRECTA
         function guardarYEnviarCorreo() {
             const nroRuta = document.getElementById('nroRuta').value.trim();
             const fecha = document.getElementById('fecha').value;
@@ -446,7 +441,7 @@
                 productosPendientes: document.getElementById('productosPendientes').value.trim()
             };
 
-            // Guardar en Historial Local
+            // Guardar en Historial Local de inmediato
             const records = JSON.parse(localStorage.getItem('kof_records') || '[]');
             records.unshift(newRecord);
             localStorage.setItem('kof_records', JSON.stringify(records));
@@ -479,9 +474,9 @@
 
             emailjs.send('service_khebtmo', 'template_bmxna4o', templateParams)
                 .then(function(response) {
-                    alert(`¡Registro guardado y reporte enviado con éxito a:\n${perfil.email}!`);
+                    alert(`¡Guardado y reporte enviado con éxito a:\n${perfil.email}!`);
                     
-                    // Limpiar formulario operativo tras enviar
+                    // Limpiar formulario operativo
                     document.getElementById('nroRuta').value = '';
                     document.getElementById('sinCarga').checked = false;
                     toggleCargas();
@@ -494,12 +489,12 @@
                     document.getElementById('fecha').valueAsDate = new Date();
                     calcularEnVivo();
 
-                    btn.innerText = "✉️ Enviar a Correo Electrónico y Guardar";
+                    btn.innerText = "✉️ Guardar y Enviar Correo a la Vez";
                     btn.disabled = false;
                 }, function(error) {
-                    alert('Registro guardado localmente, pero hubo un error al enviar el correo. Verifica tu conexión.');
+                    alert('Registro guardado localmente, pero falló el envío del correo. Revisa tu internet.');
                     console.error('FAILED...', error);
-                    btn.innerText = "✉️ Enviar a Correo Electrónico y Guardar";
+                    btn.innerText = "✉️ Guardar y Enviar Correo a la Vez";
                     btn.disabled = false;
                 });
         }
