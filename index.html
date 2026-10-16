@@ -88,6 +88,14 @@
         .calc-box.highlight { background: #FFF5F5; border: 1px solid #FEB2B2; }
         .calc-box.highlight strong { color: var(--kolab-red); }
 
+        /* Panel Acumulado Semanal Izquierda */
+        .weekly-summary-panel { background: #FFF9F9; border: 1px solid #FEB2B2; border-radius: 10px; padding: 14px; margin-bottom: 18px; }
+        .weekly-summary-panel h4 { font-size: 0.85rem; color: var(--kolab-red); text-transform: uppercase; font-weight: 800; margin-bottom: 8px; border-bottom: 1px dashed #FEB2B2; padding-bottom: 4px; }
+        .weekly-stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; text-align: center; margin-top: 8px; }
+        .weekly-box { background: white; padding: 8px; border-radius: 6px; border: 1px solid #E2E8F0; }
+        .weekly-box span { display: block; font-size: 0.65rem; color: #718096; text-transform: uppercase; font-weight: 700; }
+        .weekly-box strong { font-size: 1rem; color: #2D3748; font-weight: 800; }
+
         .btn-primary { width: 100%; background: linear-gradient(135deg, var(--kolab-red), var(--kolab-dark-red)); color: white; border: none; padding: 14px; border-radius: 8px; font-size: 0.95rem; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 0.8px; box-shadow: 0 4px 12px rgba(230,0,0,0.3); transition: transform 0.1s, filter 0.2s; margin-top: 5px; }
         .btn-primary:active { transform: scale(0.98); filter: brightness(0.9); }
 
@@ -127,6 +135,7 @@
         .collab-badge-card strong { color: #1A202C; }
         
         .history-body span { display: block; font-size: 0.8rem; color: #4A5568; margin-bottom: 4px; }
+        .incentive-badge { background: #EBF8FF; border: 1px solid #BEE3F8; color: #2B6CB0; padding: 8px; border-radius: 6px; margin-top: 8px; font-size: 0.78rem; font-weight: 700; }
         
         .empty-history { text-align: center; color: #A0AEC0; font-size: 0.85rem; padding: 30px 0; font-style: italic; }
         .profile-summary { background: #FFF5F5; border: 1px dashed var(--kolab-red); padding: 12px 14px; border-radius: 8px; margin-bottom: 18px; font-size: 0.85rem; color: #2D3748; font-weight: 500; display: flex; justify-content: space-between; align-items: center; }
@@ -287,6 +296,21 @@
             <div class="card" id="formCard" style="display: none;">
                 <div class="profile-summary" id="profileDisplay"></div>
                 
+                <!-- PANEL ACUMULADO SEMANAL (LUNES A VIERNES) EN LA PARTE IZQUIERDA -->
+                <div class="weekly-summary-panel">
+                    <h4>📊 Acumulado Semanal (Lunes a Viernes)</h4>
+                    <div class="weekly-stats-grid">
+                        <div class="weekly-box">
+                            <span>Total Cajas Entregadas</span>
+                            <strong id="weeklyTotalCajas">0</strong>
+                        </div>
+                        <div class="weekly-box" style="background: #FFF5F5; border-color: #FEB2B2;">
+                            <span>Incentivo Semanal Est.</span>
+                            <strong id="weeklyTotalIncentivo" style="color: var(--kolab-red);">Bs. 0,00</strong>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- BOTÓN DE EVENTOS Y PROMOCIONES -->
                 <button type="button" class="btn-promo" onclick="abrirPromociones()">⭐ Eventos y Promociones</button>
                 
@@ -351,7 +375,7 @@
                             <strong id="liveCargaTotal">0</strong>
                         </div>
                         <div class="calc-box highlight">
-                            <span>Total Entregado</span>
+                            <span>Total Entregado (Hoy)</span>
                             <strong id="liveTotalEntregado">0</strong>
                         </div>
                     </div>
@@ -401,6 +425,47 @@
         document.getElementById('fecha').valueAsDate = new Date();
         let codigoGeneradoTemp = '';
         let datosTemporalesRegistro = null;
+
+        // MATRIZ CENTRALIZADA DE INCENTIVOS (Basada en la tabla oficial)
+        const MATRIZ_INCENTIVOS = {
+            "Ayudante de descarga": [
+                { min: 300, max: 399, diarioBs: 1950, diarioUsd: 3.13, semBs: 9750, semUsd: 15.65, totalSemBs: 15960, totalSemUsd: 25.62 },
+                { min: 400, max: 499, diarioBs: 4325, diarioUsd: 6.94, semBs: 21625, semUsd: 34.71, totalSemBs: 27835, totalSemUsd: 44.68 },
+                { min: 500, max: 599, diarioBs: 4720, diarioUsd: 7.58, semBs: 23600, semUsd: 37.88, totalSemBs: 29810, totalSemUsd: 47.85 },
+                { min: 600, max: 699, diarioBs: 5090, diarioUsd: 8.17, semBs: 25450, semUsd: 40.85, totalSemBs: 31660, totalSemUsd: 50.82 },
+                { min: 700, max: 799, diarioBs: 5495, diarioUsd: 8.82, semBs: 27475, semUsd: 44.10, totalSemBs: 33685, totalSemUsd: 54.07 },
+                { min: 800, max: 899, diarioBs: 5880, diarioUsd: 9.44, semBs: 29400, semUsd: 47.19, totalSemBs: 35610, totalSemUsd: 57.16 },
+                { min: 900, max: 999, diarioBs: 6265, diarioUsd: 10.06, semBs: 31325, semUsd: 50.28, totalSemBs: 37535, totalSemUsd: 60.25 },
+                { min: 1000, max: 1099, diarioBs: 6635, diarioUsd: 10.65, semBs: 33175, semUsd: 53.25, totalSemBs: 39385, totalSemUsd: 63.22 },
+                { min: 1100, max: 1199, diarioBs: 8055, diarioUsd: 12.93, semBs: 40275, semUsd: 64.65, totalSemBs: 46485, totalSemUsd: 74.61 },
+                { min: 1200, max: 1299, diarioBs: 8865, diarioUsd: 14.23, semBs: 44325, semUsd: 71.15, totalSemBs: 50535, totalSemUsd: 81.12 }
+            ],
+            "Entregador": [
+                { min: 300, max: 399, diarioBs: 2370, diarioUsd: 3.80, semBs: 11850, semUsd: 19.02, totalSemBs: 18060, totalSemUsd: 28.99 },
+                { min: 400, max: 499, diarioBs: 4670, diarioUsd: 7.50, semBs: 23350, semUsd: 37.48, totalSemBs: 29560, totalSemUsd: 47.45 },
+                { min: 500, max: 599, diarioBs: 5550, diarioUsd: 8.91, semBs: 27750, semUsd: 44.54, totalSemBs: 33960, totalSemUsd: 54.51 },
+                { min: 600, max: 699, diarioBs: 6480, diarioUsd: 10.40, semBs: 32400, semUsd: 52.01, totalSemBs: 38610, totalSemUsd: 61.97 },
+                { min: 700, max: 799, diarioBs: 7080, diarioUsd: 11.36, semBs: 35400, semUsd: 56.82, totalSemBs: 41610, totalSemUsd: 66.79 },
+                { min: 800, max: 899, diarioBs: 7770, diarioUsd: 12.47, semBs: 38850, semUsd: 62.36, totalSemBs: 45060, totalSemUsd: 72.33 },
+                { min: 900, max: 999, diarioBs: 8190, diarioUsd: 13.15, semBs: 40950, semUsd: 65.73, totalSemBs: 47160, totalSemUsd: 75.70 },
+                { min: 1000, max: 1099, diarioBs: 8790, diarioUsd: 14.11, semBs: 43950, semUsd: 70.55, totalSemBs: 50160, totalSemUsd: 80.51 },
+                { min: 1100, max: 1199, diarioBs: 9410, diarioUsd: 15.10, semBs: 47050, semUsd: 75.52, totalSemBs: 53260, totalSemUsd: 85.49 },
+                { min: 1200, max: 1299, diarioBs: 9985, diarioUsd: 16.03, semBs: 49925, semUsd: 80.14, totalSemBs: 56135, totalSemUsd: 90.10 }
+            ]
+        };
+
+        function calcularIncentivoSegunCajas(cargo, cajas) {
+            const tabla = MATRIZ_INCENTIVOS[cargo];
+            if (!tabla) return null;
+            
+            // Buscar en el rango exacto
+            let fila = tabla.find(item => cajas >= item.min && cajas <= item.max);
+            if (!fila) {
+                if (cajas < 300) fila = tabla[0]; // Rango mínimo base
+                if (cajas >= 1300) fila = tabla[tabla.length - 1]; // Rango máximo
+            }
+            return fila;
+        }
 
         window.addEventListener('load', () => {
             setTimeout(() => {
@@ -640,13 +705,32 @@
             return dias[fecha.getDay()];
         }
 
+        function actualizarAcumuladoSemanal(records, perfil) {
+            let totalCajasSemana = 0;
+            let totalIncentivoSemanaBs = 0;
+
+            records.forEach(rec => {
+                totalCajasSemana += (rec.totalEntregado || 0);
+                const infoIncentivo = calcularIncentivoSegunCajas(perfil.cargo, rec.totalEntregado || 0);
+                if (infoIncentivo) {
+                    totalIncentivoSemanaBs += infoIncentivo.diarioBs;
+                }
+            });
+
+            document.getElementById('weeklyTotalCajas').innerText = totalCajasSemana;
+            document.getElementById('weeklyTotalIncentivo').innerText = `Bs. ${totalIncentivoSemanaBs.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        }
+
         function loadHistory() {
             const sesionActiva = localStorage.getItem('kolab_sesion_activa');
             if (!sesionActiva) return;
 
+            const perfil = JSON.parse(localStorage.getItem('kolab_profile_' + sesionActiva));
             const records = JSON.parse(localStorage.getItem('kolab_records_' + sesionActiva) || '[]');
             const historyList = document.getElementById('historyList');
             const deleteHistoryContainer = document.getElementById('deleteHistoryContainer');
+
+            actualizarAcumuladoSemanal(records, perfil);
 
             if (records.length === 0) {
                 historyList.innerHTML = '<div class="empty-history">No hay registros guardados aún.</div>';
@@ -658,6 +742,18 @@
             
             records.forEach((rec, index) => {
                 const diaNombre = obtenerDiaSemana(rec.fecha);
+                const infoIncentivo = calcularIncentivoSegunCajas(rec.cargo, rec.totalEntregado);
+
+                let incentivoHtml = '';
+                if (infoIncentivo) {
+                    incentivoHtml = `
+                        <div class="incentive-badge">
+                            💰 Incentivo (${rec.cargo}): Bs. ${infoIncentivo.diarioBs.toLocaleString()} ($${infoIncentivo.diarioUsd.toFixed(2)})<br>
+                            <small>Semanal (5d): Bs. ${infoIncentivo.semBs.toLocaleString()} ($${infoIncentivo.semUsd.toFixed(2)}) | Total c/cuota: Bs. ${infoIncentivo.totalSemBs.toLocaleString()}</small>
+                        </div>
+                    `;
+                }
+
                 const div = document.createElement('div');
                 div.className = 'history-card-item';
                 div.innerHTML = `
@@ -674,6 +770,7 @@
                         <span><strong>Cargas:</strong> F1:${rec.f1} | F2:${rec.f2} | G1:${rec.g1} | G2:${rec.g2} (<strong>Total: ${rec.cargaTotal}</strong>)</span>
                         <span><strong>Entregado Efectivo:</strong> ${rec.totalEntregado} | <strong>Devueltas:</strong> ${rec.cajasDevueltas}</span>
                         ${rec.productosPendientes ? `<span style="color:#C53030; margin-top:4px;"><strong>Pendientes:</strong> ${rec.productosPendientes}</span>` : ''}
+                        ${incentivoHtml}
                     </div>
                     <button type="button" class="btn-share-history" onclick="compartirHistorialPorCorreo(${index}, this)">✉️ Reenviar este reporte por correo</button>
                 `;
@@ -761,6 +858,9 @@
             const rec = records[index];
             if (!rec) return;
 
+            const infoIncentivo = calcularIncentivoSegunCajas(rec.cargo, rec.totalEntregado);
+            let detalleIncentivoTxt = infoIncentivo ? `Incentivo Diario: Bs. ${infoIncentivo.diarioBs} ($${infoIncentivo.diarioUsd.toFixed(2)})` : '';
+
             const templateParams = {
                 to_email: perfil.email,
                 email: perfil.email,
@@ -778,7 +878,7 @@
                 carga_total: rec.cargaTotal,
                 total_entregado: rec.totalEntregado,
                 cajas_devueltas: rec.cajasDevueltas,
-                productos_pendientes: rec.productosPendientes || 'Ninguno'
+                productos_pendientes: `${rec.productosPendientes || 'Ninguno'} | ${detalleIncentivoTxt}`
             };
 
             botonElement.innerText = "Enviando...";
