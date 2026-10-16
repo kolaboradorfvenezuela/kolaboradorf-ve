@@ -161,7 +161,7 @@
                 </div>
             </div>
 
-            <!-- 2. PANTALLA DE REGISTRO CON VERIFICACIÓN DE CÓDIGO -->
+            <!-- 2. PANTALLA DE REGISTRO CON SELECTOR DE CARGO (Ayudante de descarga / Entregador) -->
             <div class="card" id="registerCard" style="display: none;">
                 <h2 class="section-title">📝 Regístrate y Verifica Correo</h2>
                 
@@ -177,7 +177,11 @@
                         </div>
                         <div class="form-group">
                             <label for="regCargo">Cargo *</label>
-                            <input type="text" id="regCargo" placeholder="Ej. Ayudante de Entrega" required>
+                            <select id="regCargo" required>
+                                <option value="">Selecciona...</option>
+                                <option value="Ayudante de descarga">Ayudante de descarga</option>
+                                <option value="Entregador">Entregador</option>
+                            </select>
                         </div>
                     </div>
                     <div class="form-group">
@@ -288,7 +292,6 @@
                     </div>
                 </form>
                 
-                <!-- BOTÓN EXCLUSIVO DE GUARDAR -->
                 <button type="button" class="btn-email" onclick="guardarRegistroLocal()">💾 Guardar Registro</button>
                 <button type="button" style="background:none; border:none; color:#E53E3E; font-size:0.75rem; width:100%; margin-top:12px; cursor:pointer; font-weight:700;" onclick="cerrarSesion()">Cerrar Sesión</button>
             </div>
@@ -406,13 +409,13 @@
         function enviarCodigoVerificacion() {
             const nombre = document.getElementById('regNombre').value.trim();
             const anos = document.getElementById('regAnos').value.trim();
-            const cargo = document.getElementById('regCargo').value.trim();
+            const cargo = document.getElementById('regCargo').value;
             const emailUser = document.getElementById('emailUser').value.trim();
             const emailDomain = document.getElementById('emailDomain').value;
             const password = document.getElementById('regPassword').value.trim();
 
             if (!nombre || !anos || !cargo || !emailUser || !password) {
-                alert('Por favor, completa todos los campos del registro.');
+                alert('Por favor, completa todos los campos del registro (incluyendo tu cargo).');
                 return;
             }
 
@@ -583,7 +586,6 @@
             }
         }
 
-        // Función para guardar solo en el historial local
         function guardarRegistroLocal() {
             const sesionActiva = localStorage.getItem('kolab_sesion_activa');
             const perfil = JSON.parse(localStorage.getItem('kolab_profile_' + sesionActiva));
@@ -630,7 +632,6 @@
 
             alert(`¡Registro guardado con éxito en tu historial local!`);
             
-            // Limpiar formulario operativo
             document.getElementById('nroRuta').value = '';
             document.getElementById('sinCarga').checked = false;
             toggleCargas();
@@ -644,7 +645,6 @@
             calcularEnVivo();
         }
 
-        // Función para compartir/enviar un reporte específico del historial por correo
         function compartirHistorialPorCorreo(index) {
             const sesionActiva = localStorage.getItem('kolab_sesion_activa');
             const perfil = JSON.parse(localStorage.getItem('kolab_profile_' + sesionActiva));
