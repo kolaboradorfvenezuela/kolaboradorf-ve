@@ -160,15 +160,9 @@
                     </div>
                 </div>
 
-                <div class="grid-2">
-                    <div class="form-group">
-                        <label for="cajasBajas">Cajas Bajas / Averías</label>
-                        <input type="number" id="cajasBajas" min="0" value="0" oninput="calcularEnVivo()" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="cajasDevueltas">Cajas Devueltas</label>
-                        <input type="number" id="cajasDevueltas" min="0" value="0" oninput="calcularEnVivo()" required>
-                    </div>
+                <div class="form-group">
+                    <label for="cajasDevueltas">Cajas Devueltas</label>
+                    <input type="number" id="cajasDevueltas" min="0" value="0" oninput="calcularEnVivo()" required>
                 </div>
 
                 <!-- Panel de Cálculo Interactivo en Vivo -->
@@ -265,11 +259,10 @@
             const g1 = sinCarga ? 0 : (parseFloat(document.getElementById('cargaG1').value) || 0);
             const g2 = sinCarga ? 0 : (parseFloat(document.getElementById('cargaG2').value) || 0);
 
-            const cajasBajas = parseFloat(document.getElementById('cajasBajas').value) || 0;
             const cajasDevueltas = parseFloat(document.getElementById('cajasDevueltas').value) || 0;
 
             const cargaTotal = f1 + f2 + g1 + g2;
-            const totalEntregado = cargaTotal - cajasBajas - cajasDevueltas;
+            const totalEntregado = cargaTotal - cajasDevueltas;
 
             document.getElementById('liveCargaTotal').innerText = cargaTotal;
             document.getElementById('liveTotalEntregado').innerText = totalEntregado >= 0 ? totalEntregado : 0;
@@ -294,7 +287,7 @@
                         <span>Colaborador: ${rec.nombre} (${rec.cargo})</span>
                         <span>Horario: ${rec.horaEntrada} a ${rec.horaSalida}</span>
                         <span><strong>Cargas:</strong> F1: ${rec.f1} | F2: ${rec.f2} | G1: ${rec.g1} | G2: ${rec.g2} (<strong>Total: ${rec.cargaTotal}</strong>)</span>
-                        <span><strong>Entregado Efectivo:</strong> ${rec.totalEntregado} | <strong>Devueltas:</strong> ${rec.cajasDevueltas} | <strong>Bajas:</strong> ${rec.cajasBajas}</span>
+                        <span><strong>Entregado Efectivo:</strong> ${rec.totalEntregado} | <strong>Devueltas:</strong> ${rec.cajasDevueltas}</span>
                         ${rec.productosPendientes ? `<span style="color:#C53030; margin-top:2px;"><strong>Pendientes:</strong> ${rec.productosPendientes}</span>` : ''}
                     </div>
                 `;
@@ -312,11 +305,10 @@
             const g1 = sinCarga ? 0 : (parseFloat(document.getElementById('cargaG1').value) || 0);
             const g2 = sinCarga ? 0 : (parseFloat(document.getElementById('cargaG2').value) || 0);
 
-            const cajasBajas = parseFloat(document.getElementById('cajasBajas').value) || 0;
             const cajasDevueltas = parseFloat(document.getElementById('cajasDevueltas').value) || 0;
 
             const cargaTotal = f1 + f2 + g1 + g2;
-            const totalEntregado = cargaTotal - cajasBajas - cajasDevueltas;
+            const totalEntregado = cargaTotal - cajasDevueltas;
 
             const newRecord = {
                 nombre: perfil.nombre,
@@ -328,7 +320,6 @@
                 nroRuta: document.getElementById('nroRuta').value,
                 f1, f2, g1, g2,
                 cargaTotal,
-                cajasBajas,
                 cajasDevueltas,
                 totalEntregado: totalEntregado >= 0 ? totalEntregado : 0,
                 productosPendientes: document.getElementById('productosPendientes').value.trim()
@@ -346,7 +337,6 @@
             document.getElementById('cargaF2').value = 0;
             document.getElementById('cargaG1').value = 0;
             document.getElementById('cargaG2').value = 0;
-            document.getElementById('cajasBajas').value = 0;
             document.getElementById('cajasDevueltas').value = 0;
             document.getElementById('productosPendientes').value = '';
             document.getElementById('fecha').valueAsDate = new Date();
@@ -380,8 +370,7 @@
                 `Carga Total General: ${ultimo.cargaTotal}\n\n` +
                 `--- BALANCE Y RESULTADOS ---\n` +
                 `Total Entregado Efectivo: ${ultimo.totalEntregado}\n` +
-                `Cajas Devueltas: ${ultimo.cajasDevueltas}\n` +
-                `Cajas Bajas / Averías: ${ultimo.cajasBajas}\n\n` +
+                `Cajas Devueltas: ${ultimo.cajasDevueltas}\n\n` +
                 `--- PRODUCTOS PENDIENTES POR ENTREGAR ---\n` +
                 `${ultimo.productosPendientes || 'Ninguno'}\n\n` +
                 `[Aviso Legal: Documento generado para uso operativo interno de Coca-Cola FEMSA Venezuela. Todos los derechos reservados © 2026]`
