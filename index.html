@@ -152,6 +152,10 @@
                 <h2 class="section-title">📋 2. Registro y Carga Operativa</h2>
                 <form id="kofForm">
                     <div class="form-group">
+                        <label for="correoDestino">Correo de Destino (Supervisor / Destinatario) *</label>
+                        <input type="email" id="correoDestino" placeholder="Ej. supervisor@coca-colafemsa.com" required>
+                    </div>
+                    <div class="form-group">
                         <label for="fecha">Fecha</label>
                         <input type="date" id="fecha" required>
                     </div>
@@ -253,6 +257,7 @@
     <script>
         document.getElementById('fecha').valueAsDate = new Date();
 
+        // Cargar correo guardado previamente si existe
         window.addEventListener('load', () => {
             setTimeout(() => {
                 const splash = document.getElementById('splashScreen');
@@ -260,6 +265,11 @@
                 setTimeout(() => splash.style.display = 'none', 500);
             }, 800);
             verificarPerfil();
+
+            const correoGuardado = localStorage.getItem('kof_correo_destino');
+            if (correoGuardado) {
+                document.getElementById('correoDestino').value = correoGuardado;
+            }
         });
 
         function verificarPerfil() {
@@ -433,8 +443,18 @@
             alert(`¡Registro guardado con éxito!\nCarga Total: ${cargaTotal} | Total Entregado: ${newRecord.totalEntregado}`);
         });
 
-        // Función de Envío Automático Invisible con EmailJS
+        // Función de Envío Automático Invisible con EmailJS incluyendo Correo de Destino
         function enviarCorreoAutomatico() {
+            const correoDestino = document.getElementById('correoDestino').value.trim();
+            if (!correoDestino) {
+                alert('Por favor, ingresa un correo de destino válido.');
+                document.getElementById('correoDestino').focus();
+                return;
+            }
+
+            // Guardar el correo en el teléfono para que no tengas que escribirlo siempre
+            localStorage.setItem('kof_correo_destino', correoDestino);
+
             const records = JSON.parse(localStorage.getItem('kof_records') || '[]');
             if (records.length === 0) {
                 alert('No hay registros en el historial para enviar.');
@@ -444,6 +464,7 @@
             const ultimo = records[0];
 
             const templateParams = {
+                to_email: correoDestino,
                 colaborador_nombre: ultimo.nombre,
                 cargo_colaborador: ultimo.cargo,
                 anos_servicio: ultimo.anos,
@@ -461,14 +482,13 @@
                 productos_pendientes: ultimo.productosPendientes || 'Ninguno'
             };
 
-            // Deshabilitar botón temporalmente para evitar doble clic
             const btn = event.target;
             btn.innerText = "Enviando reporte...";
             btn.disabled = true;
 
             emailjs.send('service_khebtmo', 'template_bmxna4o', templateParams)
                 .then(function(response) {
-                    alert('¡Reporte enviado por correo con éxito de forma automática!');
+                    alert(`¡Reporte enviado con éxito de forma automática a:\n${correoDestino}!`);
                     btn.innerText = "✉️ Enviar Reporte por Correo Automático";
                     btn.disabled = false;
                 }, function(error) {
