@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control Operativo Pro | Coca-Cola FEMSA</title>
+    <title>Control Operativo Pro | KolabOradoF</title>
     <!-- Librería EmailJS para envío automático -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script type="text/javascript">
@@ -64,8 +64,11 @@
         textarea { resize: vertical; height: 80px; }
         
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        
         .email-input-group { display: grid; grid-template-columns: 1.2fr 1fr; gap: 8px; align-items: center; }
+
+        .auth-switch { text-align: center; margin-top: 15px; font-size: 0.85rem; color: #4A5568; }
+        .auth-switch a { color: var(--kof-red); font-weight: 700; text-decoration: none; cursor: pointer; }
+        .auth-switch a:hover { text-decoration: underline; }
 
         .checkbox-group { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; background: #FFF5F5; padding: 12px 14px; border-radius: 8px; border: 1.5px solid #FEB2B2; }
         .checkbox-group input { width: 22px; height: 22px; accent-color: var(--kof-red); cursor: pointer; }
@@ -77,6 +80,9 @@
         .calc-box strong { font-size: 1.15rem; color: var(--kof-black); font-weight: 800; }
         .calc-box.highlight { background: #FFF5F5; border: 1px solid #FEB2B2; }
         .calc-box.highlight strong { color: var(--kof-red); }
+
+        .btn-primary { width: 100%; background: linear-gradient(135deg, var(--kof-red), var(--kof-dark-red)); color: white; border: none; padding: 14px; border-radius: 8px; font-size: 0.95rem; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 0.8px; box-shadow: 0 4px 12px rgba(230,0,0,0.3); transition: transform 0.1s, filter 0.2s; margin-top: 5px; }
+        .btn-primary:active { transform: scale(0.98); filter: brightness(0.9); }
 
         .btn-email { width: 100%; background: linear-gradient(135deg, #3182CE, #2B6CB0); color: white; border: none; padding: 14px; border-radius: 8px; font-size: 0.9rem; font-weight: 700; cursor: pointer; margin-top: 12px; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 10px rgba(49,130,206,0.3); transition: filter 0.2s; }
         .btn-email:hover { filter: brightness(1.1); }
@@ -106,13 +112,13 @@
 <body>
 
     <div id="splashScreen">
-        <div class="splash-logo">Coca-Cola FEMSA</div>
+        <div class="splash-logo">KolabOradoF</div>
         <div class="splash-sub">Cargando Sistema Operativo...</div>
     </div>
 
     <nav>
         <div class="logo-container">
-            <div class="logo-img">Coca-Cola FEMSA</div>
+            <div class="logo-img">KolabOradoF</div>
         </div>
         <div class="user-nav-info" id="navUserInfo">
             <span>Venezuela</span> Sistema Pro
@@ -127,41 +133,71 @@
     <div class="main-layout">
         
         <div>
-            <div class="card" id="profileCard" style="display: none;">
-                <h2 class="section-title">👤 1. Datos del Colaborador</h2>
-                <div class="form-group">
-                    <label for="nombreColaborador">Nombre Completo *</label>
-                    <input type="text" id="nombreColaborador" placeholder="Ej. Dhermes Pérez" required>
-                </div>
-                <div class="grid-2">
+            <!-- 1. PANTALLA DE REGISTRO DE CUENTA NUEVA -->
+            <div class="card" id="registerCard" style="display: none;">
+                <h2 class="section-title">📝 Regístrate Aquí</h2>
+                <form id="registerForm" onsubmit="event.preventDefault(); procesarRegistro();">
                     <div class="form-group">
-                        <label for="anosServicio">Años de Servicio *</label>
-                        <input type="number" id="anosServicio" min="0" placeholder="Ej. 3" required>
+                        <label for="regNombre">Nombre Completo *</label>
+                        <input type="text" id="regNombre" placeholder="Ej. Dhermes Pérez" required>
+                    </div>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label for="regAnos">Años de Servicio *</label>
+                            <input type="number" id="regAnos" min="0" placeholder="Ej. 3" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="regCargo">Cargo *</label>
+                            <input type="text" id="regCargo" placeholder="Ej. Ayudante de Entrega" required>
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label for="cargoColaborador">Cargo *</label>
-                        <input type="text" id="cargoColaborador" placeholder="Ej. Ayudante de Entrega" required>
+                        <label for="emailUser">Correo Electrónico (Usuario) *</label>
+                        <div class="email-input-group">
+                            <input type="text" id="emailUser" placeholder="ej. derme73" required>
+                            <select id="emailDomain">
+                                <option value="@gmail.com">@gmail.com</option>
+                                <option value="@outlook.com">@outlook.com</option>
+                                <option value="@hotmail.com">@hotmail.com</option>
+                                <option value="@yahoo.es">@yahoo.es</option>
+                                <option value="@icloud.com">@icloud.com</option>
+                            </select>
+                        </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label for="emailUser">Correo Electrónico (Destino de reportes) *</label>
-                    <div class="email-input-group">
-                        <input type="text" id="emailUser" placeholder="ej. derme73" required>
-                        <select id="emailDomain">
-                            <option value="@gmail.com">@gmail.com</option>
-                            <option value="@outlook.com">@outlook.com</option>
-                            <option value="@hotmail.com">@hotmail.com</option>
-                            <option value="@yahoo.es">@yahoo.es</option>
-                            <option value="@icloud.com">@icloud.com</option>
-                        </select>
+                    <div class="form-group">
+                        <label for="regPassword">Crea una Contraseña de Acceso *</label>
+                        <input type="password" id="regPassword" placeholder="••••••••" required>
                     </div>
+                    <button type="submit" class="btn-primary">Crear Cuenta y Entrar</button>
+                </form>
+                <div class="auth-switch">
+                    ¿Ya tienes cuenta? <a onclick="mostrarLogin()">Inicia sesión aquí</a>
                 </div>
-                <button type="button" class="btn-email" onclick="guardarPerfil()">Fijar Datos Personales</button>
             </div>
 
+            <!-- 2. PANTALLA DE INICIO DE SESIÓN -->
+            <div class="card" id="loginCard" style="display: none;">
+                <h2 class="section-title">🔑 Iniciar Sesión</h2>
+                <form id="loginForm" onsubmit="event.preventDefault(); procesarLogin();">
+                    <div class="form-group">
+                        <label for="loginEmail">Correo Electrónico *</label>
+                        <input type="email" id="loginEmail" placeholder="Ej. derme73@gmail.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Contraseña *</label>
+                        <input type="password" id="loginPassword" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="btn-primary">Iniciar Sesión</button>
+                </form>
+                <div class="auth-switch">
+                    ¿No tienes cuenta? <a onclick="mostrarRegistro()">Regístrate aquí</a>
+                </div>
+            </div>
+
+            <!-- 3. PANEL OPERATIVO PRINCIPAL -->
             <div class="card" id="formCard" style="display: none;">
                 <div class="profile-summary" id="profileDisplay"></div>
-                <h2 class="section-title">📋 2. Registro y Carga Operativa</h2>
+                <h2 class="section-title">📋 Registro y Carga Operativa</h2>
                 <form id="kofForm" onsubmit="event.preventDefault();">
                     <div class="form-group">
                         <label for="fecha">Fecha</label>
@@ -229,14 +265,12 @@
 
                     <div class="form-group">
                         <label for="productosPendientes">Productos por Entregar a Cliente (Pendientes)</label>
-                        <textarea id="productosPendientes" placeholder="Ej. 1 unidad de 2L Coca-Cola negra, Bodega María, o por caja..."></textarea>
+                        <textarea id="productosPendientes" placeholder="Ej. 1 unidad de producto pendiente, Bodega María..."></textarea>
                     </div>
                 </form>
                 
-                <!-- BOTÓN UNIFICADO DIRECTO -->
                 <button type="button" class="btn-email" onclick="guardarYEnviarCorreo()">✉️ Guardar y Enviar Correo a la Vez</button>
-                
-                <button type="button" style="background:none; border:none; color:#718096; font-size:0.75rem; width:100%; margin-top:12px; cursor:pointer; text-decoration:underline;" onclick="cambiarPerfil()">Modificar mis datos personales</button>
+                <button type="button" style="background:none; border:none; color:#E53E3E; font-size:0.75rem; width:100%; margin-top:12px; cursor:pointer; font-weight:700;" onclick="cerrarSesion()">Cerrar Sesión</button>
             </div>
         </div>
 
@@ -244,7 +278,7 @@
             <div class="card">
                 <h2 class="section-title">📂 Historial por Días</h2>
                 <div id="historyList">
-                    <div class="empty-history">No hay registros guardados aún.</div>
+                    <div class="empty-history">Inicia sesión para ver tu historial.</div>
                 </div>
                 <div id="deleteHistoryContainer" style="display: none;">
                     <button type="button" class="btn-danger" onclick="borrarHistorial()">🗑️ Borrar Todo el Historial</button>
@@ -256,10 +290,10 @@
 
     <div class="bottom-banner">
         <div>
-            <span class="zero-tag">PRODUCTO PRINCIPAL: COCA-COLA ZERO</span>
+            <span class="zero-tag">SISTEMA: KOLABORADOF</span>
         </div>
         <footer class="legal">
-            <p><strong>Aviso Legal y Propiedad Intelectual: El contenido, marcas comerciales, logotipos y diseños de esta interfaz pertenecen exclusivamente a Coca-Cola FEMSA (KOFVE) y The Coca-Cola Company. Uso operativo interno bajo estricta responsabilidad del colaborador. Copyright © 2026 Todos los derechos reservados.</strong></p>
+            <p><strong>Aviso Legal y Propiedad Intelectual: El contenido, marcas comerciales, logotipos y diseños de esta interfaz pertenecen exclusivamente a KolabOradoF. Uso operativo interno bajo estricta responsabilidad del colaborador. Copyright © 2026 Todos los derechos reservados.</strong></p>
         </footer>
     </div>
 
@@ -272,46 +306,94 @@
                 splash.style.opacity = '0';
                 setTimeout(() => splash.style.display = 'none', 500);
             }, 800);
-            verificarPerfil();
+            comprobarEstadoSesion();
         });
 
-        function verificarPerfil() {
-            const perfil = JSON.parse(localStorage.getItem('kof_profile'));
+        function comprobarEstadoSesion() {
+            const sesionActiva = localStorage.getItem('kolab_sesion_activa');
             const navUserInfo = document.getElementById('navUserInfo');
-            
-            if (perfil) {
-                document.getElementById('profileCard').style.display = 'none';
-                document.getElementById('formCard').style.display = 'block';
-                navUserInfo.innerHTML = `${perfil.nombre}<span>${perfil.cargo}</span>`;
-                document.getElementById('profileDisplay').innerHTML = `<span><strong>Colaborador:</strong> ${perfil.nombre}<br><small>${perfil.cargo} (${perfil.anos} años) — ✉️ ${perfil.email}</small></span>`;
-            } else {
-                document.getElementById('profileCard').style.display = 'block';
-                document.getElementById('formCard').style.display = 'none';
-                navUserInfo.innerHTML = `Venezuela<span>Sistema Pro</span>`;
+
+            if (sesionActiva) {
+                const perfil = JSON.parse(localStorage.getItem('kolab_profile_' + sesionActiva));
+                if (perfil) {
+                    document.getElementById('registerCard').style.display = 'none';
+                    document.getElementById('loginCard').style.display = 'none';
+                    document.getElementById('formCard').style.display = 'block';
+                    navUserInfo.innerHTML = `${perfil.nombre}<span>${perfil.cargo}</span>`;
+                    document.getElementById('profileDisplay').innerHTML = `<span><strong>Colaborador:</strong> ${perfil.nombre}<br><small>${perfil.cargo} (${perfil.anos} años) — ✉️ ${perfil.email}</small></span>`;
+                    loadHistory();
+                    return;
+                }
             }
+            mostrarLogin();
         }
 
-        function guardarPerfil() {
-            const nombre = document.getElementById('nombreColaborador').value.trim();
-            const anos = document.getElementById('anosServicio').value.trim();
-            const cargo = document.getElementById('cargoColaborador').value.trim();
+        function mostrarRegistro() {
+            document.getElementById('loginCard').style.display = 'none';
+            document.getElementById('registerCard').style.display = 'block';
+            document.getElementById('formCard').style.display = 'none';
+            document.getElementById('historyList').innerHTML = '<div class="empty-history">Regístrate o inicia sesión para gestionar tus reportes.</div>';
+            document.getElementById('deleteHistoryContainer').style.display = 'none';
+            document.getElementById('navUserInfo').innerHTML = `Venezuela<span>Sistema Pro</span>`;
+        }
+
+        function mostrarLogin() {
+            document.getElementById('registerCard').style.display = 'none';
+            document.getElementById('loginCard').style.display = 'block';
+            document.getElementById('formCard').style.display = 'none';
+            document.getElementById('historyList').innerHTML = '<div class="empty-history">Inicia sesión para gestionar tus reportes.</div>';
+            document.getElementById('deleteHistoryContainer').style.display = 'none';
+            document.getElementById('navUserInfo').innerHTML = `Venezuela<span>Sistema Pro</span>`;
+        }
+
+        function procesarRegistro() {
+            const nombre = document.getElementById('regNombre').value.trim();
+            const anos = document.getElementById('regAnos').value.trim();
+            const cargo = document.getElementById('regCargo').value.trim();
             const emailUser = document.getElementById('emailUser').value.trim();
             const emailDomain = document.getElementById('emailDomain').value;
+            const password = document.getElementById('regPassword').value.trim();
 
-            if (!nombre || !anos || !cargo || !emailUser) {
-                alert('Por favor, completa todos los campos obligatorios del perfil.');
+            if (!nombre || !anos || !cargo || !emailUser || !password) {
+                alert('Por favor, completa todos los campos del registro.');
                 return;
             }
 
             const emailCompleto = emailUser + emailDomain;
-            const perfil = { nombre, anos, cargo, email: emailCompleto };
-            localStorage.setItem('kof_profile', JSON.stringify(perfil));
-            verificarPerfil();
+            const perfil = { nombre, anos, cargo, email: emailCompleto, password };
+
+            localStorage.setItem('kolab_profile_' + emailCompleto, JSON.stringify(perfil));
+            localStorage.setItem('kolab_sesion_activa', emailCompleto);
+
+            alert('¡Cuenta creada con éxito en KolabOradoF!');
+            comprobarEstadoSesion();
         }
 
-        function cambiarPerfil() {
-            localStorage.removeItem('kof_profile');
-            verificarPerfil();
+        function procesarLogin() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+
+            const perfilGuardado = localStorage.getItem('kolab_profile_' + email);
+            if (!perfilGuardado) {
+                alert('No existe ninguna cuenta registrada con este correo. Por favor regístrate.');
+                return;
+            }
+
+            const perfil = JSON.parse(perfilGuardado);
+            if (perfil.password !== password) {
+                alert('Contraseña incorrecta. Inténtalo de nuevo.');
+                return;
+            }
+
+            localStorage.setItem('kolab_sesion_activa', email);
+            alert(`¡Bienvenido de nuevo, ${perfil.nombre}!`);
+            comprobarEstadoSesion();
+        }
+
+        function cerrarSesion() {
+            localStorage.removeItem('kolab_sesion_activa');
+            alert('Has cerrado sesión correctamente.');
+            mostrarLogin();
         }
 
         function toggleCargas() {
@@ -345,9 +427,6 @@
             document.getElementById('liveTotalEntregado').innerText = totalEntregado >= 0 ? totalEntregado : 0;
         }
 
-        const historyList = document.getElementById('historyList');
-        const deleteHistoryContainer = document.getElementById('deleteHistoryContainer');
-
         function obtenerDiaSemana(fechaStr) {
             const dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
             const [year, month, day] = fechaStr.split('-');
@@ -356,7 +435,13 @@
         }
 
         function loadHistory() {
-            const records = JSON.parse(localStorage.getItem('kof_records') || '[]');
+            const sesionActiva = localStorage.getItem('kolab_sesion_activa');
+            if (!sesionActiva) return;
+
+            const records = JSON.parse(localStorage.getItem('kolab_records_' + sesionActiva) || '[]');
+            const historyList = document.getElementById('historyList');
+            const deleteHistoryContainer = document.getElementById('deleteHistoryContainer');
+
             if (records.length === 0) {
                 historyList.innerHTML = '<div class="empty-history">No hay registros guardados aún.</div>';
                 deleteHistoryContainer.style.display = 'none';
@@ -390,16 +475,19 @@
         }
 
         function borrarHistorial() {
-            const confirmar = confirm("¿Estás 100% seguro de que deseas eliminar todo el historial guardado en este dispositivo?");
-            if (confirmar) {
-                localStorage.removeItem('kof_records');
+            const sesionActiva = localStorage.getItem('kolab_sesion_activa');
+            const confirmar = confirm("¿Estás 100% seguro de que deseas eliminar todo tu historial guardado?");
+            if (confirmar && sesionActiva) {
+                localStorage.removeItem('kolab_records_' + sesionActiva);
                 loadHistory();
                 alert("El historial ha sido eliminado con éxito.");
             }
         }
 
-        // FUNCIÓN UNIFICADA DIRECTA
         function guardarYEnviarCorreo() {
+            const sesionActiva = localStorage.getItem('kolab_sesion_activa');
+            const perfil = JSON.parse(localStorage.getItem('kolab_profile_' + sesionActiva));
+
             const nroRuta = document.getElementById('nroRuta').value.trim();
             const fecha = document.getElementById('fecha').value;
             const horaEntrada = document.getElementById('horaEntrada').value;
@@ -407,12 +495,6 @@
 
             if (!nroRuta || !fecha || !horaEntrada || !horaSalida) {
                 alert('Por favor, completa los campos obligatorios de la ruta y horario.');
-                return;
-            }
-
-            const perfil = JSON.parse(localStorage.getItem('kof_profile'));
-            if (!perfil || !perfil.email) {
-                alert('No se encontró el correo del colaborador en el perfil.');
                 return;
             }
 
@@ -441,13 +523,11 @@
                 productosPendientes: document.getElementById('productosPendientes').value.trim()
             };
 
-            // Guardar en Historial Local de inmediato
-            const records = JSON.parse(localStorage.getItem('kof_records') || '[]');
+            const records = JSON.parse(localStorage.getItem('kolab_records_' + sesionActiva) || '[]');
             records.unshift(newRecord);
-            localStorage.setItem('kof_records', JSON.stringify(records));
+            localStorage.setItem('kolab_records_' + sesionActiva, JSON.stringify(records));
             loadHistory();
 
-            // Preparar parámetros para EmailJS
             const templateParams = {
                 to_email: perfil.email,
                 email: perfil.email,
@@ -471,35 +551,3 @@
             const btn = event.target;
             btn.innerText = "Guardando y Enviando...";
             btn.disabled = true;
-
-            emailjs.send('service_khebtmo', 'template_bmxna4o', templateParams)
-                .then(function(response) {
-                    alert(`¡Guardado y reporte enviado con éxito a:\n${perfil.email}!`);
-                    
-                    // Limpiar formulario operativo
-                    document.getElementById('nroRuta').value = '';
-                    document.getElementById('sinCarga').checked = false;
-                    toggleCargas();
-                    document.getElementById('cargaF1').value = 0;
-                    document.getElementById('cargaF2').value = 0;
-                    document.getElementById('cargaG1').value = 0;
-                    document.getElementById('cargaG2').value = 0;
-                    document.getElementById('cajasDevueltas').value = 0;
-                    document.getElementById('productosPendientes').value = '';
-                    document.getElementById('fecha').valueAsDate = new Date();
-                    calcularEnVivo();
-
-                    btn.innerText = "✉️ Guardar y Enviar Correo a la Vez";
-                    btn.disabled = false;
-                }, function(error) {
-                    alert('Registro guardado localmente, pero falló el envío del correo. Revisa tu internet.');
-                    console.error('FAILED...', error);
-                    btn.innerText = "✉️ Guardar y Enviar Correo a la Vez";
-                    btn.disabled = false;
-                });
-        }
-
-        loadHistory();
-    </script>
-</body>
-</html>
