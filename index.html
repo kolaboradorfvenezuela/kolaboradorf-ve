@@ -106,15 +106,18 @@
 
         /* Estilos del Muro de Promociones (Modal en la misma pestaña) */
         #promoModal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; display: none; justify-content: center; align-items: center; padding: 15px; backdrop-filter: blur(5px); }
-        .promo-modal-content { background: #FFFFFF; width: 100%; max-width: 650px; border-radius: 14px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.3); border-top: 6px solid #D69E2E; display: flex; flex-direction: column; max-height: 90vh; }
+        .promo-modal-content { background: #FFFFFF; width: 100%; max-width: 700px; border-radius: 14px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.3); border-top: 6px solid #D69E2E; display: flex; flex-direction: column; max-height: 90vh; }
         .promo-header { background: #1A202C; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
         .promo-header h3 { font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; color: #D69E2E; }
         .btn-close-modal { background: none; border: none; color: white; font-size: 1.2rem; cursor: pointer; font-weight: bold; }
         .promo-body { padding: 20px; overflow-y: auto; font-size: 0.9rem; color: #2D3748; line-height: 1.5; }
         .legal-disclaimer { background: #FFF5F5; border: 1px solid #FEB2B2; padding: 12px; border-radius: 8px; font-size: 0.78rem; color: #C53030; margin-bottom: 15px; font-weight: 600; text-align: center; }
+        
         .promo-feed-item { background: #F7FAFC; border: 1px solid #E2E8F0; border-left: 4px solid #D69E2E; padding: 14px; border-radius: 8px; margin-bottom: 12px; }
         .promo-feed-item h4 { font-size: 0.95rem; color: #1A202C; margin-bottom: 4px; }
-        .promo-feed-item p { font-size: 0.82rem; color: #4A5568; }
+        .promo-feed-item p { font-size: 0.82rem; color: #4A5568; margin-bottom: 8px; }
+        .promo-link { display: inline-block; font-size: 0.78rem; font-weight: 700; color: #3182CE; text-decoration: none; }
+        .promo-link:hover { text-decoration: underline; }
 
         .history-card-item { background: #FFFFFF; border-radius: 12px; padding: 16px; margin-bottom: 14px; border-left: 5px solid var(--kolab-red); box-shadow: 0 4px 12px rgba(0,0,0,0.06); border-top: 1px solid #E2E8F0; border-right: 1px solid #E2E8F0; border-bottom: 1px solid #E2E8F0; }
         .history-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #EDF2F7; padding-bottom: 8px; margin-bottom: 10px; }
@@ -148,7 +151,7 @@
         <div class="splash-sub">Cargando Sistema Operativo...</div>
     </div>
 
-    <!-- MODAL DE EVENTOS Y PROMOCIONES (Muro en la misma pestaña) -->
+    <!-- MODAL DE EVENTOS Y PROMOCIONES OFICIALES CON ENLACES DIRECTOS A LAS FUENTES -->
     <div id="promoModal">
         <div class="promo-modal-content">
             <div class="promo-header">
@@ -159,19 +162,24 @@
                 <div class="legal-disclaimer">
                     ⚠️ Aviso Legal: No nos hacemos responsables de lo que observas. Todo el contenido, marcas y derechos de propiedad intelectual pertenecen exclusivamente a la compañía internacional <strong>The Coca-Cola Company</strong> y a su licenciatario oficial en Venezuela (<strong>Coca-Cola FEMSA</strong>).
                 </div>
-                <p style="margin-bottom: 15px; font-size: 0.85rem; font-weight: 600; color: #4A5568;">Actualizaciones recientes sincronizadas de los portales oficiales globales y nacionales:</p>
+                <p style="margin-bottom: 15px; font-size: 0.85rem; font-weight: 600; color: #4A5568;">Información oficial sincronizada de los portales corporativos globales y nacionales:</p>
                 
                 <div class="promo-feed-item">
-                    <h4>🚀 Lanzamiento de Nuevas Presentaciones Comerciales</h4>
-                    <p>Conoce los nuevos formatos ecológicos y de distribución masiva incorporados este mes por la red logística oficial en territorio nacional.</p>
+                    <h4>🌐 Noticias y Actualidad Global (The Coca-Cola Company)</h4>
+                    <p>Accede a los comunicados oficiales, lanzamientos mundiales de productos, reportes de sostenibilidad y campañas institucionales a nivel internacional.</p>
+                    <a href="https://www.coca-colacompany.com/news" target="_blank" class="promo-link">🔗 Ver Sitio Oficial Global &rarr;</a>
                 </div>
+
                 <div class="promo-feed-item">
-                    <h4>🎯 Campaña de Incentivos Operativos y Logísticos</h4>
-                    <p>Revisión de metas de distribución, eficiencia en entrega y bonificaciones de rendimiento para ayudantes de descarga y entregadores.</p>
+                    <h4>🇻🇪 Operaciones, Empleo y Novedades en Venezuela (Coca-Cola FEMSA)</h4>
+                    <p>Información institucional acerca de la presencia de FEMSA en territorio venezolano, iniciativas comunitarias y desarrollo de talento humano.</p>
+                    <a href="https://coca-colafemsa.com/" target="_blank" class="promo-link">🔗 Ver Portal Oficial FEMSA &rarr;</a>
                 </div>
+
                 <div class="promo-feed-item">
-                    <h4>🌐 Novedades Corporativas Internacionales</h4>
-                    <p>Reportes de sostenibilidad, innovación tecnológica en flotas de reparto y optimización de rutas comerciales a nivel global.</p>
+                    <h4>📦 Distribución, Logística y Rendimiento Comercial</h4>
+                    <p>Lineamientos y pautas operativas enfocadas en la optimización de cargas, rutas y desempeño para ayudantes de descarga y entregadores.</p>
+                    <span style="font-size: 0.75rem; color: #718096; font-style: italic;">Actualizado automáticamente para el personal operativo.</span>
                 </div>
             </div>
         </div>
@@ -405,7 +413,6 @@
             cargarTasaBCV();
         });
 
-        // Funciones para abrir y cerrar el muro de Eventos y Promociones en la misma pestaña
         function abrirPromociones() {
             document.getElementById('promoModal').style.display = 'flex';
         }
@@ -744,7 +751,6 @@
             calcularEnVivo();
         }
 
-        // Función para compartir reporte con confirmación y restauración inmediata del botón
         function compartirHistorialPorCorreo(index, botonElement) {
             const confirmarEnvio = confirm("¿Deseas enviar este reporte por correo electrónico?");
             if (!confirmarEnvio) return;
