@@ -551,3 +551,32 @@
             const btn = event.target;
             btn.innerText = "Guardando y Enviando...";
             btn.disabled = true;
+
+            emailjs.send('service_khebtmo', 'template_bmxna4o', templateParams)
+                .then(function(response) {
+                    alert(`¡Guardado y reporte enviado con éxito por KolabOradoF a:\n${perfil.email}!`);
+                    
+                    document.getElementById('nroRuta').value = '';
+                    document.getElementById('sinCarga').checked = false;
+                    toggleCargas();
+                    document.getElementById('cargaF1').value = 0;
+                    document.getElementById('cargaF2').value = 0;
+                    document.getElementById('cargaG1').value = 0;
+                    document.getElementById('cargaG2').value = 0;
+                    document.getElementById('cajasDevueltas').value = 0;
+                    document.getElementById('productosPendientes').value = '';
+                    document.getElementById('fecha').valueAsDate = new Date();
+                    calcularEnVivo();
+
+                    btn.innerText = "✉️ Guardar y Enviar Correo a la Vez";
+                    btn.disabled = false;
+                }, function(error) {
+                    alert('Registro guardado localmente, pero falló el envío del correo. Revisa tu internet.');
+                    console.error('FAILED...', error);
+                    btn.innerText = "✉️ Guardar y Enviar Correo a la Vez";
+                    btn.disabled = false;
+                });
+        }
+    </script>
+</body>
+</html>
