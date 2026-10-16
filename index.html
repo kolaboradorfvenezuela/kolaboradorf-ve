@@ -3,46 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro Operativo - KOF</title>
+    <title>Control Operativo | Coca-Cola FEMSA Venezuela</title>
     <style>
         :root {
             --kof-red: #F40000;
             --kof-dark-red: #C50000;
-            --kof-black: #111111;
-            --kof-gray: #F4F4F4;
-            --kof-border: #E0E0E0;
+            --kof-black: #1a1a1a;
+            --kof-gray-bg: #f5f6f8;
+            --kof-border: #dcdcdc;
+            --kof-white: #ffffff;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-        body { background-color: var(--kof-gray); color: var(--kof-black); padding-bottom: 40px; }
-        header { background: linear-gradient(135deg, var(--kof-red), var(--kof-dark-red)); color: white; padding: 20px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        header h1 { font-size: 1.3rem; font-weight: 700; letter-spacing: 0.5px; }
-        header p { font-size: 0.85rem; opacity: 0.9; margin-top: 4px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; }
+        body { background-color: var(--kof-gray-bg); color: var(--kof-black); padding-bottom: 50px; }
+        
+        /* Barra de navegación estilo KOF */
+        nav { background-color: var(--kof-white); border-bottom: 3px solid var(--kof-red); padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .logo-container { display: flex; align-items: center; gap: 10px; }
+        .logo-badge { background-color: var(--kof-red); color: var(--kof-white); font-weight: 900; padding: 6px 12px; font-size: 0.9rem; letter-spacing: 1px; border-radius: 4px; }
+        .logo-text { font-size: 0.8rem; font-weight: 700; color: #55s; text-transform: uppercase; line-height: 1.1; }
+
+        header.hero { background: linear-gradient(135deg, var(--kof-red), #990000); color: white; padding: 25px 20px; text-align: center; }
+        header.hero h1 { font-size: 1.2rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        header.hero p { font-size: 0.8rem; opacity: 0.9; margin-top: 4px; }
+
         .container { max-width: 500px; margin: 20px auto; padding: 0 15px; }
-        .card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 20px; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; font-size: 0.85rem; font-weight: 600; color: #444; margin-bottom: 6px; }
-        input, select { width: 100%; padding: 12px; border: 1px solid var(--kof-border); border-radius: 8px; font-size: 1rem; background: #fafafa; }
+        .card { background: var(--kof-white); border-radius: 10px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px; border-top: 4px solid var(--kof-red); }
+        
+        h2.section-title { font-size: 0.95rem; color: #333; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--kof-border); padding-bottom: 6px; }
+        
+        .form-group { margin-bottom: 14px; }
+        label { display: block; font-size: 0.8rem; font-weight: 700; color: #444; margin-bottom: 5px; text-transform: uppercase; }
+        input, select { width: 100%; padding: 11px; border: 1px solid var(--kof-border); border-radius: 6px; font-size: 0.95rem; background: #fafafa; }
         input:focus, select:focus { outline: none; border-color: var(--kof-red); background: white; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        button.btn-primary { width: 100%; background: var(--kof-red); color: white; border: none; padding: 14px; border-radius: 8px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: background 0.2s; }
-        button.btn-primary:active { background: var(--kof-dark-red); }
-        .history-item { padding: 12px; border-bottom: 1px solid var(--kof-border); font-size: 0.85rem; display: flex; justify-content: space-between; align-items: center; }
-        .history-item:last-child { border-bottom: none; }
-        .history-info strong { display: block; color: var(--kof-black); font-size: 0.9rem; }
-        .history-info span { color: #666; font-size: 0.8rem; }
-        .badge { background: #ffebee; color: var(--kof-red); padding: 4px 8px; border-radius: 6px; font-weight: 600; font-size: 0.75rem; }
-        .empty-history { text-align: center; color: #888; font-size: 0.85rem; padding: 20px 0; }
+        
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        
+        .btn-primary { width: 100%; background: var(--kof-red); color: white; border: none; padding: 13px; border-radius: 6px; font-size: 0.95rem; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; transition: background 0.2s; margin-top: 5px; }
+        .btn-primary:active { background: var(--kof-dark-red); }
+
+        .btn-email { width: 100%; background: #2563eb; color: white; border: none; padding: 11px; border-radius: 6px; font-size: 0.85rem; font-weight: 700; cursor: pointer; margin-top: 10px; text-transform: uppercase; }
+        .btn-email:active { background: #1d4ed8; }
+
+        .history-item { padding: 12px; border-bottom: 1px solid var(--kof-border); font-size: 0.82rem; background: #fff; border-radius: 6px; margin-bottom: 8px; border-left: 3px solid var(--kof-red); box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+        .history-info strong { display: block; color: var(--kof-black); font-size: 0.88rem; margin-bottom: 3px; }
+        .history-info span { color: #666; display: block; margin-bottom: 2px; }
+        .badge-container { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+        .badge { background: #ffebee; color: var(--kof-red); padding: 3px 6px; border-radius: 4px; font-weight: 700; font-size: 0.72rem; }
+        
+        .empty-history { text-align: center; color: #888; font-size: 0.85rem; padding: 15px 0; }
+        .profile-summary { background: #fff8f8; border: 1px dashed var(--kof-red); padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 0.82rem; color: #333; }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>COCA-COLA FEMSA</h1>
-        <p>Control Operativo Diario</p>
+    <nav>
+        <div class="logo-container">
+            <div class="logo-badge">KOF</div>
+            <div class="logo-text">Coca-Cola FEMSA<br><span style="font-size:0.65rem; color:#777; font-weight:400;">Venezuela</span></div>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <h1>Control de Operaciones y Distribución</h1>
+        <p>Registro Diario de Jornada y Cajas</p>
     </header>
 
     <div class="container">
-        <div class="card">
+        
+        <!-- Tarjeta de Datos del Personal -->
+        <div class="card" id="profileCard">
+            <h2 class="section-title">1. Datos del Colaborador</h2>
+            <div class="form-group">
+                <label for="nombreColaborador">Nombre Completo *</label>
+                <input type="text" id="nombreColaborador" placeholder="Ej. Dhermes Pérez" required>
+            </div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label for="anosServicio">Años de Servicio *</label>
+                    <input type="number" id="anosServicio" min="0" placeholder="Ej. 3" required>
+                </div>
+                <div class="form-group">
+                    <label for="cargoColaborador">Cargo *</label>
+                    <input type="text" id="cargoColaborador" placeholder="Ej. Ayudante de Entrega" required>
+                </div>
+            </div>
+            <button type="button" class="btn-primary" onclick="guardarPerfil()">Fijar Datos Personales</button>
+        </div>
+
+        <!-- Tarjeta de Registro Diario (Oculta hasta rellenar perfil) -->
+        <div class="card" id="formCard" style="display: none;">
+            <div class="profile-summary" id="profileDisplay"></div>
+            <h2 class="section-title">2. Registro de Jornada</h2>
             <form id="kofForm">
                 <div class="form-group">
                     <label for="fecha">Fecha</label>
@@ -58,6 +109,10 @@
                         <input type="time" id="horaSalida" required>
                     </div>
                 </div>
+                <div class="form-group">
+                    <label for="nroRuta">Número de Ruta</label>
+                    <input type="text" id="nroRuta" placeholder="Ej. R-402" required>
+                </div>
                 <div class="grid-2">
                     <div class="form-group">
                         <label for="cajasBajas">Cajas Bajas</label>
@@ -68,16 +123,15 @@
                         <input type="number" id="cajasDevueltas" min="0" placeholder="0" required>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label for="nroRuta">Número de Ruta</label>
-                    <input type="text" id="nroRuta" placeholder="Ej. R-402" required>
-                </div>
-                <button type="submit" class="btn-primary">Guardar Registro</button>
+                <button type="submit" class="btn-primary">Guardar Registro del Día</button>
             </form>
+            <button type="button" class="btn-email" onclick="enviarCorreo()">Enviar Reporte por Correo</button>
+            <button type="button" style="background:none; border:none; color:#666; font-size:0.75rem; width:100%; margin-top:10px; cursor:pointer;" onclick="cambiarPerfil()">Modificar mis datos personales</button>
         </div>
 
+        <!-- Historial Local -->
         <div class="card">
-            <h3 style="font-size: 1rem; margin-bottom: 12px; color: #333;">Historial en este Teléfono</h3>
+            <h2 class="section-title">Historial en este Dispositivo</h2>
             <div id="historyList">
                 <div class="empty-history">No hay registros guardados aún.</div>
             </div>
@@ -86,6 +140,38 @@
 
     <script>
         document.getElementById('fecha').valueAsDate = new Date();
+
+        function verificarPerfil() {
+            const perfil = JSON.parse(localStorage.getItem('kof_profile'));
+            if (perfil) {
+                document.getElementById('profileCard').style.display = 'none';
+                document.getElementById('formCard').style.display = 'block';
+                document.getElementById('profileDisplay').innerHTML = `<strong>Colaborador:</strong> ${perfil.nombre} | <strong>Cargo:</strong> ${perfil.cargo} (${perfil.anos} años de servicio)`;
+            } else {
+                document.getElementById('profileCard').style.display = 'block';
+                document.getElementById('formCard').style.display = 'none';
+            }
+        }
+
+        function guardarPerfil() {
+            const nombre = document.getElementById('nombreColaborador').value.trim();
+            const anos = document.getElementById('anosServicio').value.trim();
+            const cargo = document.getElementById('cargoColaborador').value.trim();
+
+            if (!nombre || !anos || !cargo) {
+                alert('Por favor, completa todos los campos obligatorios del personal.');
+                return;
+            }
+
+            const perfil = { nombre, anos, cargo };
+            localStorage.setItem('kof_profile', JSON.stringify(perfil));
+            verificarPerfil();
+        }
+
+        function cambiarPerfil() {
+            localStorage.removeItem('kof_profile');
+            verificarPerfil();
+        }
 
         const form = document.getElementById('kofForm');
         const historyList = document.getElementById('historyList');
@@ -97,16 +183,18 @@
                 return;
             }
             historyList.innerHTML = '';
-            records.forEach((rec, index) => {
+            records.forEach((rec) => {
                 const div = document.createElement('div');
                 div.className = 'history-item';
                 div.innerHTML = `
                     <div class="history-info">
-                        <strong>Ruta: ${rec.nroRuta} (${rec.fecha})</strong>
+                        <strong>Ruta: ${rec.nroRuta} — Fecha: ${rec.fecha}</strong>
                         <span>Entrada: ${rec.horaEntrada} | Salida: ${rec.horaSalida}</span>
+                        <span>Colaborador: ${rec.nombre} (${rec.cargo}, ${rec.anos} años)</span>
                     </div>
-                    <div>
-                        <span class="badge">Bajas: ${rec.cajasBajas} | Dev: ${rec.cajasDevueltas}</span>
+                    <div class="badge-container">
+                        <span class="badge">Bajas: ${rec.cajasBajas}</span>
+                        <span class="badge">Devueltas: ${rec.cajasDevueltas}</span>
                     </div>
                 `;
                 historyList.appendChild(div);
@@ -115,25 +203,60 @@
 
         form.addEventListener('submit', (e) => {
             e.preventDefault();
+            const perfil = JSON.parse(localStorage.getItem('kof_profile'));
+
             const newRecord = {
+                nombre: perfil.nombre,
+                anos: perfil.anos,
+                cargo: perfil.cargo,
                 fecha: document.getElementById('fecha').value,
                 horaEntrada: document.getElementById('horaEntrada').value,
                 horaSalida: document.getElementById('horaSalida').value,
+                nroRuta: document.getElementById('nroRuta').value,
                 cajasBajas: document.getElementById('cajasBajas').value,
-                cajasDevueltas: document.getElementById('cajasDevueltas').value,
-                nroRuta: document.getElementById('nroRuta').value
+                cajasDevueltas: document.getElementById('cajasDevueltas').value
             };
 
             const records = JSON.parse(localStorage.getItem('kof_records') || '[]');
             records.unshift(newRecord);
             localStorage.setItem('kof_records', JSON.stringify(records));
 
-            form.reset();
+            // Limpiar solo los campos operativos
+            document.getElementById('nroRuta').value = '';
+            document.getElementById('cajasBajas').value = '';
+            document.getElementById('cajasDevueltas').value = '';
             document.getElementById('fecha').valueAsDate = new Date();
+
             loadHistory();
-            alert('¡Registro guardado con éxito!');
+            alert('¡Registro diario guardado con éxito!');
         });
 
+        function enviarCorreo() {
+            const records = JSON.parse(localStorage.getItem('kof_records') || '[]');
+            if (records.length === 0) {
+                alert('No hay registros en el historial para enviar.');
+                return;
+            }
+
+            const ultimo = records[0];
+            const asunto = encodeURIComponent(`Reporte Operativo KOF - Ruta ${ultimo.nroRuta} (${ultimo.fecha})`);
+            const cuerpo = encodeURIComponent(
+                `REPORTE DE OPERACIONES - COCA-COLA FEMSA VENEZUELA\n\n` +
+                `Colaborador: ${ultimo.nombre}\n` +
+                `Cargo: ${ultimo.cargo}\n` +
+                `Años de Servicio: ${ultimo.anos}\n\n` +
+                `Fecha: ${ultimo.fecha}\n` +
+                `Ruta: ${ultimo.nroRuta}\n` +
+                `Hora de Entrada: ${ultimo.horaEntrada}\n` +
+                `Hora de Salida: ${ultimo.horaSalida}\n` +
+                `Cajas Bajas: ${ultimo.cajasBajas}\n` +
+                `Cajas Devueltas: ${ultimo.cajasDevueltas}\n`
+            );
+
+            window.location.href = `mailto:?subject=${asunto}&body=${cuerpo}`;
+        }
+
+        verificarPerfil();
         loadHistory();
     </script>
 </body>
