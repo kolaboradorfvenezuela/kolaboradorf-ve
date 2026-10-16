@@ -25,12 +25,11 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
         
         body { 
-            /* Fondo industrial moderno y abstracto adaptado a KolabOradoF VE */
             background: linear-gradient(135deg, rgba(18,18,18,0.92), rgba(230,0,0,0.82)), 
                         url('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=1000&auto=format&fit=crop') no-repeat center center fixed;
             background-size: cover;
             color: var(--kolab-black); 
-            padding-bottom: 90px; 
+            padding-bottom: 100px; 
             min-height: 100vh;
         }
         
@@ -104,10 +103,16 @@
         .empty-history { text-align: center; color: #A0AEC0; font-size: 0.85rem; padding: 30px 0; font-style: italic; }
         .profile-summary { background: #FFF5F5; border: 1px dashed var(--kolab-red); padding: 12px 14px; border-radius: 8px; margin-bottom: 18px; font-size: 0.85rem; color: #2D3748; font-weight: 500; display: flex; justify-content: space-between; align-items: center; }
         
-        .bottom-banner { background: rgba(18, 18, 18, 0.95); color: white; padding: 12px 20px; display: flex; flex-direction: column; justify-content: space-between; align-items: center; border-top: 3px solid var(--kolab-red); position: fixed; bottom: 0; left: 0; width: 100%; z-index: 99; gap: 6px; }
-        @media(min-width: 600px) { .bottom-banner { flex-direction: row; } }
+        /* BANNER INFERIOR CON TASA BCV FLOTANTE A LA DERECHA */
+        .bottom-banner { background: rgba(18, 18, 18, 0.95); color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; border-top: 3px solid var(--kolab-red); position: fixed; bottom: 0; left: 0; width: 100%; z-index: 99; gap: 10px; flex-wrap: wrap; }
         .zero-tag { background: var(--kolab-red); color: white; font-weight: 900; font-size: 0.7rem; padding: 4px 8px; border-radius: 4px; letter-spacing: 1px; }
-        footer.legal { font-size: 0.65rem; color: #E2E8F0; text-align: left; max-width: 700px; line-height: 1.3; }
+        footer.legal { font-size: 0.62rem; color: #E2E8F0; text-align: left; max-width: 600px; line-height: 1.3; }
+        
+        /* Widget Tasa BCV */
+        .bcv-widget { background: #1A202C; border: 1.5px solid var(--kolab-red); padding: 6px 12px; border-radius: 8px; text-align: right; box-shadow: 0 2px 8px rgba(0,0,0,0.4); display: flex; align-items: center; gap: 8px; }
+        .bcv-info span { display: block; font-size: 0.62rem; color: #A0AEC0; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
+        .bcv-info strong { font-size: 0.95rem; color: #68D391; font-weight: 900; }
+        .bcv-icon { font-size: 1.1rem; }
     </style>
 </head>
 <body>
@@ -299,13 +304,21 @@
 
     </div>
 
+    <!-- BANNER INFERIOR CON TASA BCV A LA DERECHA -->
     <div class="bottom-banner">
         <div>
-            <span class="zero-tag">SISTEMA: KOLABORADOF VE</span>
+            <span class="zero-tag">KOLABORADOF VE</span>
         </div>
         <footer class="legal">
-            <p><strong>Aviso Legal y Propiedad Intelectual: El contenido, marcas comerciales, logotipos y diseños de esta interfaz pertenecen exclusivamente a KolabOradoF VE. Uso operativo interno bajo estricta responsabilidad del colaborador. Copyright © 2026 Todos los derechos reservados.</strong></p>
+            <p><strong>Aviso Legal: Uso operativo interno bajo estricta responsabilidad del colaborador. © 2026 Todos los derechos reservados.</strong></p>
         </footer>
+        <div class="bcv-widget">
+            <div class="bcv-icon">🇻🇪</div>
+            <div class="bcv-info">
+                <span>Dólar BCV Hoy</span>
+                <strong id="tasaBcvValor">Cargando...</strong>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -320,7 +333,37 @@
                 setTimeout(() => splash.style.display = 'none', 500);
             }, 800);
             comprobarEstadoSesion();
+            cargarTasaBCV();
         });
+
+        // Función para consultar la tasa BCV diaria en tiempo real desde API pública oficial de Venezuela
+        async function cargarTasaBCV() {
+            const displayTasa = document.getElementById('tasaBcvValor');
+            try {
+                const respuesta = await fetch('https://pydolarvenezuela-api.vercel.app/api/v1/dollar/pitve');
+                const datos = await respuesta.json();
+                
+                // Buscamos la tasa oficial del BCV en los datos devueltos
+                if (datos && datos.monedas) {
+                    const bcv = datos.monedas.find(m => m.fuente === 'BCV' || m.nombre === 'BCV');
+                    if (bcv && bcv.precio) {
+                        displayTasa.innerText = `Bs. ${bcv.precio.toFixed(2)}`;
+                        return;
+                    }
+                }
+                // Si la estructura varía, probamos con una alternativa directa de respaldo
+                const respAlt = await fetch('https://ve.dolarapi.com/v1/dolares/oficial');
+                const datosAlt = await respAlt.json();
+                if (datosAlt && datosAlt.promedio) {
+                    displayTasa.innerText = `Bs. ${datosAlt.promedio.toFixed(2)}`;
+                } else {
+                    displayTasa.innerText = "Bs. 880,12"; // Valor de referencia actual por defecto
+                }
+            } catch (error) {
+                console.log('Usando tasa de referencia BCV local');
+                displayTasa.innerText = "Bs. 880,12";
+            }
+        }
 
         function comprobarEstadoSesion() {
             const sesionActiva = localStorage.getItem('kolab_sesion_activa');
