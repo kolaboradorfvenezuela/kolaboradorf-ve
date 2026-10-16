@@ -16,11 +16,10 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; }
         body { background-color: var(--kof-gray-bg); color: var(--kof-black); padding-bottom: 50px; }
         
-        /* Barra de navegación estilo KOF */
         nav { background-color: var(--kof-white); border-bottom: 3px solid var(--kof-red); padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .logo-container { display: flex; align-items: center; gap: 10px; }
         .logo-badge { background-color: var(--kof-red); color: var(--kof-white); font-weight: 900; padding: 6px 12px; font-size: 0.9rem; letter-spacing: 1px; border-radius: 4px; }
-        .logo-text { font-size: 0.8rem; font-weight: 700; color: #55s; text-transform: uppercase; line-height: 1.1; }
+        .logo-text { font-size: 0.8rem; font-weight: 700; color: #444; text-transform: uppercase; line-height: 1.1; }
 
         header.hero { background: linear-gradient(135deg, var(--kof-red), #990000); color: white; padding: 25px 20px; text-align: center; }
         header.hero h1 { font-size: 1.2rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -33,8 +32,9 @@
         
         .form-group { margin-bottom: 14px; }
         label { display: block; font-size: 0.8rem; font-weight: 700; color: #444; margin-bottom: 5px; text-transform: uppercase; }
-        input, select { width: 100%; padding: 11px; border: 1px solid var(--kof-border); border-radius: 6px; font-size: 0.95rem; background: #fafafa; }
-        input:focus, select:focus { outline: none; border-color: var(--kof-red); background: white; }
+        input, select, textarea { width: 100%; padding: 11px; border: 1px solid var(--kof-border); border-radius: 6px; font-size: 0.95rem; background: #fafafa; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--kof-red); background: white; }
+        textarea { resize: vertical; height: 80px; }
         
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         
@@ -52,6 +52,8 @@
         
         .empty-history { text-align: center; color: #888; font-size: 0.85rem; padding: 15px 0; }
         .profile-summary { background: #fff8f8; border: 1px dashed var(--kof-red); padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 0.82rem; color: #333; }
+        
+        footer.legal { text-align: center; font-size: 0.7rem; color: #666; padding: 10px; line-height: 1.4; }
     </style>
 </head>
 <body>
@@ -65,7 +67,7 @@
 
     <header class="hero">
         <h1>Control de Operaciones y Distribución</h1>
-        <p>Registro Diario de Jornada y Cajas</p>
+        <p>Registro de Jornada, Cargas y Entregas</p>
     </header>
 
     <div class="container">
@@ -90,10 +92,10 @@
             <button type="button" class="btn-primary" onclick="guardarPerfil()">Fijar Datos Personales</button>
         </div>
 
-        <!-- Tarjeta de Registro Diario (Oculta hasta rellenar perfil) -->
+        <!-- Tarjeta de Registro Diario -->
         <div class="card" id="formCard" style="display: none;">
             <div class="profile-summary" id="profileDisplay"></div>
-            <h2 class="section-title">2. Registro de Jornada</h2>
+            <h2 class="section-title">2. Registro y Carga Operativa</h2>
             <form id="kofForm">
                 <div class="form-group">
                     <label for="fecha">Fecha</label>
@@ -113,9 +115,31 @@
                     <label for="nroRuta">Número de Ruta</label>
                     <input type="text" id="nroRuta" placeholder="Ej. R-402" required>
                 </div>
+                
                 <div class="grid-2">
                     <div class="form-group">
-                        <label for="cajasBajas">Cajas Bajas</label>
+                        <label for="cargaAsignada">Carga Asignada (Principal)</label>
+                        <input type="number" id="cargaAsignada" min="0" placeholder="Ej. 300" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="tipoCargaExtra">Tipo Carga Adicional (Opcional)</label>
+                        <select id="tipoCargaExtra">
+                            <option value="Ninguna">Ninguna</option>
+                            <option value="F2">F2</option>
+                            <option value="G1">G1</option>
+                            <option value="G2">G2</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="valorCargaExtra">Cantidad Carga Adicional (Si aplica)</label>
+                    <input type="number" id="valorCargaExtra" min="0" placeholder="0">
+                </div>
+
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="cajasBajas">Cajas Bajas / Averías</label>
                         <input type="number" id="cajasBajas" min="0" placeholder="0" required>
                     </div>
                     <div class="form-group">
@@ -123,6 +147,12 @@
                         <input type="number" id="cajasDevueltas" min="0" placeholder="0" required>
                     </div>
                 </div>
+
+                <div class="form-group">
+                    <label for="productosPendientes">Productos por Entregar a Cliente (Pendientes)</label>
+                    <textarea id="productosPendientes" placeholder="Ej. 1 unidad de 2L Coca-Cola negra, Bodega María, o por caja..."></textarea>
+                </div>
+
                 <button type="submit" class="btn-primary">Guardar Registro del Día</button>
             </form>
             <button type="button" class="btn-email" onclick="enviarCorreo()">Enviar Reporte por Correo</button>
@@ -136,6 +166,11 @@
                 <div class="empty-history">No hay registros guardados aún.</div>
             </div>
         </div>
+
+        <footer class="legal">
+            <p><strong>Aviso Legal y Propiedad Intelectual:</strong> El contenido, marcas comerciales, logotipos y diseños de esta interfaz pertenecen a Coca-Cola FEMSA (KOFVE) y The Coca-Cola Company. Uso exclusivo interno y operativo bajo estricta responsabilidad del usuario.</p>
+            <p style="margin-top: 4px;">Copyright © 2026 Todos los derechos reservados.</p>
+        </footer>
     </div>
 
     <script>
@@ -190,11 +225,10 @@
                     <div class="history-info">
                         <strong>Ruta: ${rec.nroRuta} — Fecha: ${rec.fecha}</strong>
                         <span>Entrada: ${rec.horaEntrada} | Salida: ${rec.horaSalida}</span>
-                        <span>Colaborador: ${rec.nombre} (${rec.cargo}, ${rec.anos} años)</span>
-                    </div>
-                    <div class="badge-container">
-                        <span class="badge">Bajas: ${rec.cajasBajas}</span>
-                        <span class="badge">Devueltas: ${rec.cajasDevueltas}</span>
+                        <span>Colaborador: ${rec.nombre} (${rec.cargo})</span>
+                        <span><strong>Carga Total:</strong> ${rec.cargaTotal} (Principal: ${rec.cargaAsignada} | Extra ${rec.tipoCargaExtra}: ${rec.valorCargaExtra})</span>
+                        <span><strong>Total Entregado:</strong> ${rec.totalEntregado} | <strong>Devueltas:</strong> ${rec.cajasDevueltas} | <strong>Bajas:</strong> ${rec.cajasBajas}</span>
+                        ${rec.productosPendientes ? `<span><strong>Pendientes cliente:</strong> ${rec.productosPendientes}</span>` : ''}
                     </div>
                 `;
                 historyList.appendChild(div);
@@ -205,6 +239,15 @@
             e.preventDefault();
             const perfil = JSON.parse(localStorage.getItem('kof_profile'));
 
+            const cargaAsignada = parseFloat(document.getElementById('cargaAsignada').value) || 0;
+            const tipoCargaExtra = document.getElementById('tipoCargaExtra').value;
+            const valorCargaExtra = parseFloat(document.getElementById('valorCargaExtra').value) || 0;
+            const cajasBajas = parseFloat(document.getElementById('cajasBajas').value) || 0;
+            const cajasDevueltas = parseFloat(document.getElementById('cajasDevueltas').value) || 0;
+
+            const cargaTotal = cargaAsignada + (tipoCargaExtra !== 'Ninguna' ? valorCargaExtra : 0);
+            const totalEntregado = cargaTotal - cajasBajas - cajasDevueltas;
+
             const newRecord = {
                 nombre: perfil.nombre,
                 anos: perfil.anos,
@@ -213,22 +256,32 @@
                 horaEntrada: document.getElementById('horaEntrada').value,
                 horaSalida: document.getElementById('horaSalida').value,
                 nroRuta: document.getElementById('nroRuta').value,
-                cajasBajas: document.getElementById('cajasBajas').value,
-                cajasDevueltas: document.getElementById('cajasDevueltas').value
+                cargaAsignada,
+                tipoCargaExtra: tipoCargaExtra !== 'Ninguna' ? tipoCargaExtra : 'Ninguna',
+                valorCargaExtra: tipoCargaExtra !== 'Ninguna' ? valorCargaExtra : 0,
+                cargaTotal,
+                cajasBajas,
+                cajasDevueltas,
+                totalEntregado: totalEntregado >= 0 ? totalEntregado : 0,
+                productosPendientes: document.getElementById('productosPendientes').value.trim()
             };
 
             const records = JSON.parse(localStorage.getItem('kof_records') || '[]');
             records.unshift(newRecord);
             localStorage.setItem('kof_records', JSON.stringify(records));
 
-            // Limpiar solo los campos operativos
+            // Limpiar formulario operativo
             document.getElementById('nroRuta').value = '';
+            document.getElementById('cargaAsignada').value = '';
+            document.getElementById('tipoCargaExtra').value = 'Ninguna';
+            document.getElementById('valorCargaExtra').value = '';
             document.getElementById('cajasBajas').value = '';
             document.getElementById('cajasDevueltas').value = '';
+            document.getElementById('productosPendientes').value = '';
             document.getElementById('fecha').valueAsDate = new Date();
 
             loadHistory();
-            alert('¡Registro diario guardado con éxito!');
+            alert(`¡Registro guardado con éxito!\nTotal entregado calculado: ${newRecord.totalEntregado} unidades/cajas.`);
         });
 
         function enviarCorreo() {
@@ -243,14 +296,21 @@
             const cuerpo = encodeURIComponent(
                 `REPORTE DE OPERACIONES - COCA-COLA FEMSA VENEZUELA\n\n` +
                 `Colaborador: ${ultimo.nombre}\n` +
-                `Cargo: ${ultimo.cargo}\n` +
-                `Años de Servicio: ${ultimo.anos}\n\n` +
+                `Cargo: ${ultimo.cargo} (${ultimo.anos} años de servicio)\n\n` +
                 `Fecha: ${ultimo.fecha}\n` +
-                `Ruta: ${ultimo.nroRuta}\n` +
-                `Hora de Entrada: ${ultimo.horaEntrada}\n` +
-                `Hora de Salida: ${ultimo.horaSalida}\n` +
-                `Cajas Bajas: ${ultimo.cajasBajas}\n` +
-                `Cajas Devueltas: ${ultimo.cajasDevueltas}\n`
+                `Número de Ruta: ${ultimo.nroRuta}\n` +
+                `Hora de Entrada: ${ultimo.horaEntrada} | Hora de Salida: ${ultimo.horaSalida}\n\n` +
+                `--- GESTIÓN DE CARGA ---\n` +
+                `Carga Principal Asignada: ${ultimo.cargaAsignada}\n` +
+                `Carga Adicional (${ultimo.tipoCargaExtra}): ${ultimo.valorCargaExtra}\n` +
+                `Carga Total del Día: ${ultimo.cargaTotal}\n\n` +
+                `--- RESULTADOS ---\n` +
+                `Total Entregado Efectivo: ${ultimo.totalEntregado}\n` +
+                `Cajas Devueltas: ${ultimo.cajasDevueltas}\n` +
+                `Cajas Bajas / Averías: ${ultimo.cajasBajas}\n\n` +
+                `--- PRODUCTOS PENDIENTES POR ENTREGAR ---\n` +
+                `${ultimo.productosPendientes || 'Ninguno'}\n\n` +
+                `[Aviso Legal: Documento generado para uso operativo interno de Coca-Cola FEMSA Venezuela. Todos los derechos reservados © 2026]`
             );
 
             window.location.href = `mailto:?subject=${asunto}&body=${cuerpo}`;
