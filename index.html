@@ -298,7 +298,7 @@
             <div class="card" id="formCard" style="display: none;">
                 <div class="profile-summary" id="profileDisplay"></div>
                 
-                <!-- PANEL ACUMULADO SEMANAL 100% EN DÓLARES CON REGLAS DE EFECTIVIDAD Y MÍNIMO DE DÍAS -->
+                <!-- PANEL ACUMULADO SEMANAL 100% EN DÓLARES CON EFECTIVIDAD PROGRESIVA -->
                 <div class="weekly-summary-panel">
                     <h4>📊 Acumulado Semanal (Lunes a Viernes)</h4>
                     <div class="weekly-stats-grid">
@@ -310,12 +310,16 @@
                             <span>Incentivo Diario Acumulado ($)</span>
                             <strong id="weeklyIncentivoPuro">$0.00</strong>
                         </div>
+                        <div class="weekly-box" style="background: #F0FFF4; border-color: #9AE6B4;">
+                            <span>Efectividad Acumulada Semana</span>
+                            <strong id="weeklyEfectividadPromedio" style="color: #276749;">0.0%</strong>
+                        </div>
                         <div class="weekly-box" style="background: #FFF5F5; border-color: #FEB2B2;">
                             <span>Total Semanal (c/ Efectividad $9.97)</span>
                             <strong id="weeklyTotalIncentivo" style="color: var(--kolab-red);">$0.00</strong>
                         </div>
                     </div>
-                    <div id="weeklyAlertBox" class="weekly-alert">⚠️ Faltan requisitos mínimos (Mín. 3 días laborados o <97% efectividad) para aplicar el bono de $9.97 de efectividad.</div>
+                    <div id="weeklyAlertBox" class="weekly-alert">⚠️ El promedio de efectividad actual es menor al 97%. Aún no aplica el bono de $9.97.</div>
                 </div>
 
                 <!-- BOTÓN DE EVENTOS Y PROMOCIONES -->
@@ -748,23 +752,23 @@
                 sumaPorcentajesEfectividad += calcularPorcentajeEfectividadDia(rec);
             });
 
-            let cumpleRequisitos = false;
+            // PROMEDIO ACUMULADO PROGRESIVO DE EFECTIVIDAD
             let promedioEfectividadSemanal = records.length > 0 ? (sumaPorcentajesEfectividad / records.length) : 0;
 
-            if (records.length >= 3 && promedioEfectividadSemanal >= 97) {
-                cumpleRequisitos = true;
-            }
+            // REGLA: Únicamente se evalúa que el promedio acumulado sea >= 97% (sin mínimo de días)
+            let cumpleRequisitos = (records.length > 0 && promedioEfectividadSemanal >= 97);
 
             const totalGeneralUsd = incentivoPuroUsd + (cumpleRequisitos ? EFECTIVIDAD_REPARTO_FIJA_USD : 0);
 
             document.getElementById('weeklyTotalCajas').innerText = totalCajasSemana;
             document.getElementById('weeklyIncentivoPuro').innerText = `$${incentivoPuroUsd.toFixed(2)}`;
+            document.getElementById('weeklyEfectividadPromedio').innerText = `${promedioEfectividadSemanal.toFixed(1)}%`;
             document.getElementById('weeklyTotalIncentivo').innerText = `$${totalGeneralUsd.toFixed(2)}`;
 
             const alertBox = document.getElementById('weeklyAlertBox');
             if (!cumpleRequisitos && records.length > 0) {
                 alertBox.style.display = 'block';
-                alertBox.innerText = `⚠️ Aún no cumples requisitos para el bono ($9.97): Tienes ${records.length} día(s) (Mín. 3) y promedio de efectividad ${promedioEfectividadSemanal.toFixed(1)}% (Mín. 97%).`;
+                alertBox.innerText = `⚠️ Promedio actual de efectividad: ${promedioEfectividadSemanal.toFixed(1)}% (Necesitas al menos 97.0% para activar el bono de $9.97).`;
             } else {
                 alertBox.style.display = 'none';
             }
@@ -866,7 +870,6 @@
             const cargaTotal = f1 + f2 + g1 + g2;
             const totalEntregado = cargaTotal - (cajasDevueltas + pepitosSnaps + introduccionesVacio); 
 
-            // Obtener la hora actual exacta de registro
             const ahora = new Date();
             const horaRegistro = ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
