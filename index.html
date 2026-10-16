@@ -91,10 +91,9 @@
         .btn-primary { width: 100%; background: linear-gradient(135deg, var(--kolab-red), var(--kolab-dark-red)); color: white; border: none; padding: 14px; border-radius: 8px; font-size: 0.95rem; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 0.8px; box-shadow: 0 4px 12px rgba(230,0,0,0.3); transition: transform 0.1s, filter 0.2s; margin-top: 5px; }
         .btn-primary:active { transform: scale(0.98); filter: brightness(0.9); }
 
-        .btn-email { width: 100%; background: linear-gradient(135deg, #3182CE, #2B6CB0); color: white; border: none; padding: 14px; border-radius: 8px; font-size: 0.9rem; font-weight: 700; cursor: pointer; margin-top: 12px; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 10px rgba(49,130,206,0.3); transition: filter 0.2s; }
+        .btn-email { width: 100%; background: linear-gradient(135deg, #3182CE, #2B6CB0); color: white; border: none; padding: 14px; border-radius: 8px; font-size: 0.90rem; font-weight: 700; cursor: pointer; margin-top: 12px; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 10px rgba(49,130,206,0.3); transition: filter 0.2s; }
         .btn-email:hover { filter: brightness(1.1); }
 
-        /* Botón de Eventos y Promociones en Panel Principal */
         .btn-promo { width: 100%; background: linear-gradient(135deg, #D69E2E, #B7791F); color: white; border: none; padding: 12px; border-radius: 8px; font-size: 0.9rem; font-weight: 700; cursor: pointer; margin-top: 10px; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 10px rgba(214,158,46,0.3); transition: filter 0.2s; }
         .btn-promo:hover { filter: brightness(1.1); }
 
@@ -104,20 +103,34 @@
         .btn-danger { width: 100%; background: #E53E3E; color: white; border: none; padding: 10px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; cursor: pointer; margin-top: 15px; text-transform: uppercase; letter-spacing: 0.5px; transition: background 0.2s; }
         .btn-danger:hover { background: #C53030; }
 
-        /* Estilos del Muro de Promociones (Modal en la misma pestaña) */
+        /* Estilos exactos inspirados en el Privacy Preference Center de la imagen */
         #promoModal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; display: none; justify-content: center; align-items: center; padding: 15px; backdrop-filter: blur(5px); }
-        .promo-modal-content { background: #FFFFFF; width: 100%; max-width: 700px; border-radius: 14px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.3); border-top: 6px solid #D69E2E; display: flex; flex-direction: column; max-height: 90vh; }
-        .promo-header { background: #1A202C; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
-        .promo-header h3 { font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; color: #D69E2E; }
-        .btn-close-modal { background: none; border: none; color: white; font-size: 1.2rem; cursor: pointer; font-weight: bold; }
-        .promo-body { padding: 20px; overflow-y: auto; font-size: 0.9rem; color: #2D3748; line-height: 1.5; }
-        .legal-disclaimer { background: #FFF5F5; border: 1px solid #FEB2B2; padding: 12px; border-radius: 8px; font-size: 0.78rem; color: #C53030; margin-bottom: 15px; font-weight: 600; text-align: center; }
+        .promo-modal-content { background: #F4F4F4; width: 100%; max-width: 520px; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.4); display: flex; flex-direction: column; max-height: 90vh; color: #121212; position: relative; }
+        .promo-modal-header { padding: 25px 25px 15px 25px; display: flex; justify-content: space-between; align-items: flex-start; }
+        .promo-modal-header h2 { font-size: 1.8rem; font-weight: 900; line-height: 1.1; letter-spacing: -0.5px; color: #121212; }
+        .btn-close-circle { background: #121212; border: none; color: white; width: 32px; height: 32px; border-radius: 50%; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; }
         
-        .promo-feed-item { background: #F7FAFC; border: 1px solid #E2E8F0; border-left: 4px solid #D69E2E; padding: 14px; border-radius: 8px; margin-bottom: 12px; }
-        .promo-feed-item h4 { font-size: 0.95rem; color: #1A202C; margin-bottom: 4px; }
-        .promo-feed-item p { font-size: 0.82rem; color: #4A5568; margin-bottom: 8px; }
-        .promo-link { display: inline-block; font-size: 0.78rem; font-weight: 700; color: #3182CE; text-decoration: none; }
-        .promo-link:hover { text-decoration: underline; }
+        .promo-modal-body { padding: 0 25px 25px 25px; overflow-y: auto; font-size: 0.88rem; color: #333333; line-height: 1.5; }
+        .privacy-desc { margin-bottom: 15px; }
+        .policy-link-text { font-weight: 700; color: #121212; text-decoration: underline; cursor: pointer; display: inline-block; margin-bottom: 20px; }
+
+        .legal-notice-box { background: #FFF5F5; border: 1px solid #FEB2B2; padding: 10px 12px; border-radius: 8px; font-size: 0.72rem; color: #C53030; margin-bottom: 20px; font-weight: 600; text-align: center; }
+
+        .pref-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid #E2E8F0; }
+        .pref-title { font-weight: 800; font-size: 0.95rem; color: #121212; }
+        .pref-status { font-size: 0.78rem; font-weight: 700; color: #666666; }
+
+        /* Estilo Switch Toggle */
+        .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #CCCCCC; transition: .3s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
+        input:checked + .slider { background-color: #121212; }
+        input:checked + .slider:before { transform: translateX(24px); }
+
+        .privacy-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 25px; }
+        .btn-privacy-black { width: 100%; background: #121212; color: white; border: none; padding: 15px; border-radius: 30px; font-size: 0.95rem; font-weight: 800; cursor: pointer; text-align: center; transition: background 0.2s; }
+        .btn-privacy-black:hover { background: #333333; }
 
         .history-card-item { background: #FFFFFF; border-radius: 12px; padding: 16px; margin-bottom: 14px; border-left: 5px solid var(--kolab-red); box-shadow: 0 4px 12px rgba(0,0,0,0.06); border-top: 1px solid #E2E8F0; border-right: 1px solid #E2E8F0; border-bottom: 1px solid #E2E8F0; }
         .history-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #EDF2F7; padding-bottom: 8px; margin-bottom: 10px; }
@@ -151,35 +164,64 @@
         <div class="splash-sub">Cargando Sistema Operativo...</div>
     </div>
 
-    <!-- MODAL DE EVENTOS Y PROMOCIONES OFICIALES CON ENLACES DIRECTOS A LAS FUENTES -->
+    <!-- PRIVACY PREFERENCE CENTER (Estilo exacto solicitado con botones negros e interruptores) -->
     <div id="promoModal">
         <div class="promo-modal-content">
-            <div class="promo-header">
-                <h3>⭐ Eventos y Promociones Oficiales</h3>
-                <button type="button" class="btn-close-modal" onclick="cerrarPromociones()">✕</button>
+            <div class="promo-modal-header">
+                <h2>Privacy Preference Center</h2>
+                <button type="button" class="btn-close-circle" onclick="cerrarPromociones()">✕</button>
             </div>
-            <div class="promo-body">
-                <div class="legal-disclaimer">
-                    ⚠️ Aviso Legal: No nos hacemos responsables de lo que observas. Todo el contenido, marcas y derechos de propiedad intelectual pertenecen exclusivamente a la compañía internacional <strong>The Coca-Cola Company</strong> y a su licenciatario oficial en Venezuela (<strong>Coca-Cola FEMSA</strong>).
+            <div class="promo-modal-body">
+                <div class="legal-notice-box">
+                    ⚠️ Aviso Legal Interno: Todo el contenido y marcas pertenecen exclusivamente a The Coca-Cola Company y Coca-Cola FEMSA Venezuela.
                 </div>
-                <p style="margin-bottom: 15px; font-size: 0.85rem; font-weight: 600; color: #4A5568;">Información oficial sincronizada de los portales corporativos globales y nacionales:</p>
                 
-                <div class="promo-feed-item">
-                    <h4>🌐 Noticias y Actualidad Global (The Coca-Cola Company)</h4>
-                    <p>Accede a los comunicados oficiales, lanzamientos mundiales de productos, reportes de sostenibilidad y campañas institucionales a nivel internacional.</p>
-                    <a href="https://www.coca-colacompany.com/news" target="_blank" class="promo-link">🔗 Ver Sitio Oficial Global &rarr;</a>
+                <p class="privacy-desc">
+                    Coca-Cola and Partners ("We") use cookies, to operate our website, to show you personalized content and manage our objectives as a business. You can find out more about how we use cookies below. You can allow all cookies, select them individually or decline them all.
+                </p>
+                <span class="policy-link-text" onclick="window.open('https://www.coca-colacompany.com/', '_blank')">Policy Link</span>
+
+                <div class="pref-item">
+                    <div>
+                        <div class="pref-title">Necessary</div>
+                    </div>
+                    <div class="pref-status">Always Active</div>
                 </div>
 
-                <div class="promo-feed-item">
-                    <h4>🇻🇪 Operaciones, Empleo y Novedades en Venezuela (Coca-Cola FEMSA)</h4>
-                    <p>Información institucional acerca de la presencia de FEMSA en territorio venezolano, iniciativas comunitarias y desarrollo de talento humano.</p>
-                    <a href="https://coca-colafemsa.com/" target="_blank" class="promo-link">🔗 Ver Portal Oficial FEMSA &rarr;</a>
+                <div class="pref-item">
+                    <div>
+                        <div class="pref-title">Analytics Cookies</div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="toggleAnalytics" checked>
+                        <span class="slider"></span>
+                    </label>
                 </div>
 
-                <div class="promo-feed-item">
-                    <h4>📦 Distribución, Logística y Rendimiento Comercial</h4>
-                    <p>Lineamientos y pautas operativas enfocadas en la optimización de cargas, rutas y desempeño para ayudantes de descarga y entregadores.</p>
-                    <span style="font-size: 0.75rem; color: #718096; font-style: italic;">Actualizado automáticamente para el personal operativo.</span>
+                <div class="pref-item">
+                    <div>
+                        <div class="pref-title">Advertising</div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="toggleAdvertising" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="pref-item">
+                    <div>
+                        <div class="pref-title">Personalization</div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="togglePersonalization" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="privacy-actions">
+                    <button type="button" class="btn-privacy-black" onclick="guardarPreferenciasPrivacidad('allowAll')">Allow All</button>
+                    <button type="button" class="btn-privacy-black" onclick="guardarPreferenciasPrivacidad('confirm')">Confirm My Choices</button>
+                    <button type="button" class="btn-privacy-black" onclick="guardarPreferenciasPrivacidad('rejectAll')">Reject All</button>
                 </div>
             </div>
         </div>
@@ -418,6 +460,27 @@
         }
         function cerrarPromociones() {
             document.getElementById('promoModal').style.display = 'none';
+        }
+
+        function guardarPreferenciasPrivacidad(tipo) {
+            const tAnalytics = document.getElementById('toggleAnalytics');
+            const tAdvertising = document.getElementById('toggleAdvertising');
+            const tPersonalization = document.getElementById('togglePersonalization');
+
+            if (tipo === 'allowAll') {
+                tAnalytics.checked = true;
+                tAdvertising.checked = true;
+                tPersonalization.checked = true;
+                alert("¡Preferencias guardadas: Todos los permisos permitidos!");
+            } else if (tipo === 'rejectAll') {
+                tAnalytics.checked = false;
+                tAdvertising.checked = false;
+                tPersonalization.checked = false;
+                alert("¡Preferencias guardadas: Todos los permisos rechazados!");
+            } else {
+                alert("¡Preferencias personalizadas guardadas con éxito!");
+            }
+            cerrarPromociones();
         }
 
         async function cargarTasaBCV() {
