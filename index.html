@@ -133,13 +133,32 @@
     <div class="main-layout">
         
         <div>
-            <!-- 1. PANTALLA DE REGISTRO DE CUENTA NUEVA -->
+            <!-- 1. PANTALLA DE INICIO DE SESIÓN (ÚNICA VISTA INICIAL) -->
+            <div class="card" id="loginCard">
+                <h2 class="section-title">🔑 Iniciar Sesión</h2>
+                <form id="loginForm" onsubmit="event.preventDefault(); procesarLogin();">
+                    <div class="form-group">
+                        <label for="loginEmail">Correo Electrónico *</label>
+                        <input type="email" id="loginEmail" placeholder="Ej. alezander@gmail.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Contraseña *</label>
+                        <input type="password" id="loginPassword" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="btn-primary">Iniciar Sesión</button>
+                </form>
+                <div class="auth-switch">
+                    ¿No tienes cuenta? <a onclick="mostrarRegistro()">Regístrate aquí</a>
+                </div>
+            </div>
+
+            <!-- 2. PANTALLA DE REGISTRO DE CUENTA NUEVA -->
             <div class="card" id="registerCard" style="display: none;">
                 <h2 class="section-title">📝 Regístrate Aquí</h2>
                 <form id="registerForm" onsubmit="event.preventDefault(); procesarRegistro();">
                     <div class="form-group">
                         <label for="regNombre">Nombre Completo *</label>
-                        <input type="text" id="regNombre" placeholder="Ej. Dhermes Pérez" required>
+                        <input type="text" id="regNombre" placeholder="Ej. Alezander Cabrera" required>
                     </div>
                     <div class="grid-2">
                         <div class="form-group">
@@ -154,7 +173,7 @@
                     <div class="form-group">
                         <label for="emailUser">Correo Electrónico (Usuario) *</label>
                         <div class="email-input-group">
-                            <input type="text" id="emailUser" placeholder="ej. derme73" required>
+                            <input type="text" id="emailUser" placeholder="ej. alezander" required>
                             <select id="emailDomain">
                                 <option value="@gmail.com">@gmail.com</option>
                                 <option value="@outlook.com">@outlook.com</option>
@@ -172,25 +191,6 @@
                 </form>
                 <div class="auth-switch">
                     ¿Ya tienes cuenta? <a onclick="mostrarLogin()">Inicia sesión aquí</a>
-                </div>
-            </div>
-
-            <!-- 2. PANTALLA DE INICIO DE SESIÓN -->
-            <div class="card" id="loginCard" style="display: none;">
-                <h2 class="section-title">🔑 Iniciar Sesión</h2>
-                <form id="loginForm" onsubmit="event.preventDefault(); procesarLogin();">
-                    <div class="form-group">
-                        <label for="loginEmail">Correo Electrónico *</label>
-                        <input type="email" id="loginEmail" placeholder="Ej. derme73@gmail.com" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="loginPassword">Contraseña *</label>
-                        <input type="password" id="loginPassword" placeholder="••••••••" required>
-                    </div>
-                    <button type="submit" class="btn-primary">Iniciar Sesión</button>
-                </form>
-                <div class="auth-switch">
-                    ¿No tienes cuenta? <a onclick="mostrarRegistro()">Regístrate aquí</a>
                 </div>
             </div>
 
