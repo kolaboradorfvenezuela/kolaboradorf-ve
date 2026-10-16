@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control Operativo Pro | KolabOradoF VE</title>
+    <title>Control Operativo Pro | Kolaboradorf VE</title>
     <!-- Librería EmailJS para envío automático -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script type="text/javascript">
@@ -95,6 +95,7 @@
         .weekly-box { background: white; padding: 10px; border-radius: 6px; border: 1px solid #E2E8F0; }
         .weekly-box span { display: block; font-size: 0.65rem; color: #718096; text-transform: uppercase; font-weight: 700; }
         .weekly-box strong { font-size: 1.05rem; color: #2D3748; font-weight: 800; }
+        .weekly-alert { background: #FFF5F5; color: #C53030; font-size: 0.72rem; font-weight: 700; padding: 6px; border-radius: 4px; margin-top: 8px; text-align: center; border: 1px solid #FEB2B2; display: none; }
 
         .btn-primary { width: 100%; background: linear-gradient(135deg, var(--kolab-red), var(--kolab-dark-red)); color: white; border: none; padding: 14px; border-radius: 8px; font-size: 0.95rem; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 0.8px; box-shadow: 0 4px 12px rgba(230,0,0,0.3); transition: transform 0.1s, filter 0.2s; margin-top: 5px; }
         .btn-primary:active { transform: scale(0.98); filter: brightness(0.9); }
@@ -156,7 +157,7 @@
 <body>
 
     <div id="splashScreen">
-        <div class="splash-logo">KolabOradoF VE</div>
+        <div class="splash-logo">Kolaboradorf VE</div>
         <div class="splash-sub">Cargando Sistema Operativo...</div>
     </div>
 
@@ -196,7 +197,7 @@
 
     <nav>
         <div class="logo-container">
-            <div class="logo-img">KolabOradoF VE</div>
+            <div class="logo-img">Kolaboradorf VE</div>
         </div>
         <div class="user-nav-container" id="navUserContainer" style="display: none;">
             <div class="user-nav-info" id="navUserInfo"></div>
@@ -297,7 +298,7 @@
             <div class="card" id="formCard" style="display: none;">
                 <div class="profile-summary" id="profileDisplay"></div>
                 
-                <!-- PANEL ACUMULADO SEMANAL CON EFECTIVIDAD FIJA -->
+                <!-- PANEL ACUMULADO SEMANAL 100% EN DÓLARES CON REGLAS DE EFECTIVIDAD Y MÍNIMO DE DÍAS -->
                 <div class="weekly-summary-panel">
                     <h4>📊 Acumulado Semanal (Lunes a Viernes)</h4>
                     <div class="weekly-stats-grid">
@@ -306,14 +307,15 @@
                             <strong id="weeklyTotalCajas">0</strong>
                         </div>
                         <div class="weekly-box">
-                            <span>Incentivo Diario Acumulado</span>
-                            <strong id="weeklyIncentivoPuro">Bs. 0,00</strong>
+                            <span>Incentivo Diario Acumulado ($)</span>
+                            <strong id="weeklyIncentivoPuro">$0.00</strong>
                         </div>
                         <div class="weekly-box" style="background: #FFF5F5; border-color: #FEB2B2;">
-                            <span>Total Semanal (c/ Efectividad Fija Bs. 6.210)</span>
-                            <strong id="weeklyTotalIncentivo" style="color: var(--kolab-red);">Bs. 0,00</strong>
+                            <span>Total Semanal (c/ Efectividad $9.97)</span>
+                            <strong id="weeklyTotalIncentivo" style="color: var(--kolab-red);">$0.00</strong>
                         </div>
                     </div>
+                    <div id="weeklyAlertBox" class="weekly-alert">⚠️ Faltan requisitos mínimos (Mín. 3 días laborados o <97% efectividad) para aplicar el bono de $9.97 de efectividad.</div>
                 </div>
 
                 <!-- BOTÓN DE EVENTOS Y PROMOCIONES -->
@@ -423,7 +425,7 @@
     <!-- BANNER INFERIOR CON TASA BCV A LA DERECHA -->
     <div class="bottom-banner">
         <div>
-            <span class="zero-tag">KOLABORADOF VE</span>
+            <span class="zero-tag">KOLABORADORF VE</span>
         </div>
         <footer class="legal">
             <p><strong>Aviso Legal: Uso operativo interno bajo estricta responsabilidad del colaborador. © 2026 Todos los derechos reservados.</strong></p>
@@ -442,34 +444,34 @@
         let codigoGeneradoTemp = '';
         let datosTemporalesRegistro = null;
 
-        // VALOR FIJO DE EFECTIVIDAD DE REPARTO (Según tabla oficial: 6.210 Bs / $9.97)
-        const EFECTIVIDAD_REPARTO_FIJA_BS = 6210;
+        // VALOR FIJO DE EFECTIVIDAD DE REPARTO EN DÓLARES ($9.97)
+        const EFECTIVIDAD_REPARTO_FIJA_USD = 9.97;
 
-        // MATRIZ CENTRALIZADA DE INCENTIVOS (Basada en la tabla oficial)
+        // MATRIZ CENTRALIZADA DE INCENTIVOS EN DÓLARES ($)
         const MATRIZ_INCENTIVOS = {
             "Ayudante de descarga": [
-                { min: 300, max: 399, diarioBs: 1950, diarioUsd: 3.13, semBs: 9750, semUsd: 15.65 },
-                { min: 400, max: 499, diarioBs: 4325, diarioUsd: 6.94, semBs: 21625, semUsd: 34.71 },
-                { min: 500, max: 599, diarioBs: 4720, diarioUsd: 7.58, semBs: 23600, semUsd: 37.88 },
-                { min: 600, max: 699, diarioBs: 5090, diarioUsd: 8.17, semBs: 25450, semUsd: 40.85 },
-                { min: 700, max: 799, diarioBs: 5495, diarioUsd: 8.82, semBs: 27475, semUsd: 44.10 },
-                { min: 800, max: 899, diarioBs: 5880, diarioUsd: 9.44, semBs: 29400, semUsd: 47.19 },
-                { min: 900, max: 999, diarioBs: 6265, diarioUsd: 10.06, semBs: 31325, semUsd: 50.28 },
-                { min: 1000, max: 1099, diarioBs: 6635, diarioUsd: 10.65, semBs: 33175, semUsd: 53.25 },
-                { min: 1100, max: 1199, diarioBs: 8055, diarioUsd: 12.93, semBs: 40275, semUsd: 64.65 },
-                { min: 1200, max: 1299, diarioBs: 8865, diarioUsd: 14.23, semBs: 44325, semUsd: 71.15 }
+                { min: 300, max: 399, diarioUsd: 3.13, semUsd: 15.65 },
+                { min: 400, max: 499, diarioUsd: 6.94, semUsd: 34.71 },
+                { min: 500, max: 599, diarioUsd: 7.58, semUsd: 37.88 },
+                { min: 600, max: 699, diarioUsd: 8.17, semUsd: 40.85 },
+                { min: 700, max: 799, diarioUsd: 8.82, semUsd: 44.10 },
+                { min: 800, max: 899, diarioUsd: 9.44, semUsd: 47.19 },
+                { min: 900, max: 999, diarioUsd: 10.06, semUsd: 50.28 },
+                { min: 1000, max: 1099, diarioUsd: 10.65, semUsd: 53.25 },
+                { min: 1100, max: 1199, diarioUsd: 12.93, semUsd: 64.65 },
+                { min: 1200, max: 1299, diarioUsd: 14.23, semUsd: 71.15 }
             ],
             "Entregador": [
-                { min: 300, max: 399, diarioBs: 2370, diarioUsd: 3.80, semBs: 11850, semUsd: 19.02 },
-                { min: 400, max: 499, diarioBs: 4670, diarioUsd: 7.50, semBs: 23350, semUsd: 37.48 },
-                { min: 500, max: 599, diarioBs: 5550, diarioUsd: 8.91, semBs: 27750, semUsd: 44.54 },
-                { min: 600, max: 699, diarioBs: 6480, diarioUsd: 10.40, semBs: 32400, semUsd: 52.01 },
-                { min: 700, max: 799, diarioBs: 7080, diarioUsd: 11.36, semBs: 35400, semUsd: 56.82 },
-                { min: 800, max: 899, diarioBs: 7770, diarioUsd: 12.47, semBs: 38850, semUsd: 62.36 },
-                { min: 900, max: 999, diarioBs: 8190, diarioUsd: 13.15, semBs: 40950, semUsd: 65.73 },
-                { min: 1000, max: 1099, diarioBs: 8790, diarioUsd: 14.11, semBs: 43950, semUsd: 70.55 },
-                { min: 1100, max: 1199, diarioBs: 9410, diarioUsd: 15.10, semBs: 47050, semUsd: 75.52 },
-                { min: 1200, max: 1299, diarioBs: 9985, diarioUsd: 16.03, semBs: 49925, semUsd: 80.14 }
+                { min: 300, max: 399, diarioUsd: 3.80, semUsd: 19.02 },
+                { min: 400, max: 499, diarioUsd: 7.50, semUsd: 37.48 },
+                { min: 500, max: 599, diarioUsd: 8.91, semUsd: 44.54 },
+                { min: 600, max: 699, diarioUsd: 10.40, semUsd: 52.01 },
+                { min: 700, max: 799, diarioUsd: 11.36, semUsd: 56.82 },
+                { min: 800, max: 899, diarioUsd: 12.47, semUsd: 62.36 },
+                { min: 900, max: 999, diarioUsd: 13.15, semUsd: 65.73 },
+                { min: 1000, max: 1099, diarioUsd: 14.11, semUsd: 70.55 },
+                { min: 1100, max: 1199, diarioUsd: 15.10, semUsd: 75.52 },
+                { min: 1200, max: 1299, diarioUsd: 16.03, semUsd: 80.14 }
             ]
         };
 
@@ -608,7 +610,7 @@
                 hora_salida: "--",
                 carga_f1: 0, carga_f2: 0, carga_g1: 0, carga_g2: 0,
                 carga_total: 0, total_entregado: 0, cajas_devueltas: 0,
-                productos_pendientes: `Tu código de verificación de KolabOradoF VE es: ${codigoGeneradoTemp}`
+                productos_pendientes: `Tu código de verificación de Kolaboradorf VE es: ${codigoGeneradoTemp}`
             };
 
             emailjs.send('service_khebtmo', 'template_bmxna4o', templateParams)
@@ -635,7 +637,7 @@
             localStorage.setItem('kolab_profile_' + datosTemporalesRegistro.email, JSON.stringify(datosTemporalesRegistro));
             localStorage.setItem('kolab_sesion_activa', datosTemporalesRegistro.email);
 
-            alert('¡Correo verificado y cuenta creada con éxito en KolabOradoF VE!');
+            alert('¡Correo verificado y cuenta creada con éxito en Kolaboradorf VE!');
             comprobarEstadoSesion();
         }
 
@@ -673,7 +675,7 @@
             const confirmar1 = confirm("⚠️ ¿Estás completamente seguro de que deseas eliminar tu cuenta?\n\nEsta acción borrará tu perfil y todo tu historial guardado de este dispositivo, y tendrás que registrarte nuevamente si deseas ingresar en el futuro.");
             
             if (confirmar1) {
-                const confirmar2 = confirm("🚨 ÚLTIMA ADVERTENCIA: ¿Confirmas la eliminación permanente de tu cuenta en KolabOradoF VE?");
+                const confirmar2 = confirm("🚨 ÚLTIMA ADVERTENCIA: ¿Confirmas la eliminación permanente de tu cuenta en Kolaboradorf VE?");
                 if (confirmar2) {
                     localStorage.removeItem('kolab_profile_' + sesionActiva);
                     localStorage.removeItem('kolab_records_' + sesionActiva);
@@ -725,23 +727,47 @@
             return dias[fecha.getDay()];
         }
 
+        function calcularPorcentajeEfectividadDia(rec) {
+            if (rec.cargaTotal <= 0) return 100;
+            const entregadoOperativo = rec.totalEntregado + (rec.pepitosSnaps || 0) + (rec.introduccionesVacio || 0);
+            let pct = (entregadoOperativo / rec.cargaTotal) * 100;
+            return Math.max(0, Math.min(100, pct));
+        }
+
         function actualizarAcumuladoSemanal(records, perfil) {
             let totalCajasSemana = 0;
-            let incentivoPuroBs = 0;
+            let incentivoPuroUsd = 0;
+            let sumaPorcentajesEfectividad = 0;
 
             records.forEach(rec => {
                 totalCajasSemana += (rec.totalEntregado || 0);
                 const infoIncentivo = calcularIncentivoSegunCajas(perfil.cargo, rec.totalEntregado || 0);
                 if (infoIncentivo) {
-                    incentivoPuroBs += infoIncentivo.diarioBs;
+                    incentivoPuroUsd += infoIncentivo.diarioUsd;
                 }
+                sumaPorcentajesEfectividad += calcularPorcentajeEfectividadDia(rec);
             });
 
-            const totalGeneralBs = incentivoPuroBs + EFECTIVIDAD_REPARTO_FIJA_BS;
+            let cumpleRequisitos = false;
+            let promedioEfectividadSemanal = records.length > 0 ? (sumaPorcentajesEfectividad / records.length) : 0;
+
+            if (records.length >= 3 && promedioEfectividadSemanal >= 97) {
+                cumpleRequisitos = true;
+            }
+
+            const totalGeneralUsd = incentivoPuroUsd + (cumpleRequisitos ? EFECTIVIDAD_REPARTO_FIJA_USD : 0);
 
             document.getElementById('weeklyTotalCajas').innerText = totalCajasSemana;
-            document.getElementById('weeklyIncentivoPuro').innerText = `Bs. ${incentivoPuroBs.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-            document.getElementById('weeklyTotalIncentivo').innerText = `Bs. ${totalGeneralBs.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            document.getElementById('weeklyIncentivoPuro').innerText = `$${incentivoPuroUsd.toFixed(2)}`;
+            document.getElementById('weeklyTotalIncentivo').innerText = `$${totalGeneralUsd.toFixed(2)}`;
+
+            const alertBox = document.getElementById('weeklyAlertBox');
+            if (!cumpleRequisitos && records.length > 0) {
+                alertBox.style.display = 'block';
+                alertBox.innerText = `⚠️ Aún no cumples requisitos para el bono ($9.97): Tienes ${records.length} día(s) (Mín. 3) y promedio de efectividad ${promedioEfectividadSemanal.toFixed(1)}% (Mín. 97%).`;
+            } else {
+                alertBox.style.display = 'none';
+            }
         }
 
         function loadHistory() {
@@ -766,19 +792,14 @@
             records.forEach((rec, index) => {
                 const diaNombre = obtenerDiaSemana(rec.fecha);
                 const infoIncentivo = calcularIncentivoSegunCajas(rec.cargo, rec.totalEntregado);
-
-                // Cálculo del porcentaje de cumplimiento del día
-                let porcentajeCumplimiento = 100;
-                if (rec.cargaTotal > 0) {
-                    porcentajeCumplimiento = Math.max(0, Math.min(100, (rec.totalEntregado / rec.cargaTotal) * 100));
-                }
+                const porcentajeCumplimiento = calcularPorcentajeEfectividadDia(rec);
 
                 let incentivoHtml = '';
                 if (infoIncentivo) {
                     incentivoHtml = `
                         <div class="incentive-badge">
-                            💰 Incentivo Diario (${rec.cargo}): Bs. ${infoIncentivo.diarioBs.toLocaleString()} ($${infoIncentivo.diarioUsd.toFixed(2)})<br>
-                            <small>Base Semanal (5d): Bs. ${infoIncentivo.semBs.toLocaleString()} | + Efectividad Fija: Bs. 6.210</small>
+                            💰 Incentivo Diario (${rec.cargo}): $${infoIncentivo.diarioUsd.toFixed(2)}<br>
+                            <small>Base Semanal (5d): $${infoIncentivo.semUsd.toFixed(2)} | + Efectividad Fija: $9.97</small>
                         </div>
                     `;
                 }
@@ -788,7 +809,7 @@
                 div.innerHTML = `
                     <div class="history-header">
                         <span class="history-day">${diaNombre}</span>
-                        <span class="history-date">${rec.fecha}</span>
+                        <span class="history-date">${rec.fecha} ${rec.horaRegistro ? '— ' + rec.horaRegistro : ''}</span>
                     </div>
                     <div class="collab-badge-card">
                         <strong>${rec.nombre}</strong><br>
@@ -798,7 +819,7 @@
                         <span><strong>Ruta:</strong> ${rec.nroRuta} | <strong>Horario:</strong> ${rec.horaEntrada} - ${rec.horaSalida}</span>
                         <span><strong>Cargas:</strong> F1:${rec.f1} | F2:${rec.f2} | G1:${rec.g1} | G2:${rec.g2} (<strong>Total Bruto: ${rec.cargaTotal}</strong>)</span>
                         <span><strong>Entregado Efectivo (Neto):</strong> ${rec.totalEntregado} | <strong>Devueltas:</strong> ${rec.cajasDevueltas} | <strong>Pepitos:</strong> ${rec.pepitosSnaps || 0} | <strong>Introd. Vacío:</strong> ${rec.introduccionesVacio || 0}</span>
-                        <div><span class="compliance-badge">📈 Cumplimiento del Día: ${porcentajeCumplimiento.toFixed(1)}%</span></div>
+                        <div><span class="compliance-badge">📈 Efectividad del Día: ${porcentajeCumplimiento.toFixed(1)}%</span></div>
                         ${rec.productosPendientes ? `<span style="color:#C53030; margin-top:4px;"><strong>Pendientes:</strong> ${rec.productosPendientes}</span>` : ''}
                         ${incentivoHtml}
                     </div>
@@ -843,13 +864,18 @@
             const introduccionesVacio = parseFloat(document.getElementById('introduccionesVacio').value) || 0;
 
             const cargaTotal = f1 + f2 + g1 + g2;
-            const totalEntregado = cargaTotal - (cajasDevueltas + pepitosSnaps + introduccionesVacio); // REGLA: Descontar devoluciones, pepitos e introducciones
+            const totalEntregado = cargaTotal - (cajasDevueltas + pepitosSnaps + introduccionesVacio); 
+
+            // Obtener la hora actual exacta de registro
+            const ahora = new Date();
+            const horaRegistro = ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
             const newRecord = {
                 nombre: perfil.nombre,
                 anos: perfil.anos,
                 cargo: perfil.cargo,
                 fecha: fecha,
+                horaRegistro: horaRegistro,
                 horaEntrada: horaEntrada,
                 horaSalida: horaSalida,
                 nroRuta: nroRuta,
@@ -867,7 +893,7 @@
             localStorage.setItem('kolab_records_' + sesionActiva, JSON.stringify(records));
             loadHistory();
 
-            alert(`¡Registro guardado con éxito en tu historial local!`);
+            alert(`¡Registro guardado con éxito a las ${horaRegistro}!`);
             
             document.getElementById('nroRuta').value = '';
             document.getElementById('sinCarga').checked = false;
@@ -896,7 +922,7 @@
             if (!rec) return;
 
             const infoIncentivo = calcularIncentivoSegunCajas(rec.cargo, rec.totalEntregado);
-            let detalleIncentivoTxt = infoIncentivo ? `Incentivo Diario: Bs. ${infoIncentivo.diarioBs} ($${infoIncentivo.diarioUsd.toFixed(2)})` : '';
+            let detalleIncentivoTxt = infoIncentivo ? `Incentivo Diario: $${infoIncentivo.diarioUsd.toFixed(2)}` : '';
 
             const templateParams = {
                 to_email: perfil.email,
@@ -904,7 +930,7 @@
                 colaborador_nombre: rec.nombre,
                 cargo_colaborador: rec.cargo,
                 anos_servicio: rec.anos,
-                fecha: rec.fecha,
+                fecha: `${rec.fecha} (Registrado a las ${rec.horaRegistro || '--'})`,
                 nro_ruta: rec.nroRuta,
                 hora_entrada: rec.horaEntrada,
                 hora_salida: rec.horaSalida,
