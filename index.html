@@ -81,7 +81,7 @@
         .btn-primary { width: 100%; background: linear-gradient(135deg, var(--kof-red), var(--kof-dark-red)); color: white; border: none; padding: 14px; border-radius: 8px; font-size: 0.95rem; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 0.8px; box-shadow: 0 4px 12px rgba(230,0,0,0.3); transition: transform 0.1s, filter 0.2s; margin-top: 5px; }
         .btn-primary:active { transform: scale(0.98); filter: brightness(0.9); }
 
-        .btn-email { width: 100%; background: linear-gradient(135deg, #3182CE, #2B6CB0); color: white; border: none; padding: 12px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; cursor: pointer; margin-top: 12px; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 10px rgba(49,130,206,0.3); transition: filter 0.2s; }
+        .btn-email { width: 100%; background: linear-gradient(135deg, #3182CE, #2B6CB0); color: white; border: none; padding: 14px; border-radius: 8px; font-size: 0.9rem; font-weight: 700; cursor: pointer; margin-top: 12px; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 10px rgba(49,130,206,0.3); transition: filter 0.2s; }
         .btn-email:hover { filter: brightness(1.1); }
 
         .btn-danger { width: 100%; background: #E53E3E; color: white; border: none; padding: 10px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; cursor: pointer; margin-top: 15px; text-transform: uppercase; letter-spacing: 0.5px; transition: background 0.2s; }
@@ -235,9 +235,12 @@
                         <textarea id="productosPendientes" placeholder="Ej. 1 unidad de 2L Coca-Cola negra, Bodega María, o por caja..."></textarea>
                     </div>
 
-                    <button type="submit" class="btn-primary">Guardar Registro del Día</button>
+                    <button type="submit" class="btn-primary" style="display:none;">Guardar (Oculto)</button>
                 </form>
-                <button type="button" class="btn-email" onclick="enviarCorreoAutomatico()">✉️ Enviar a Correo Electrónico y Guardar</button>
+                
+                <!-- BOTÓN UNIFICADO: Guarda el registro y envía el correo de inmediato -->
+                <button type="button" class="btn-email" onclick="guardarYEnviarCorreo()">✉️ Enviar a Correo Electrónico y Guardar</button>
+                
                 <button type="button" style="background:none; border:none; color:#718096; font-size:0.75rem; width:100%; margin-top:12px; cursor:pointer; text-decoration:underline;" onclick="cambiarPerfil()">Modificar mis datos personales</button>
             </div>
         </div>
@@ -347,7 +350,6 @@
             document.getElementById('liveTotalEntregado').innerText = totalEntregado >= 0 ? totalEntregado : 0;
         }
 
-        const form = document.getElementById('kofForm');
         const historyList = document.getElementById('historyList');
         const deleteHistoryContainer = document.getElementById('deleteHistoryContainer');
 
@@ -401,9 +403,23 @@
             }
         }
 
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
+        // FUNCIÓN ÚNICA: Guarda el formulario y envía el correo automáticamente al mismo tiempo
+        function guardarYEnviarCorreo() {
+            const nroRuta = document.getElementById('nroRuta').value.trim();
+            const fecha = document.getElementById('fecha').value;
+            const horaEntrada = document.getElementById('horaEntrada').value;
+            const horaSalida = document.getElementById('horaSalida').value;
+
+            if (!nroRuta || !fecha || !horaEntrada || !horaSalida) {
+                alert('Por favor, completa los campos obligatorios de la ruta y horario.');
+                return;
+            }
+
             const perfil = JSON.parse(localStorage.getItem('kof_profile'));
+            if (!perfil || !perfil.email) {
+                alert('No se encontró el correo del colaborador en el perfil.');
+                return;
+            }
 
             const sinCarga = document.getElementById('sinCarga').checked;
             const f1 = sinCarga ? 0 : (parseFloat(document.getElementById('cargaF1').value) || 0);
@@ -412,7 +428,6 @@
             const g2 = sinCarga ? 0 : (parseFloat(document.getElementById('cargaG2').value) || 0);
 
             const cajasDevueltas = parseFloat(document.getElementById('cajasDevueltas').value) || 0;
-
             const cargaTotal = f1 + f2 + g1 + g2;
             const totalEntregado = cargaTotal - cajasDevueltas;
 
@@ -420,10 +435,10 @@
                 nombre: perfil.nombre,
                 anos: perfil.anos,
                 cargo: perfil.cargo,
-                fecha: document.getElementById('fecha').value,
-                horaEntrada: document.getElementById('horaEntrada').value,
-                horaSalida: document.getElementById('horaSalida').value,
-                nroRuta: document.getElementById('nroRuta').value,
+                fecha: fecha,
+                horaEntrada: horaEntrada,
+                horaSalida: horaSalida,
+                nroRuta: nroRuta,
                 f1, f2, g1, g2,
                 cargaTotal,
                 cajasDevueltas,
@@ -431,78 +446,63 @@
                 productosPendientes: document.getElementById('productosPendientes').value.trim()
             };
 
+            // Guardar en Historial Local
             const records = JSON.parse(localStorage.getItem('kof_records') || '[]');
             records.unshift(newRecord);
             localStorage.setItem('kof_records', JSON.stringify(records));
-
-            document.getElementById('nroRuta').value = '';
-            document.getElementById('sinCarga').checked = false;
-            toggleCargas();
-            document.getElementById('cargaF1').value = 0;
-            document.getElementById('cargaF2').value = 0;
-            document.getElementById('cargaG1').value = 0;
-            document.getElementById('cargaG2').value = 0;
-            document.getElementById('cajasDevueltas').value = 0;
-            document.getElementById('productosPendientes').value = '';
-            document.getElementById('fecha').valueAsDate = new Date();
-            calcularEnVivo();
-
             loadHistory();
-            alert(`¡Registro guardado con éxito!\nCarga Total: ${cargaTotal} | Total Entregado: ${newRecord.totalEntregado}`);
-        });
 
-        function enviarCorreoAutomatico() {
-            const perfil = JSON.parse(localStorage.getItem('kof_profile'));
-            if (!perfil || !perfil.email) {
-                alert('No se encontró el correo del colaborador en el perfil.');
-                return;
-            }
-
-            const records = JSON.parse(localStorage.getItem('kof_records') || '[]');
-            if (records.length === 0) {
-                alert('No hay registros en el historial para enviar.');
-                return;
-            }
-
-            const ultimo = records[0];
-
-            // Pasamos tanto to_email como email para forzar a EmailJS a usar el destinatario correcto
+            // Preparar parámetros para EmailJS
             const templateParams = {
                 to_email: perfil.email,
                 email: perfil.email,
-                colaborador_nombre: ultimo.nombre,
-                cargo_colaborador: ultimo.cargo,
-                anos_servicio: ultimo.anos,
-                fecha: ultimo.fecha,
-                nro_ruta: ultimo.nroRuta,
-                hora_entrada: ultimo.horaEntrada,
-                hora_salida: ultimo.horaSalida,
-                carga_f1: ultimo.f1,
-                carga_f2: ultimo.f2,
-                carga_g1: ultimo.g1,
-                carga_g2: ultimo.g2,
-                carga_total: ultimo.cargaTotal,
-                total_entregado: ultimo.totalEntregado,
-                cajas_devueltas: ultimo.cajasDevueltas,
-                productos_pendientes: ultimo.productosPendientes || 'Ninguno'
+                colaborador_nombre: newRecord.nombre,
+                cargo_colaborador: newRecord.cargo,
+                anos_servicio: newRecord.anos,
+                fecha: newRecord.fecha,
+                nro_ruta: newRecord.nroRuta,
+                hora_entrada: newRecord.horaEntrada,
+                hora_salida: newRecord.horaSalida,
+                carga_f1: newRecord.f1,
+                carga_f2: newRecord.f2,
+                carga_g1: newRecord.g1,
+                carga_g2: newRecord.g2,
+                carga_total: newRecord.cargaTotal,
+                total_entregado: newRecord.totalEntregado,
+                cajas_devueltas: newRecord.cajasDevueltas,
+                productos_pendientes: newRecord.productosPendientes || 'Ninguno'
             };
 
             const btn = event.target;
-            btn.innerText = "Enviando...";
+            btn.innerText = "Guardando y Enviando...";
             btn.disabled = true;
 
             emailjs.send('service_khebtmo', 'template_bmxna4o', templateParams)
                 .then(function(response) {
-                    alert(`¡Reporte enviado con éxito a:\n${perfil.email}!`);
+                    alert(`¡Registro guardado y reporte enviado con éxito a:\n${perfil.email}!`);
+                    
+                    // Limpiar formulario operativo tras enviar
+                    document.getElementById('nroRuta').value = '';
+                    document.getElementById('sinCarga').checked = false;
+                    toggleCargas();
+                    document.getElementById('cargaF1').value = 0;
+                    document.getElementById('cargaF2').value = 0;
+                    document.getElementById('cargaG1').value = 0;
+                    document.getElementById('cargaG2').value = 0;
+                    document.getElementById('cajasDevueltas').value = 0;
+                    document.getElementById('productosPendientes').value = '';
+                    document.getElementById('fecha').valueAsDate = new Date();
+                    calcularEnVivo();
+
                     btn.innerText = "✉️ Enviar a Correo Electrónico y Guardar";
                     btn.disabled = false;
                 }, function(error) {
-                    alert('Error al enviar el correo. Verifica tu conexión a internet.');
+                    alert('Registro guardado localmente, pero hubo un error al enviar el correo. Verifica tu conexión.');
                     console.error('FAILED...', error);
                     btn.innerText = "✉️ Enviar a Correo Electrónico y Guardar";
                     btn.disabled = false;
                 });
-        }                                                                                                                        
+        }
 
         loadHistory();
     </script>
