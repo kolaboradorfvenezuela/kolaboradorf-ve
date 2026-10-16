@@ -466,8 +466,10 @@
 
             const ultimo = records[0];
 
+            // Pasamos tanto to_email como email para forzar a EmailJS a usar el destinatario correcto
             const templateParams = {
                 to_email: perfil.email,
+                email: perfil.email,
                 colaborador_nombre: ultimo.nombre,
                 cargo_colaborador: ultimo.cargo,
                 anos_servicio: ultimo.anos,
