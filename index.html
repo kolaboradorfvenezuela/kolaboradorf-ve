@@ -65,7 +65,6 @@
         
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         
-        /* Contenedor inteligente para correo con selector de dominio */
         .email-input-group { display: grid; grid-template-columns: 1.2fr 1fr; gap: 8px; align-items: center; }
 
         .checkbox-group { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; background: #FFF5F5; padding: 12px 14px; border-radius: 8px; border: 1.5px solid #FEB2B2; }
@@ -131,7 +130,6 @@
     <div class="main-layout">
         
         <div>
-            <!-- Tarjeta de Datos del Personal con Selector de Correo Inteligente -->
             <div class="card" id="profileCard" style="display: none;">
                 <h2 class="section-title">👤 1. Datos del Colaborador</h2>
                 <div class="form-group">
@@ -164,7 +162,6 @@
                 <button type="button" class="btn-primary" onclick="guardarPerfil()">Fijar Datos Personales</button>
             </div>
 
-            <!-- Tarjeta de Registro Diario (Sin campo de correo repetido) -->
             <div class="card" id="formCard" style="display: none;">
                 <div class="profile-summary" id="profileDisplay"></div>
                 <h2 class="section-title">📋 2. Registro y Carga Operativa</h2>
@@ -240,7 +237,7 @@
 
                     <button type="submit" class="btn-primary">Guardar Registro del Día</button>
                 </form>
-                <button type="button" class="btn-email" onclick="enviarCorreoAutomatico()">✉️ Enviar Reporte por Correo Automático</button>
+                <button type="button" class="btn-email" onclick="enviarCorreoAutomatico()">✉️ Enviar a Correo Electrónico y Guardar</button>
                 <button type="button" style="background:none; border:none; color:#718096; font-size:0.75rem; width:100%; margin-top:12px; cursor:pointer; text-decoration:underline;" onclick="cambiarPerfil()">Modificar mis datos personales</button>
             </div>
         </div>
@@ -454,7 +451,6 @@
             alert(`¡Registro guardado con éxito!\nCarga Total: ${cargaTotal} | Total Entregado: ${newRecord.totalEntregado}`);
         });
 
-        // Función de Envío Automático usando el correo guardado en el perfil
         function enviarCorreoAutomatico() {
             const perfil = JSON.parse(localStorage.getItem('kof_profile'));
             if (!perfil || !perfil.email) {
@@ -490,18 +486,18 @@
             };
 
             const btn = event.target;
-            btn.innerText = "Enviando reporte...";
+            btn.innerText = "Enviando...";
             btn.disabled = true;
 
             emailjs.send('service_khebtmo', 'template_bmxna4o', templateParams)
                 .then(function(response) {
-                    alert(`¡Reporte enviado con éxito de forma automática a tu correo:\n${perfil.email}!`);
-                    btn.innerText = "✉️ Enviar Reporte por Correo Automático";
+                    alert(`¡Reporte enviado con éxito a:\n${perfil.email}!`);
+                    btn.innerText = "✉️ Enviar a Correo Electrónico y Guardar";
                     btn.disabled = false;
                 }, function(error) {
                     alert('Error al enviar el correo. Verifica tu conexión a internet.');
                     console.error('FAILED...', error);
-                    btn.innerText = "✉️ Enviar Reporte por Correo Automático";
+                    btn.innerText = "✉️ Enviar a Correo Electrónico y Guardar";
                     btn.disabled = false;
                 });
         }
