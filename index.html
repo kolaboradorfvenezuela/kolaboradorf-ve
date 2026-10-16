@@ -38,6 +38,10 @@
         
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         
+        .checkbox-group { display: flex; align-items: center; gap: 8px; margin-bottom: 15px; background: #fff3f3; padding: 10px; border-radius: 6px; border: 1px solid #ffcdd2; }
+        .checkbox-group input { width: 20px; height: 20px; accent-color: var(--kof-red); }
+        .checkbox-group label { margin-bottom: 0; color: var(--kof-red); font-weight: 700; cursor: pointer; }
+
         .btn-primary { width: 100%; background: var(--kof-red); color: white; border: none; padding: 13px; border-radius: 6px; font-size: 0.95rem; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; transition: background 0.2s; margin-top: 5px; }
         .btn-primary:active { background: var(--kof-dark-red); }
 
@@ -47,8 +51,6 @@
         .history-item { padding: 12px; border-bottom: 1px solid var(--kof-border); font-size: 0.82rem; background: #fff; border-radius: 6px; margin-bottom: 8px; border-left: 3px solid var(--kof-red); box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
         .history-info strong { display: block; color: var(--kof-black); font-size: 0.88rem; margin-bottom: 3px; }
         .history-info span { color: #666; display: block; margin-bottom: 2px; }
-        .badge-container { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
-        .badge { background: #ffebee; color: var(--kof-red); padding: 3px 6px; border-radius: 4px; font-weight: 700; font-size: 0.72rem; }
         
         .empty-history { text-align: center; color: #888; font-size: 0.85rem; padding: 15px 0; }
         .profile-summary { background: #fff8f8; border: 1px dashed var(--kof-red); padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 0.82rem; color: #333; }
@@ -115,36 +117,46 @@
                     <label for="nroRuta">Número de Ruta</label>
                     <input type="text" id="nroRuta" placeholder="Ej. R-402" required>
                 </div>
-                
-                <div class="grid-2">
-                    <div class="form-group">
-                        <label for="cargaAsignada">Carga Asignada (Principal)</label>
-                        <input type="number" id="cargaAsignada" min="0" placeholder="Ej. 300" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="tipoCargaExtra">Tipo Carga Adicional (Opcional)</label>
-                        <select id="tipoCargaExtra">
-                            <option value="Ninguna">Ninguna</option>
-                            <option value="F2">F2</option>
-                            <option value="G1">G1</option>
-                            <option value="G2">G2</option>
-                        </select>
-                    </div>
+
+                <!-- Opción No Tengo Carga -->
+                <div class="checkbox-group">
+                    <input type="checkbox" id="sinCarga" onchange="toggleCargas()">
+                    <label for="sinCarga">No tengo carga asignada hoy</label>
                 </div>
 
-                <div class="form-group">
-                    <label for="valorCargaExtra">Cantidad Carga Adicional (Si aplica)</label>
-                    <input type="number" id="valorCargaExtra" min="0" placeholder="0">
+                <!-- Sección de Cargas F1, F2, G1, G2 -->
+                <div id="seccionCargas">
+                    <h3 style="font-size: 0.85rem; color:#444; margin-bottom: 8px; text-transform: uppercase;">Detalle de Cargas</h3>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label for="cargaF1">Carga F1</label>
+                            <input type="number" id="cargaF1" min="0" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="cargaF2">Carga F2</label>
+                            <input type="number" id="cargaF2" min="0" value="0">
+                        </div>
+                    </div>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label for="cargaG1">Carga G1</label>
+                            <input type="number" id="cargaG1" min="0" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="cargaG2">Carga G2</label>
+                            <input type="number" id="cargaG2" min="0" value="0">
+                        </div>
+                    </div>
                 </div>
 
                 <div class="grid-2">
                     <div class="form-group">
                         <label for="cajasBajas">Cajas Bajas / Averías</label>
-                        <input type="number" id="cajasBajas" min="0" placeholder="0" required>
+                        <input type="number" id="cajasBajas" min="0" value="0" required>
                     </div>
                     <div class="form-group">
                         <label for="cajasDevueltas">Cajas Devueltas</label>
-                        <input type="number" id="cajasDevueltas" min="0" placeholder="0" required>
+                        <input type="number" id="cajasDevueltas" min="0" value="0" required>
                     </div>
                 </div>
 
@@ -208,6 +220,20 @@
             verificarPerfil();
         }
 
+        function toggleCargas() {
+            const sinCarga = document.getElementById('sinCarga').checked;
+            const seccionCargas = document.getElementById('seccionCargas');
+            if (sinCarga) {
+                seccionCargas.style.display = 'none';
+                document.getElementById('cargaF1').value = 0;
+                document.getElementById('cargaF2').value = 0;
+                document.getElementById('cargaG1').value = 0;
+                document.getElementById('cargaG2').value = 0;
+            } else {
+                seccionCargas.style.display = 'block';
+            }
+        }
+
         const form = document.getElementById('kofForm');
         const historyList = document.getElementById('historyList');
 
@@ -226,7 +252,7 @@
                         <strong>Ruta: ${rec.nroRuta} — Fecha: ${rec.fecha}</strong>
                         <span>Entrada: ${rec.horaEntrada} | Salida: ${rec.horaSalida}</span>
                         <span>Colaborador: ${rec.nombre} (${rec.cargo})</span>
-                        <span><strong>Carga Total:</strong> ${rec.cargaTotal} (Principal: ${rec.cargaAsignada} | Extra ${rec.tipoCargaExtra}: ${rec.valorCargaExtra})</span>
+                        <span><strong>Cargas:</strong> F1: ${rec.f1} | F2: ${rec.f2} | G1: ${rec.g1} | G2: ${rec.g2} | <strong>Carga Total:</strong> ${rec.cargaTotal}</span>
                         <span><strong>Total Entregado:</strong> ${rec.totalEntregado} | <strong>Devueltas:</strong> ${rec.cajasDevueltas} | <strong>Bajas:</strong> ${rec.cajasBajas}</span>
                         ${rec.productosPendientes ? `<span><strong>Pendientes cliente:</strong> ${rec.productosPendientes}</span>` : ''}
                     </div>
@@ -239,13 +265,16 @@
             e.preventDefault();
             const perfil = JSON.parse(localStorage.getItem('kof_profile'));
 
-            const cargaAsignada = parseFloat(document.getElementById('cargaAsignada').value) || 0;
-            const tipoCargaExtra = document.getElementById('tipoCargaExtra').value;
-            const valorCargaExtra = parseFloat(document.getElementById('valorCargaExtra').value) || 0;
+            const sinCarga = document.getElementById('sinCarga').checked;
+            const f1 = sinCarga ? 0 : (parseFloat(document.getElementById('cargaF1').value) || 0);
+            const f2 = sinCarga ? 0 : (parseFloat(document.getElementById('cargaF2').value) || 0);
+            const g1 = sinCarga ? 0 : (parseFloat(document.getElementById('cargaG1').value) || 0);
+            const g2 = sinCarga ? 0 : (parseFloat(document.getElementById('cargaG2').value) || 0);
+
             const cajasBajas = parseFloat(document.getElementById('cajasBajas').value) || 0;
             const cajasDevueltas = parseFloat(document.getElementById('cajasDevueltas').value) || 0;
 
-            const cargaTotal = cargaAsignada + (tipoCargaExtra !== 'Ninguna' ? valorCargaExtra : 0);
+            const cargaTotal = f1 + f2 + g1 + g2;
             const totalEntregado = cargaTotal - cajasBajas - cajasDevueltas;
 
             const newRecord = {
@@ -256,9 +285,7 @@
                 horaEntrada: document.getElementById('horaEntrada').value,
                 horaSalida: document.getElementById('horaSalida').value,
                 nroRuta: document.getElementById('nroRuta').value,
-                cargaAsignada,
-                tipoCargaExtra: tipoCargaExtra !== 'Ninguna' ? tipoCargaExtra : 'Ninguna',
-                valorCargaExtra: tipoCargaExtra !== 'Ninguna' ? valorCargaExtra : 0,
+                f1, f2, g1, g2,
                 cargaTotal,
                 cajasBajas,
                 cajasDevueltas,
@@ -272,16 +299,19 @@
 
             // Limpiar formulario operativo
             document.getElementById('nroRuta').value = '';
-            document.getElementById('cargaAsignada').value = '';
-            document.getElementById('tipoCargaExtra').value = 'Ninguna';
-            document.getElementById('valorCargaExtra').value = '';
-            document.getElementById('cajasBajas').value = '';
-            document.getElementById('cajasDevueltas').value = '';
+            document.getElementById('sinCarga').checked = false;
+            toggleCargas();
+            document.getElementById('cargaF1').value = 0;
+            document.getElementById('cargaF2').value = 0;
+            document.getElementById('cargaG1').value = 0;
+            document.getElementById('cargaG2').value = 0;
+            document.getElementById('cajasBajas').value = 0;
+            document.getElementById('cajasDevueltas').value = 0;
             document.getElementById('productosPendientes').value = '';
             document.getElementById('fecha').valueAsDate = new Date();
 
             loadHistory();
-            alert(`¡Registro guardado con éxito!\nTotal entregado calculado: ${newRecord.totalEntregado} unidades/cajas.`);
+            alert(`¡Registro guardado con éxito!\nCarga Total: ${cargaTotal} | Total Entregado: ${newRecord.totalEntregado}`);
         });
 
         function enviarCorreo() {
@@ -300,11 +330,13 @@
                 `Fecha: ${ultimo.fecha}\n` +
                 `Número de Ruta: ${ultimo.nroRuta}\n` +
                 `Hora de Entrada: ${ultimo.horaEntrada} | Hora de Salida: ${ultimo.horaSalida}\n\n` +
-                `--- GESTIÓN DE CARGA ---\n` +
-                `Carga Principal Asignada: ${ultimo.cargaAsignada}\n` +
-                `Carga Adicional (${ultimo.tipoCargaExtra}): ${ultimo.valorCargaExtra}\n` +
-                `Carga Total del Día: ${ultimo.cargaTotal}\n\n` +
-                `--- RESULTADOS ---\n` +
+                `--- DESGLOSE DE CARGAS ---\n` +
+                `Carga F1: ${ultimo.f1}\n` +
+                `Carga F2: ${ultimo.f2}\n` +
+                `Carga G1: ${ultimo.g1}\n` +
+                `Carga G2: ${ultimo.g2}\n` +
+                `Carga Total General: ${ultimo.cargaTotal}\n\n` +
+                `--- BALANCE Y RESULTADOS ---\n` +
                 `Total Entregado Efectivo: ${ultimo.totalEntregado}\n` +
                 `Cajas Devueltas: ${ultimo.cajasDevueltas}\n` +
                 `Cajas Bajas / Averías: ${ultimo.cajasBajas}\n\n` +
