@@ -38,11 +38,19 @@
         .splash-sub { font-size: 0.85rem; color: #718096; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
-        nav { background-color: rgba(255, 255, 255, 0.95); backdrop-filter: blur(5px); border-bottom: 3px solid var(--kolab-red); padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
+        nav { background-color: rgba(255, 255, 255, 0.95); backdrop-filter: blur(5px); border-bottom: 3px solid var(--kolab-red); padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
         .logo-container { display: flex; align-items: center; gap: 10px; }
-        .logo-img { font-size: 1.1rem; font-weight: 900; color: var(--kolab-red); text-transform: uppercase; letter-spacing: 1px; background: #fff; padding: 5px 10px; border-radius: 6px; border: 2px solid var(--kolab-red); }
-        .user-nav-info { font-size: 0.8rem; font-weight: 800; color: #2D3748; text-transform: uppercase; line-height: 1.2; text-align: right; }
-        .user-nav-info span { font-size: 0.65rem; color: var(--kolab-red); font-weight: 600; display: block; }
+        .logo-img { font-size: 1rem; font-weight: 900; color: var(--kolab-red); text-transform: uppercase; letter-spacing: 1px; background: #fff; padding: 4px 8px; border-radius: 6px; border: 2px solid var(--kolab-red); }
+        
+        /* Contenedor derecho de usuario con botones compactos */
+        .user-nav-container { display: flex; align-items: center; gap: 12px; }
+        .user-nav-info { font-size: 0.75rem; font-weight: 800; color: #2D3748; text-transform: uppercase; line-height: 1.2; text-align: right; }
+        .user-nav-info span { font-size: 0.6rem; color: var(--kolab-red); font-weight: 600; display: block; }
+        .nav-actions { display: flex; gap: 6px; }
+        .btn-nav-action { background: #EDF2F7; border: 1px solid #CBD5E0; color: #4A5568; font-size: 0.65rem; font-weight: 700; padding: 4px 8px; border-radius: 4px; cursor: pointer; text-transform: uppercase; transition: all 0.2s; }
+        .btn-nav-action:hover { background: #E2E8F0; color: #1A202C; }
+        .btn-nav-delete { background: #FFF5F5; border: 1px solid #FEB2B2; color: #E53E3E; }
+        .btn-nav-delete:hover { background: #FED7D7; color: #C53030; }
 
         header.hero { background: linear-gradient(135deg, rgba(230,0,0,0.9), rgba(153,0,0,0.95)); color: white; padding: 25px 20px; text-align: center; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
         header.hero h1 { font-size: 1.2rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; }
@@ -129,8 +137,15 @@
         <div class="logo-container">
             <div class="logo-img">KolabOradoF VE</div>
         </div>
-        <div class="user-nav-info" id="navUserInfo">
-            <span>Venezuela</span> Sistema Pro
+        <div class="user-nav-container" id="navUserContainer" style="display: none;">
+            <div class="user-nav-info" id="navUserInfo"></div>
+            <div class="nav-actions">
+                <button type="button" class="btn-nav-action" onclick="cerrarSesion()">Cerrar Sesión</button>
+                <button type="button" class="btn-nav-action btn-nav-delete" onclick="eliminarCuenta()">Eliminar Cuenta</button>
+            </div>
+        </div>
+        <div id="navGuestInfo" style="font-size: 0.75rem; font-weight: 700; color: #4A5568; text-transform: uppercase;">
+            Venezuela <span>Sistema Pro</span>
         </div>
     </nav>
 
@@ -161,7 +176,7 @@
                 </div>
             </div>
 
-            <!-- 2. PANTALLA DE REGISTRO CON SELECTOR DE CARGO (Ayudante de descarga / Entregador) -->
+            <!-- 2. PANTALLA DE REGISTRO CON SELECTOR DE CARGO -->
             <div class="card" id="registerCard" style="display: none;">
                 <h2 class="section-title">📝 Regístrate y Verifica Correo</h2>
                 
@@ -293,7 +308,6 @@
                 </form>
                 
                 <button type="button" class="btn-email" onclick="guardarRegistroLocal()">💾 Guardar Registro</button>
-                <button type="button" style="background:none; border:none; color:#E53E3E; font-size:0.75rem; width:100%; margin-top:12px; cursor:pointer; font-weight:700;" onclick="cerrarSesion()">Cerrar Sesión</button>
             </div>
         </div>
 
@@ -369,6 +383,8 @@
 
         function comprobarEstadoSesion() {
             const sesionActiva = localStorage.getItem('kolab_sesion_activa');
+            const navUserContainer = document.getElementById('navUserContainer');
+            const navGuestInfo = document.getElementById('navGuestInfo');
             const navUserInfo = document.getElementById('navUserInfo');
 
             if (sesionActiva) {
@@ -377,7 +393,11 @@
                     document.getElementById('registerCard').style.display = 'none';
                     document.getElementById('loginCard').style.display = 'none';
                     document.getElementById('formCard').style.display = 'block';
+                    
+                    navUserContainer.style.display = 'flex';
+                    navGuestInfo.style.display = 'none';
                     navUserInfo.innerHTML = `${perfil.nombre}<span>${perfil.cargo}</span>`;
+
                     document.getElementById('profileDisplay').innerHTML = `<span><strong>Colaborador:</strong> ${perfil.nombre}<br><small>${perfil.cargo} (${perfil.anos} años) — ✉️ ${perfil.email}</small></span>`;
                     loadHistory();
                     return;
@@ -394,7 +414,9 @@
             document.getElementById('btnEnviarCod').style.display = 'block';
             document.getElementById('historyList').innerHTML = '<div class="empty-history">Regístrate o inicia sesión para gestionar tus reportes.</div>';
             document.getElementById('deleteHistoryContainer').style.display = 'none';
-            document.getElementById('navUserInfo').innerHTML = `Venezuela<span>Sistema Pro</span>`;
+            
+            document.getElementById('navUserContainer').style.display = 'none';
+            document.getElementById('navGuestInfo').style.display = 'block';
         }
 
         function mostrarLogin() {
@@ -403,7 +425,9 @@
             document.getElementById('formCard').style.display = 'none';
             document.getElementById('historyList').innerHTML = '<div class="empty-history">Inicia sesión para gestionar tus reportes.</div>';
             document.getElementById('deleteHistoryContainer').style.display = 'none';
-            document.getElementById('navUserInfo').innerHTML = `Venezuela<span>Sistema Pro</span>`;
+            
+            document.getElementById('navUserContainer').style.display = 'none';
+            document.getElementById('navGuestInfo').style.display = 'block';
         }
 
         function enviarCodigoVerificacion() {
@@ -415,7 +439,7 @@
             const password = document.getElementById('regPassword').value.trim();
 
             if (!nombre || !anos || !cargo || !emailUser || !password) {
-                alert('Por favor, completa todos los campos del registro (incluyendo tu cargo).');
+                alert('Por favor, completa todos los campos del registro.');
                 return;
             }
 
@@ -495,6 +519,26 @@
             localStorage.removeItem('kolab_sesion_activa');
             alert('Has cerrado sesión correctamente.');
             mostrarLogin();
+        }
+
+        function eliminarCuenta() {
+            const sesionActiva = localStorage.getItem('kolab_sesion_activa');
+            if (!sesionActiva) return;
+
+            const confirmar1 = confirm("⚠️ ¿Estás completamente seguro de que deseas eliminar tu cuenta?\n\nEsta acción borrará tu perfil y todo tu historial guardado de este dispositivo, y tendrás que registrarte nuevamente si deseas ingresar en el futuro.");
+            
+            if (confirmar1) {
+                const confirmar2 = confirm("🚨 ÚLTIMA ADVERTENCIA: ¿Confirmas la eliminación permanente de tu cuenta en KolabOradoF VE?");
+                if (confirmar2) {
+                    // Borrar perfil, historial y sesión
+                    localStorage.removeItem('kolab_profile_' + sesionActiva);
+                    localStorage.removeItem('kolab_records_' + sesionActiva);
+                    localStorage.removeItem('kolab_sesion_activa');
+
+                    alert("Tu cuenta ha sido eliminada con éxito. Por favor regístrate cuando desees crear una nueva.");
+                    mostrarRegistro();
+                }
+            }
         }
 
         function toggleCargas() {
