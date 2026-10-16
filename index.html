@@ -65,6 +65,9 @@
         
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         
+        /* Contenedor inteligente para correo con selector de dominio */
+        .email-input-group { display: grid; grid-template-columns: 1.2fr 1fr; gap: 8px; align-items: center; }
+
         .checkbox-group { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; background: #FFF5F5; padding: 12px 14px; border-radius: 8px; border: 1.5px solid #FEB2B2; }
         .checkbox-group input { width: 22px; height: 22px; accent-color: var(--kof-red); cursor: pointer; }
         .checkbox-group label { margin-bottom: 0; color: #C53030; font-weight: 700; cursor: pointer; font-size: 0.85rem; }
@@ -128,6 +131,7 @@
     <div class="main-layout">
         
         <div>
+            <!-- Tarjeta de Datos del Personal con Selector de Correo Inteligente -->
             <div class="card" id="profileCard" style="display: none;">
                 <h2 class="section-title">👤 1. Datos del Colaborador</h2>
                 <div class="form-group">
@@ -144,17 +148,27 @@
                         <input type="text" id="cargoColaborador" placeholder="Ej. Ayudante de Entrega" required>
                     </div>
                 </div>
+                <div class="form-group">
+                    <label for="emailUser">Correo Electrónico (Destino de reportes) *</label>
+                    <div class="email-input-group">
+                        <input type="text" id="emailUser" placeholder="ej. derme73" required>
+                        <select id="emailDomain">
+                            <option value="@gmail.com">@gmail.com</option>
+                            <option value="@outlook.com">@outlook.com</option>
+                            <option value="@hotmail.com">@hotmail.com</option>
+                            <option value="@yahoo.es">@yahoo.es</option>
+                            <option value="@icloud.com">@icloud.com</option>
+                        </select>
+                    </div>
+                </div>
                 <button type="button" class="btn-primary" onclick="guardarPerfil()">Fijar Datos Personales</button>
             </div>
 
+            <!-- Tarjeta de Registro Diario (Sin campo de correo repetido) -->
             <div class="card" id="formCard" style="display: none;">
                 <div class="profile-summary" id="profileDisplay"></div>
                 <h2 class="section-title">📋 2. Registro y Carga Operativa</h2>
                 <form id="kofForm">
-                    <div class="form-group">
-                        <label for="correoDestino">Correo de Destino (Supervisor / Destinatario) *</label>
-                        <input type="email" id="correoDestino" placeholder="Ej. supervisor@coca-colafemsa.com" required>
-                    </div>
                     <div class="form-group">
                         <label for="fecha">Fecha</label>
                         <input type="date" id="fecha" required>
@@ -257,7 +271,6 @@
     <script>
         document.getElementById('fecha').valueAsDate = new Date();
 
-        // Cargar correo guardado previamente si existe
         window.addEventListener('load', () => {
             setTimeout(() => {
                 const splash = document.getElementById('splashScreen');
@@ -265,11 +278,6 @@
                 setTimeout(() => splash.style.display = 'none', 500);
             }, 800);
             verificarPerfil();
-
-            const correoGuardado = localStorage.getItem('kof_correo_destino');
-            if (correoGuardado) {
-                document.getElementById('correoDestino').value = correoGuardado;
-            }
         });
 
         function verificarPerfil() {
@@ -280,7 +288,7 @@
                 document.getElementById('profileCard').style.display = 'none';
                 document.getElementById('formCard').style.display = 'block';
                 navUserInfo.innerHTML = `${perfil.nombre}<span>${perfil.cargo}</span>`;
-                document.getElementById('profileDisplay').innerHTML = `<span><strong>Colaborador:</strong> ${perfil.nombre}<br><small>${perfil.cargo} (${perfil.anos} años de servicio)</small></span>`;
+                document.getElementById('profileDisplay').innerHTML = `<span><strong>Colaborador:</strong> ${perfil.nombre}<br><small>${perfil.cargo} (${perfil.anos} años) — ✉️ ${perfil.email}</small></span>`;
             } else {
                 document.getElementById('profileCard').style.display = 'block';
                 document.getElementById('formCard').style.display = 'none';
@@ -292,13 +300,16 @@
             const nombre = document.getElementById('nombreColaborador').value.trim();
             const anos = document.getElementById('anosServicio').value.trim();
             const cargo = document.getElementById('cargoColaborador').value.trim();
+            const emailUser = document.getElementById('emailUser').value.trim();
+            const emailDomain = document.getElementById('emailDomain').value;
 
-            if (!nombre || !anos || !cargo) {
-                alert('Por favor, completa todos los campos obligatorios del personal.');
+            if (!nombre || !anos || !cargo || !emailUser) {
+                alert('Por favor, completa todos los campos obligatorios del perfil.');
                 return;
             }
 
-            const perfil = { nombre, anos, cargo };
+            const emailCompleto = emailUser + emailDomain;
+            const perfil = { nombre, anos, cargo, email: emailCompleto };
             localStorage.setItem('kof_profile', JSON.stringify(perfil));
             verificarPerfil();
         }
@@ -443,17 +454,13 @@
             alert(`¡Registro guardado con éxito!\nCarga Total: ${cargaTotal} | Total Entregado: ${newRecord.totalEntregado}`);
         });
 
-        // Función de Envío Automático Invisible con EmailJS incluyendo Correo de Destino
+        // Función de Envío Automático usando el correo guardado en el perfil
         function enviarCorreoAutomatico() {
-            const correoDestino = document.getElementById('correoDestino').value.trim();
-            if (!correoDestino) {
-                alert('Por favor, ingresa un correo de destino válido.');
-                document.getElementById('correoDestino').focus();
+            const perfil = JSON.parse(localStorage.getItem('kof_profile'));
+            if (!perfil || !perfil.email) {
+                alert('No se encontró el correo del colaborador en el perfil.');
                 return;
             }
-
-            // Guardar el correo en el teléfono para que no tengas que escribirlo siempre
-            localStorage.setItem('kof_correo_destino', correoDestino);
 
             const records = JSON.parse(localStorage.getItem('kof_records') || '[]');
             if (records.length === 0) {
@@ -464,7 +471,7 @@
             const ultimo = records[0];
 
             const templateParams = {
-                to_email: correoDestino,
+                to_email: perfil.email,
                 colaborador_nombre: ultimo.nombre,
                 cargo_colaborador: ultimo.cargo,
                 anos_servicio: ultimo.anos,
@@ -488,7 +495,7 @@
 
             emailjs.send('service_khebtmo', 'template_bmxna4o', templateParams)
                 .then(function(response) {
-                    alert(`¡Reporte enviado con éxito de forma automática a:\n${correoDestino}!`);
+                    alert(`¡Reporte enviado con éxito de forma automática a tu correo:\n${perfil.email}!`);
                     btn.innerText = "✉️ Enviar Reporte por Correo Automático";
                     btn.disabled = false;
                 }, function(error) {
