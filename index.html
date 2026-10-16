@@ -9,13 +9,21 @@
             --kof-red: #E60000;
             --kof-dark-red: #B30000;
             --kof-black: #121212;
-            --kof-gray-bg: #F8F9FA;
             --kof-border: #E2E8F0;
             --kof-white: #FFFFFF;
-            --kof-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
+            --kof-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-        body { background-color: var(--kof-gray-bg); color: var(--kof-black); padding-bottom: 60px; -webkit-tap-highlight-color: transparent; }
+        
+        /* Fondo dinámico y colorido con temática Coca-Cola */
+        body { 
+            background: linear-gradient(135deg, rgba(230,0,0,0.85), rgba(18,18,18,0.9)), 
+                        url('https://images.unsplash.com/photo-1622483767028-3f66f32aef97?q=80&w=1000&auto=format&fit=crop') no-repeat center center fixed;
+            background-size: cover;
+            color: var(--kof-black); 
+            padding-bottom: 80px; 
+            min-height: 100vh;
+        }
         
         /* Pantalla de Carga / Splash Screen */
         #splashScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--kof-white); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.5s ease; }
@@ -23,18 +31,23 @@
         .splash-sub { font-size: 0.85rem; color: #718096; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
-        nav { background-color: var(--kof-white); border-bottom: 3px solid var(--kof-red); padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,0.04); position: sticky; top: 0; z-index: 100; }
-        .logo-container { display: flex; align-items: center; gap: 12px; }
-        .logo-badge { background: linear-gradient(135deg, var(--kof-red), var(--kof-dark-red)); color: var(--kof-white); font-weight: 900; padding: 7px 12px; font-size: 0.9rem; letter-spacing: 1px; border-radius: 6px; box-shadow: 0 4px 10px rgba(230,0,0,0.3); }
+        nav { background-color: rgba(255, 255, 255, 0.95); backdrop-filter: blur(5px); border-bottom: 3px solid var(--kof-red); padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
+        .logo-container { display: flex; align-items: center; gap: 10px; }
+        .logo-img { font-size: 1.1rem; font-weight: 900; color: var(--kof-red); text-transform: uppercase; letter-spacing: 1px; background: #fff; padding: 5px 10px; border-radius: 6px; border: 2px solid var(--kof-red); }
         .user-nav-info { font-size: 0.8rem; font-weight: 800; color: #2D3748; text-transform: uppercase; line-height: 1.2; text-align: right; }
         .user-nav-info span { font-size: 0.65rem; color: var(--kof-red); font-weight: 600; display: block; }
 
-        header.hero { background: linear-gradient(135deg, var(--kof-red), #990000); color: white; padding: 25px 20px; text-align: center; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; box-shadow: 0 4px 15px rgba(230,0,0,0.2); }
+        header.hero { background: linear-gradient(135deg, rgba(230,0,0,0.9), rgba(153,0,0,0.95)); color: white; padding: 25px 20px; text-align: center; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
         header.hero h1 { font-size: 1.2rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; }
         header.hero p { font-size: 0.8rem; opacity: 0.9; margin-top: 4px; font-weight: 400; }
 
-        .container { max-width: 520px; margin: 20px auto; padding: 0 15px; }
-        .card { background: var(--kof-white); border-radius: 14px; padding: 22px; box-shadow: var(--kof-shadow); margin-bottom: 20px; border-top: 5px solid var(--kof-red); transition: transform 0.2s; }
+        /* Distribución de la página: Formulario y Tarjetas de Historial al lado */
+        .main-layout { max-width: 1100px; margin: 20px auto; padding: 0 15px; display: grid; grid-template-columns: 1fr; gap: 20px; }
+        @media(min-width: 850px) {
+            .main-layout { grid-template-columns: 1fr 1fr; align-items: start; }
+        }
+
+        .card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 14px; padding: 22px; box-shadow: var(--kof-shadow); margin-bottom: 20px; border-top: 5px solid var(--kof-red); }
         
         h2.section-title { font-size: 1rem; color: #1A202C; margin-bottom: 18px; text-transform: uppercase; letter-spacing: 0.6px; border-bottom: 2px solid #EDF2F7; padding-bottom: 8px; display: flex; align-items: center; gap: 8px; font-weight: 700; }
         
@@ -42,7 +55,7 @@
         label { display: block; font-size: 0.78rem; font-weight: 700; color: #4A5568; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.4px; }
         input, select, textarea { width: 100%; padding: 12px 14px; border: 1.5px solid var(--kof-border); border-radius: 8px; font-size: 0.95rem; background: #F7FAFC; color: #2D3748; transition: all 0.2s; }
         input:focus, select:focus, textarea:focus { outline: none; border-color: var(--kof-red); background: white; box-shadow: 0 0 0 3px rgba(230,0,0,0.1); }
-        textarea { resize: vertical; height: 85px; }
+        textarea { resize: vertical; height: 80px; }
         
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         
@@ -66,14 +79,24 @@
         .btn-danger { width: 100%; background: #E53E3E; color: white; border: none; padding: 10px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; cursor: pointer; margin-top: 15px; text-transform: uppercase; letter-spacing: 0.5px; transition: background 0.2s; }
         .btn-danger:hover { background: #C53030; }
 
-        .history-item { padding: 14px; border: 1px solid #E2E8F0; font-size: 0.82rem; background: #FFFFFF; border-radius: 10px; margin-bottom: 10px; border-left: 4px solid var(--kof-red); box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
-        .history-info strong { display: block; color: #1A202C; font-size: 0.9rem; margin-bottom: 4px; font-weight: 700; }
-        .history-info span { color: #4A5568; display: block; margin-bottom: 3px; }
+        /* Tarjeta de presentación para el Historial por días */
+        .history-card-item { background: #FFFFFF; border-radius: 12px; padding: 16px; margin-bottom: 14px; border-left: 5px solid var(--kof-red); box-shadow: 0 4px 12px rgba(0,0,0,0.06); border-top: 1px solid #E2E8F0; border-right: 1px solid #E2E8F0; border-bottom: 1px solid #E2E8F0; }
+        .history-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #EDF2F7; padding-bottom: 8px; margin-bottom: 10px; }
+        .history-day { font-weight: 800; color: var(--kof-red); font-size: 0.95rem; text-transform: uppercase; }
+        .history-date { font-size: 0.75rem; color: #718096; font-weight: 600; }
         
-        .empty-history { text-align: center; color: #A0AEC0; font-size: 0.85rem; padding: 20px 0; font-style: italic; }
+        .collab-badge-card { background: #FFF5F5; padding: 8px 10px; border-radius: 6px; margin-bottom: 10px; font-size: 0.8rem; border: 1px dashed var(--kof-red); }
+        .collab-badge-card strong { color: #1A202C; }
+        
+        .history-body span { display: block; font-size: 0.8rem; color: #4A5568; margin-bottom: 4px; }
+        
+        .empty-history { text-align: center; color: #A0AEC0; font-size: 0.85rem; padding: 30px 0; font-style: italic; }
         .profile-summary { background: #FFF5F5; border: 1px dashed var(--kof-red); padding: 12px 14px; border-radius: 8px; margin-bottom: 18px; font-size: 0.85rem; color: #2D3748; font-weight: 500; display: flex; justify-content: space-between; align-items: center; }
         
-        footer.legal { text-align: center; font-size: 0.71rem; color: #718096; padding: 15px 10px; line-height: 1.5; border-top: 1px solid #E2E8F0; margin-top: 25px; }
+        /* Banner inferior Coca-Cola Zero y aviso legal fijo a la izquierda */
+        .bottom-banner { background: rgba(18, 18, 18, 0.95); color: white; padding: 15px 20px; display: flex; flex-direction: column; md-flex-direction: row; justify-content: space-between; align-items: center; border-top: 3px solid var(--kof-red); position: fixed; bottom: 0; left: 0; width: 100%; z-index: 99; gap: 10px; }
+        .zero-tag { background: var(--kof-red); color: white; font-weight: 900; font-size: 0.75rem; padding: 4px 8px; border-radius: 4px; letter-spacing: 1px; }
+        footer.legal { font-size: 0.68rem; color: #E2E8F0; text-align: left; max-width: 600px; line-height: 1.3; }
     </style>
 </head>
 <body>
@@ -86,7 +109,7 @@
 
     <nav>
         <div class="logo-container">
-            <div class="logo-badge">KOF</div>
+            <div class="logo-img">Coca-Cola FEMSA</div>
         </div>
         <div class="user-nav-info" id="navUserInfo">
             <span>Venezuela</span> Sistema Pro
@@ -98,16 +121,356 @@
         <p>Gestión Inteligente de Jornada y Cargas</p>
     </header>
 
-    <div class="container">
+    <div class="main-layout">
         
-        <!-- Tarjeta de Datos del Personal (Obligatoria al principio) -->
-        <div class="card" id="profileCard" style="display: none;">
-            <h2 class="section-title">👤 1. Datos del Colaborador</h2>
-            <div class="form-group">
-                <label for="nombreColaborador">Nombre Completo *</label>
-                <input type="text" id="nombreColaborador" placeholder="Ej. Dhermes Pérez" required>
-            </div>
-            <div class="grid-2">
+        <!-- COLUMNA IZQUIERDA: Formulario de Datos Personales y Registro -->
+        <div>
+            <!-- Tarjeta de Datos del Personal (Obligatoria al principio) -->
+            <div class="card" id="profileCard" style="display: none;">
+                <h2 class="section-title">👤 1. Datos del Colaborador</h2>
                 <div class="form-group">
-                    <label for="anosServicio">Años de Servicio *</label>
-                    <input type="number" id="anosServicio" min="0" placeholder="Ej. 3"
+                    <label for="nombreColaborador">Nombre Completo *</label>
+                    <input type="text" id="nombreColaborador" placeholder="Ej. Dhermes Pérez" required>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="anosServicio">Años de Servicio *</label>
+                        <input type="number" id="anosServicio" min="0" placeholder="Ej. 3" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="cargoColaborador">Cargo *</label>
+                        <input type="text" id="cargoColaborador" placeholder="Ej. Ayudante de Entrega" required>
+                    </div>
+                </div>
+                <button type="button" class="btn-primary" onclick="guardarPerfil()">Fijar Datos Personales</button>
+            </div>
+
+            <!-- Tarjeta de Registro Diario e Interactivo -->
+            <div class="card" id="formCard" style="display: none;">
+                <div class="profile-summary" id="profileDisplay"></div>
+                <h2 class="section-title">📋 2. Registro y Carga Operativa</h2>
+                <form id="kofForm">
+                    <div class="form-group">
+                        <label for="fecha">Fecha</label>
+                        <input type="date" id="fecha" required>
+                    </div>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label for="horaEntrada">Hora Entrada</label>
+                            <input type="time" id="horaEntrada" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="horaSalida">Hora Salida</label>
+                            <input type="time" id="horaSalida" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="nroRuta">Número de Ruta</label>
+                        <input type="text" id="nroRuta" placeholder="Ej. R-402" required>
+                    </div>
+
+                    <!-- Opción No Tengo Carga -->
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="sinCarga" onchange="toggleCargas()">
+                        <label for="sinCarga">No tengo carga asignada hoy</label>
+                    </div>
+
+                    <!-- Sección de Cargas F1, F2, G1, G2 -->
+                    <div id="seccionCargas">
+                        <h3 style="font-size: 0.82rem; color:#4A5568; margin-bottom: 10px; text-transform: uppercase; font-weight: 700;">Desglose de Cargas</h3>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label for="cargaF1">Carga F1</label>
+                                <input type="number" id="cargaF1" min="0" value="0" oninput="calcularEnVivo()">
+                            </div>
+                            <div class="form-group">
+                                <label for="cargaF2">Carga F2</label>
+                                <input type="number" id="cargaF2" min="0" value="0" oninput="calcularEnVivo()">
+                            </div>
+                        </div>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label for="cargaG1">Carga G1</label>
+                                <input type="number" id="cargaG1" min="0" value="0" oninput="calcularEnVivo()">
+                            </div>
+                            <div class="form-group">
+                                <label for="cargaG2">Carga G2</label>
+                                <input type="number" id="cargaG2" min="0" value="0" oninput="calcularEnVivo()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cajasDevueltas">Cajas Devueltas</label>
+                        <input type="number" id="cajasDevueltas" min="0" value="0" oninput="calcularEnVivo()" required>
+                    </div>
+
+                    <!-- Panel de Cálculo Interactivo en Vivo -->
+                    <div class="live-calc-panel">
+                        <div class="calc-box">
+                            <span>Carga Total</span>
+                            <strong id="liveCargaTotal">0</strong>
+                        </div>
+                        <div class="calc-box highlight">
+                            <span>Total Entregado</span>
+                            <strong id="liveTotalEntregado">0</strong>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="productosPendientes">Productos por Entregar a Cliente (Pendientes)</label>
+                        <textarea id="productosPendientes" placeholder="Ej. 1 unidad de 2L Coca-Cola negra, Bodega María, o por caja..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-primary">Guardar Registro del Día</button>
+                </form>
+                <button type="button" class="btn-email" onclick="enviarCorreo()">✉️ Enviar Reporte por Correo</button>
+                <button type="button" style="background:none; border:none; color:#718096; font-size:0.75rem; width:100%; margin-top:12px; cursor:pointer; text-decoration:underline;" onclick="cambiarPerfil()">Modificar mis datos personales</button>
+            </div>
+        </div>
+
+        <!-- COLUMNA DERECHA: Historial Organizado por Tarjetas de Presentación (Días) -->
+        <div>
+            <div class="card">
+                <h2 class="section-title">📂 Historial por Días</h2>
+                <div id="historyList">
+                    <div class="empty-history">No hay registros guardados aún.</div>
+                </div>
+                <div id="deleteHistoryContainer" style="display: none;">
+                    <button type="button" class="btn-danger" onclick="borrarHistorial()">🗑️ Borrar Todo el Historial</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Banner Inferior Fijo con Producto Principal (Coca-Cola Zero) y Aviso Legal en Negritas a la Izquierda -->
+    <div class="bottom-banner">
+        <div>
+            <span class="zero-tag">PRODUCTO PRINCIPAL: COCA-COLA ZERO</span>
+        </div>
+        <footer class="legal">
+            <p><strong>Aviso Legal y Propiedad Intelectual: El contenido, marcas comerciales, logotipos y diseños de esta interfaz pertenecen exclusivamente a Coca-Cola FEMSA (KOFVE) y The Coca-Cola Company. Uso operativo interno bajo estricta responsabilidad del colaborador. Copyright © 2026 Todos los derechos reservados.</strong></p>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('fecha').valueAsDate = new Date();
+
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const splash = document.getElementById('splashScreen');
+                splash.style.opacity = '0';
+                setTimeout(() => splash.style.display = 'none', 500);
+            }, 800);
+            verificarPerfil();
+        });
+
+        function verificarPerfil() {
+            const perfil = JSON.parse(localStorage.getItem('kof_profile'));
+            const navUserInfo = document.getElementById('navUserInfo');
+            
+            if (perfil) {
+                document.getElementById('profileCard').style.display = 'none';
+                document.getElementById('formCard').style.display = 'block';
+                navUserInfo.innerHTML = `${perfil.nombre}<span>${perfil.cargo}</span>`;
+                document.getElementById('profileDisplay').innerHTML = `<span><strong>Colaborador:</strong> ${perfil.nombre}<br><small>${perfil.cargo} (${perfil.anos} años de servicio)</small></span>`;
+            } else {
+                document.getElementById('profileCard').style.display = 'block';
+                document.getElementById('formCard').style.display = 'none';
+                navUserInfo.innerHTML = `Venezuela<span>Sistema Pro</span>`;
+            }
+        }
+
+        function guardarPerfil() {
+            const nombre = document.getElementById('nombreColaborador').value.trim();
+            const anos = document.getElementById('anosServicio').value.trim();
+            const cargo = document.getElementById('cargoColaborador').value.trim();
+
+            if (!nombre || !anos || !cargo) {
+                alert('Por favor, completa todos los campos obligatorios del personal.');
+                return;
+            }
+
+            const perfil = { nombre, anos, cargo };
+            localStorage.setItem('kof_profile', JSON.stringify(perfil));
+            verificarPerfil();
+        }
+
+        function cambiarPerfil() {
+            localStorage.removeItem('kof_profile');
+            verificarPerfil();
+        }
+
+        function toggleCargas() {
+            const sinCarga = document.getElementById('sinCarga').checked;
+            const seccionCargas = document.getElementById('seccionCargas');
+            if (sinCarga) {
+                seccionCargas.style.display = 'none';
+                document.getElementById('cargaF1').value = 0;
+                document.getElementById('cargaF2').value = 0;
+                document.getElementById('cargaG1').value = 0;
+                document.getElementById('cargaG2').value = 0;
+            } else {
+                seccionCargas.style.display = 'block';
+            }
+            calcularEnVivo();
+        }
+
+        function calcularEnVivo() {
+            const sinCarga = document.getElementById('sinCarga').checked;
+            const f1 = sinCarga ? 0 : (parseFloat(document.getElementById('cargaF1').value) || 0);
+            const f2 = sinCarga ? 0 : (parseFloat(document.getElementById('cargaF2').value) || 0);
+            const g1 = sinCarga ? 0 : (parseFloat(document.getElementById('cargaG1').value) || 0);
+            const g2 = sinCarga ? 0 : (parseFloat(document.getElementById('cargaG2').value) || 0);
+
+            const cajasDevueltas = parseFloat(document.getElementById('cajasDevueltas').value) || 0;
+
+            const cargaTotal = f1 + f2 + g1 + g2;
+            const totalEntregado = cargaTotal - cajasDevueltas;
+
+            document.getElementById('liveCargaTotal').innerText = cargaTotal;
+            document.getElementById('liveTotalEntregado').innerText = totalEntregado >= 0 ? totalEntregado : 0;
+        }
+
+        const form = document.getElementById('kofForm');
+        const historyList = document.getElementById('historyList');
+        const deleteHistoryContainer = document.getElementById('deleteHistoryContainer');
+
+        function obtenerDiaSemana(fechaStr) {
+            const dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+            const [year, month, day] = fechaStr.split('-');
+            const fecha = new Date(year, month - 1, day);
+            return dias[fecha.getDay()];
+        }
+
+        function loadHistory() {
+            const records = JSON.parse(localStorage.getItem('kof_records') || '[]');
+            if (records.length === 0) {
+                historyList.innerHTML = '<div class="empty-history">No hay registros guardados aún.</div>';
+                deleteHistoryContainer.style.display = 'none';
+                return;
+            }
+            historyList.innerHTML = '';
+            deleteHistoryContainer.style.display = 'block';
+            
+            records.forEach((rec) => {
+                const diaNombre = obtenerDiaSemana(rec.fecha);
+                const div = document.createElement('div');
+                div.className = 'history-card-item';
+                div.innerHTML = `
+                    <div class="history-header">
+                        <span class="history-day">${diaNombre}</span>
+                        <span class="history-date">${rec.fecha}</span>
+                    </div>
+                    <div class="collab-badge-card">
+                        <strong>${rec.nombre}</strong><br>
+                        <span>${rec.cargo} (${rec.anos} años de servicio)</span>
+                    </div>
+                    <div class="history-body">
+                        <span><strong>Ruta:</strong> ${rec.nroRuta} | <strong>Horario:</strong> ${rec.horaEntrada} - ${rec.horaSalida}</span>
+                        <span><strong>Cargas:</strong> F1:${rec.f1} | F2:${rec.f2} | G1:${rec.g1} | G2:${rec.g2} (<strong>Total: ${rec.cargaTotal}</strong>)</span>
+                        <span><strong>Entregado Efectivo:</strong> ${rec.totalEntregado} | <strong>Devueltas:</strong> ${rec.cajasDevueltas}</span>
+                        ${rec.productosPendientes ? `<span style="color:#C53030; margin-top:4px;"><strong>Pendientes:</strong> ${rec.productosPendientes}</span>` : ''}
+                    </div>
+                `;
+                historyList.appendChild(div);
+            });
+        }
+
+        function borrarHistorial() {
+            const confirmar = confirm("¿Estás 100% seguro de que deseas eliminar todo el historial guardado en este dispositivo?");
+            if (confirmar) {
+                localStorage.removeItem('kof_records');
+                loadHistory();
+                alert("El historial ha sido eliminado con éxito.");
+            }
+        }
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const perfil = JSON.parse(localStorage.getItem('kof_profile'));
+
+            const sinCarga = document.getElementById('sinCarga').checked;
+            const f1 = sinCarga ? 0 : (parseFloat(document.getElementById('cargaF1').value) || 0);
+            const f2 = sinCarga ? 0 : (parseFloat(document.getElementById('cargaF2').value) || 0);
+            const g1 = sinCarga ? 0 : (parseFloat(document.getElementById('cargaG1').value) || 0);
+            const g2 = sinCarga ? 0 : (parseFloat(document.getElementById('cargaG2').value) || 0);
+
+            const cajasDevueltas = parseFloat(document.getElementById('cajasDevueltas').value) || 0;
+
+            const cargaTotal = f1 + f2 + g1 + g2;
+            const totalEntregado = cargaTotal - cajasDevueltas;
+
+            const newRecord = {
+                nombre: perfil.nombre,
+                anos: perfil.anos,
+                cargo: perfil.cargo,
+                fecha: document.getElementById('fecha').value,
+                horaEntrada: document.getElementById('horaEntrada').value,
+                horaSalida: document.getElementById('horaSalida').value,
+                nroRuta: document.getElementById('nroRuta').value,
+                f1, f2, g1, g2,
+                cargaTotal,
+                cajasDevueltas,
+                totalEntregado: totalEntregado >= 0 ? totalEntregado : 0,
+                productosPendientes: document.getElementById('productosPendientes').value.trim()
+            };
+
+            const records = JSON.parse(localStorage.getItem('kof_records') || '[]');
+            records.unshift(newRecord);
+            localStorage.setItem('kof_records', JSON.stringify(records));
+
+            document.getElementById('nroRuta').value = '';
+            document.getElementById('sinCarga').checked = false;
+            toggleCargas();
+            document.getElementById('cargaF1').value = 0;
+            document.getElementById('cargaF2').value = 0;
+            document.getElementById('cargaG1').value = 0;
+            document.getElementById('cargaG2').value = 0;
+            document.getElementById('cajasDevueltas').value = 0;
+            document.getElementById('productosPendientes').value = '';
+            document.getElementById('fecha').valueAsDate = new Date();
+            calcularEnVivo();
+
+            loadHistory();
+            alert(`¡Registro guardado con éxito!\nCarga Total: ${cargaTotal} | Total Entregado: ${newRecord.totalEntregado}`);
+        });
+
+        function enviarCorreo() {
+            const records = JSON.parse(localStorage.getItem('kof_records') || '[]');
+            if (records.length === 0) {
+                alert('No hay registros en el historial para enviar.');
+                return;
+            }
+
+            const ultimo = records[0];
+            const asunto = encodeURIComponent(`Reporte Operativo KOF - Ruta ${ultimo.nroRuta} (${ultimo.fecha})`);
+            const cuerpo = encodeURIComponent(
+                `REPORTE DE OPERACIONES - COCA-COLA FEMSA VENEZUELA\n\n` +
+                `Colaborador: ${ultimo.nombre}\n` +
+                `Cargo: ${ultimo.cargo} (${ultimo.anos} años de servicio)\n\n` +
+                `Fecha: ${ultimo.fecha}\n` +
+                `Número de Ruta: ${ultimo.nroRuta}\n` +
+                `Hora de Entrada: ${ultimo.horaEntrada} | Hora de Salida: ${ultimo.horaSalida}\n\n` +
+                `--- DESGLOSE DE CARGAS ---\n` +
+                `Carga F1: ${ultimo.f1}\n` +
+                `Carga F2: ${ultimo.f2}\n` +
+                `Carga G1: ${ultimo.g1}\n` +
+                `Carga G2: ${ultimo.g2}\n` +
+                `Carga Total General: ${ultimo.cargaTotal}\n\n` +
+                `--- BALANCE Y RESULTADOS ---\n` +
+                `Total Entregado Efectivo: ${ultimo.totalEntregado}\n` +
+                `Cajas Devueltas: ${ultimo.cajasDevueltas}\n\n` +
+                `--- PRODUCTOS PENDIENTES POR ENTREGAR ---\n` +
+                `${ultimo.productosPendientes || 'Ninguno'}\n\n` +
+                `[Aviso Legal: Documento generado para uso operativo interno de Coca-Cola FEMSA Venezuela. Todos los derechos reservados © 2026]`
+            );
+
+            window.location.href = `mailto:?subject=${asunto}&body=${cuerpo}`;
+        }
+
+        loadHistory();
+    </script>
+</body>
+</html>
