@@ -87,6 +87,9 @@
         .btn-email { width: 100%; background: linear-gradient(135deg, #3182CE, #2B6CB0); color: white; border: none; padding: 14px; border-radius: 8px; font-size: 0.9rem; font-weight: 700; cursor: pointer; margin-top: 12px; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 10px rgba(49,130,206,0.3); transition: filter 0.2s; }
         .btn-email:hover { filter: brightness(1.1); }
 
+        .btn-share-history { width: 100%; background: #3182CE; color: white; border: none; padding: 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; cursor: pointer; margin-top: 10px; text-transform: uppercase; letter-spacing: 0.5px; transition: background 0.2s; }
+        .btn-share-history:hover { background: #2B6CB0; }
+
         .btn-danger { width: 100%; background: #E53E3E; color: white; border: none; padding: 10px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; cursor: pointer; margin-top: 15px; text-transform: uppercase; letter-spacing: 0.5px; transition: background 0.2s; }
         .btn-danger:hover { background: #C53030; }
 
@@ -103,7 +106,7 @@
         .empty-history { text-align: center; color: #A0AEC0; font-size: 0.85rem; padding: 30px 0; font-style: italic; }
         .profile-summary { background: #FFF5F5; border: 1px dashed var(--kolab-red); padding: 12px 14px; border-radius: 8px; margin-bottom: 18px; font-size: 0.85rem; color: #2D3748; font-weight: 500; display: flex; justify-content: space-between; align-items: center; }
         
-        /* BANNER INFERIOR CON TASA BCV FLOTANTE A LA DERECHA */
+        /* BANNER INFERIOR CON TASA BCV A LA DERECHA */
         .bottom-banner { background: rgba(18, 18, 18, 0.95); color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; border-top: 3px solid var(--kolab-red); position: fixed; bottom: 0; left: 0; width: 100%; z-index: 99; gap: 10px; flex-wrap: wrap; }
         .zero-tag { background: var(--kolab-red); color: white; font-weight: 900; font-size: 0.7rem; padding: 4px 8px; border-radius: 4px; letter-spacing: 1px; }
         footer.legal { font-size: 0.62rem; color: #E2E8F0; text-align: left; max-width: 600px; line-height: 1.3; }
@@ -285,7 +288,8 @@
                     </div>
                 </form>
                 
-                <button type="button" class="btn-email" onclick="guardarYEnviarCorreo()">✉️ Guardar y Enviar Correo a la Vez</button>
+                <!-- BOTÓN EXCLUSIVO DE GUARDAR -->
+                <button type="button" class="btn-email" onclick="guardarRegistroLocal()">💾 Guardar Registro</button>
                 <button type="button" style="background:none; border:none; color:#E53E3E; font-size:0.75rem; width:100%; margin-top:12px; cursor:pointer; font-weight:700;" onclick="cerrarSesion()">Cerrar Sesión</button>
             </div>
         </div>
@@ -336,14 +340,11 @@
             cargarTasaBCV();
         });
 
-        // Función para consultar la tasa BCV diaria en tiempo real desde API pública oficial de Venezuela
         async function cargarTasaBCV() {
             const displayTasa = document.getElementById('tasaBcvValor');
             try {
                 const respuesta = await fetch('https://pydolarvenezuela-api.vercel.app/api/v1/dollar/pitve');
                 const datos = await respuesta.json();
-                
-                // Buscamos la tasa oficial del BCV en los datos devueltos
                 if (datos && datos.monedas) {
                     const bcv = datos.monedas.find(m => m.fuente === 'BCV' || m.nombre === 'BCV');
                     if (bcv && bcv.precio) {
@@ -351,16 +352,14 @@
                         return;
                     }
                 }
-                // Si la estructura varía, probamos con una alternativa directa de respaldo
                 const respAlt = await fetch('https://ve.dolarapi.com/v1/dolares/oficial');
                 const datosAlt = await respAlt.json();
                 if (datosAlt && datosAlt.promedio) {
                     displayTasa.innerText = `Bs. ${datosAlt.promedio.toFixed(2)}`;
                 } else {
-                    displayTasa.innerText = "Bs. 880,12"; // Valor de referencia actual por defecto
+                    displayTasa.innerText = "Bs. 880,12";
                 }
             } catch (error) {
-                console.log('Usando tasa de referencia BCV local');
                 displayTasa.innerText = "Bs. 880,12";
             }
         }
@@ -549,7 +548,7 @@
             historyList.innerHTML = '';
             deleteHistoryContainer.style.display = 'block';
             
-            records.forEach((rec) => {
+            records.forEach((rec, index) => {
                 const diaNombre = obtenerDiaSemana(rec.fecha);
                 const div = document.createElement('div');
                 div.className = 'history-card-item';
@@ -568,6 +567,7 @@
                         <span><strong>Entregado Efectivo:</strong> ${rec.totalEntregado} | <strong>Devueltas:</strong> ${rec.cajasDevueltas}</span>
                         ${rec.productosPendientes ? `<span style="color:#C53030; margin-top:4px;"><strong>Pendientes:</strong> ${rec.productosPendientes}</span>` : ''}
                     </div>
+                    <button type="button" class="btn-share-history" onclick="compartirHistorialPorCorreo(${index})">✉️ Reenviar este reporte por correo</button>
                 `;
                 historyList.appendChild(div);
             });
@@ -583,7 +583,8 @@
             }
         }
 
-        function guardarYEnviarCorreo() {
+        // Función para guardar solo en el historial local
+        function guardarRegistroLocal() {
             const sesionActiva = localStorage.getItem('kolab_sesion_activa');
             const perfil = JSON.parse(localStorage.getItem('kolab_profile_' + sesionActiva));
 
@@ -627,53 +628,64 @@
             localStorage.setItem('kolab_records_' + sesionActiva, JSON.stringify(records));
             loadHistory();
 
+            alert(`¡Registro guardado con éxito en tu historial local!`);
+            
+            // Limpiar formulario operativo
+            document.getElementById('nroRuta').value = '';
+            document.getElementById('sinCarga').checked = false;
+            toggleCargas();
+            document.getElementById('cargaF1').value = 0;
+            document.getElementById('cargaF2').value = 0;
+            document.getElementById('cargaG1').value = 0;
+            document.getElementById('cargaG2').value = 0;
+            document.getElementById('cajasDevueltas').value = 0;
+            document.getElementById('productosPendientes').value = '';
+            document.getElementById('fecha').valueAsDate = new Date();
+            calcularEnVivo();
+        }
+
+        // Función para compartir/enviar un reporte específico del historial por correo
+        function compartirHistorialPorCorreo(index) {
+            const sesionActiva = localStorage.getItem('kolab_sesion_activa');
+            const perfil = JSON.parse(localStorage.getItem('kolab_profile_' + sesionActiva));
+            const records = JSON.parse(localStorage.getItem('kolab_records_' + sesionActiva) || '[]');
+            
+            const rec = records[index];
+            if (!rec) return;
+
             const templateParams = {
                 to_email: perfil.email,
                 email: perfil.email,
-                colaborador_nombre: newRecord.nombre,
-                cargo_colaborador: newRecord.cargo,
-                anos_servicio: newRecord.anos,
-                fecha: newRecord.fecha,
-                nro_ruta: newRecord.nroRuta,
-                hora_entrada: newRecord.horaEntrada,
-                hora_salida: newRecord.horaSalida,
-                carga_f1: newRecord.f1,
-                carga_f2: newRecord.f2,
-                carga_g1: newRecord.g1,
-                carga_g2: newRecord.g2,
-                carga_total: newRecord.cargaTotal,
-                total_entregado: newRecord.totalEntregado,
-                cajas_devueltas: newRecord.cajasDevueltas,
-                productos_pendientes: newRecord.productosPendientes || 'Ninguno'
+                colaborador_nombre: rec.nombre,
+                cargo_colaborador: rec.cargo,
+                anos_servicio: rec.anos,
+                fecha: rec.fecha,
+                nro_ruta: rec.nroRuta,
+                hora_entrada: rec.horaEntrada,
+                hora_salida: rec.horaSalida,
+                carga_f1: rec.f1,
+                carga_f2: rec.f2,
+                carga_g1: rec.g1,
+                carga_g2: rec.g2,
+                carga_total: rec.cargaTotal,
+                total_entregado: rec.totalEntregado,
+                cajas_devueltas: rec.cajasDevueltas,
+                productos_pendientes: rec.productosPendientes || 'Ninguno'
             };
 
-            const btn = event.target;
-            btn.innerText = "Guardando y Enviando...";
-            btn.disabled = true;
+            event.target.innerText = "Enviando...";
+            event.target.disabled = true;
 
             emailjs.send('service_khebtmo', 'template_bmxna4o', templateParams)
                 .then(function(response) {
-                    alert(`¡Guardado y reporte enviado con éxito por KolabOradoF VE a:\n${perfil.email}!`);
-                    
-                    document.getElementById('nroRuta').value = '';
-                    document.getElementById('sinCarga').checked = false;
-                    toggleCargas();
-                    document.getElementById('cargaF1').value = 0;
-                    document.getElementById('cargaF2').value = 0;
-                    document.getElementById('cargaG1').value = 0;
-                    document.getElementById('cargaG2').value = 0;
-                    document.getElementById('cajasDevueltas').value = 0;
-                    document.getElementById('productosPendientes').value = '';
-                    document.getElementById('fecha').valueAsDate = new Date();
-                    calcularEnVivo();
-
-                    btn.innerText = "✉️ Guardar y Enviar Correo a la Vez";
-                    btn.disabled = false;
+                    alert(`¡Reporte del día ${rec.fecha} reenviado con éxito a:\n${perfil.email}!`);
+                    event.target.innerText = "✉️ Reenviar este reporte por correo";
+                    event.target.disabled = false;
                 }, function(error) {
-                    alert('Registro guardado localmente, pero falló el envío del correo. Revisa tu internet.');
+                    alert('Error al enviar el correo. Revisa tu conexión a internet.');
                     console.error('FAILED...', error);
-                    btn.innerText = "✉️ Guardar y Enviar Correo a la Vez";
-                    btn.disabled = false;
+                    event.target.innerText = "✉️ Reenviar este reporte por correo";
+                    event.target.disabled = false;
                 });
         }
     </script>
