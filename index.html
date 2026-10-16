@@ -133,7 +133,7 @@
     <div class="main-layout">
         
         <div>
-            <!-- 1. PANTALLA DE INICIO DE SESIÓN (ÚNICA VISTA INICIAL) -->
+            <!-- 1. PANTALLA DE INICIO DE SESIÓN -->
             <div class="card" id="loginCard">
                 <h2 class="section-title">🔑 Iniciar Sesión</h2>
                 <form id="loginForm" onsubmit="event.preventDefault(); procesarLogin();">
@@ -152,10 +152,11 @@
                 </div>
             </div>
 
-            <!-- 2. PANTALLA DE REGISTRO DE CUENTA NUEVA -->
+            <!-- 2. PANTALLA DE REGISTRO CON VERIFICACIÓN DE CÓDIGO -->
             <div class="card" id="registerCard" style="display: none;">
-                <h2 class="section-title">📝 Regístrate Aquí</h2>
-                <form id="registerForm" onsubmit="event.preventDefault(); procesarRegistro();">
+                <h2 class="section-title">📝 Regístrate y Verifica Correo</h2>
+                
+                <form id="registerForm" onsubmit="event.preventDefault(); enviarCodigoVerificacion();">
                     <div class="form-group">
                         <label for="regNombre">Nombre Completo *</label>
                         <input type="text" id="regNombre" placeholder="Ej. Alezander Cabrera" required>
@@ -187,8 +188,17 @@
                         <label for="regPassword">Crea una Contraseña de Acceso *</label>
                         <input type="password" id="regPassword" placeholder="••••••••" required>
                     </div>
-                    <button type="submit" class="btn-primary">Crear Cuenta y Entrar</button>
+                    <button type="submit" id="btnEnviarCod" class="btn-primary">Enviar Código de Verificación</button>
                 </form>
+
+                <div id="verifySection" style="display: none; margin-top: 20px; border-top: 2px dashed #E2E8F0; padding-top: 15px;">
+                    <div class="form-group">
+                        <label for="codigoIngresado" style="color: #3182CE;">Introduce el Código de 4 Dígitos *</label>
+                        <input type="text" id="codigoIngresado" placeholder="Ej. 5892" maxlength="4" style="text-align: center; font-size: 1.3rem; letter-spacing: 5px; font-weight: bold;">
+                    </div>
+                    <button type="button" class="btn-email" onclick="confirmarCodigoYRegistrar()">✅ Confirmar Código y Crear Cuenta</button>
+                </div>
+
                 <div class="auth-switch">
                     ¿Ya tienes cuenta? <a onclick="mostrarLogin()">Inicia sesión aquí</a>
                 </div>
@@ -299,6 +309,8 @@
 
     <script>
         document.getElementById('fecha').valueAsDate = new Date();
+        let codigoGeneradoTemp = '';
+        let datosTemporalesRegistro = null;
 
         window.addEventListener('load', () => {
             setTimeout(() => {
@@ -332,6 +344,8 @@
             document.getElementById('loginCard').style.display = 'none';
             document.getElementById('registerCard').style.display = 'block';
             document.getElementById('formCard').style.display = 'none';
+            document.getElementById('verifySection').style.display = 'none';
+            document.getElementById('btnEnviarCod').style.display = 'block';
             document.getElementById('historyList').innerHTML = '<div class="empty-history">Regístrate o inicia sesión para gestionar tus reportes.</div>';
             document.getElementById('deleteHistoryContainer').style.display = 'none';
             document.getElementById('navUserInfo').innerHTML = `Venezuela<span>Sistema Pro</span>`;
@@ -346,7 +360,7 @@
             document.getElementById('navUserInfo').innerHTML = `Venezuela<span>Sistema Pro</span>`;
         }
 
-        function procesarRegistro() {
+        function enviarCodigoVerificacion() {
             const nombre = document.getElementById('regNombre').value.trim();
             const anos = document.getElementById('regAnos').value.trim();
             const cargo = document.getElementById('regCargo').value.trim();
@@ -360,12 +374,53 @@
             }
 
             const emailCompleto = emailUser + emailDomain;
-            const perfil = { nombre, anos, cargo, email: emailCompleto, password };
+            codigoGeneradoTemp = Math.floor(1000 + Math.random() * 9000).toString();
+            datosTemporalesRegistro = { nombre, anos, cargo, email: emailCompleto, password };
 
-            localStorage.setItem('kolab_profile_' + emailCompleto, JSON.stringify(perfil));
-            localStorage.setItem('kolab_sesion_activa', emailCompleto);
+            const btn = document.getElementById('btnEnviarCod');
+            btn.innerText = "Enviando código al correo...";
+            btn.disabled = true;
 
-            alert('¡Cuenta creada con éxito en KolabOradoF!');
+            const templateParams = {
+                to_email: emailCompleto,
+                email: emailCompleto,
+                colaborador_nombre: nombre,
+                cargo_colaborador: cargo,
+                anos_servicio: anos,
+                fecha: "Verificación de Cuenta",
+                nro_ruta: "REGISTRO",
+                hora_entrada: "--",
+                hora_salida: "--",
+                carga_f1: 0, carga_f2: 0, carga_g1: 0, carga_g2: 0,
+                carga_total: 0, total_entregado: 0, cajas_devueltas: 0,
+                productos_pendientes: `Tu código de verificación de KolabOradoF es: ${codigoGeneradoTemp}`
+            };
+
+            emailjs.send('service_khebtmo', 'template_bmxna4o', templateParams)
+                .then(function(response) {
+                    alert(`¡Código de verificación enviado con éxito a:\n${emailCompleto}!\nRevisa tu bandeja de entrada o spam.`);
+                    btn.style.display = 'none';
+                    document.getElementById('verifySection').style.display = 'block';
+                }, function(error) {
+                    alert('Error al enviar el correo de verificación. Revisa tu internet o los datos.');
+                    console.error('FAILED...', error);
+                    btn.innerText = "Enviar Código de Verificación";
+                    btn.disabled = false;
+                });
+        }
+
+        function confirmarCodigoYRegistrar() {
+            const ingresado = document.getElementById('codigoIngresado').value.trim();
+
+            if (ingresado !== codigoGeneradoTemp) {
+                alert('Código incorrecto. Por favor verifica el número que recibiste en tu correo.');
+                return;
+            }
+
+            localStorage.setItem('kolab_profile_' + datosTemporalesRegistro.email, JSON.stringify(datosTemporalesRegistro));
+            localStorage.setItem('kolab_sesion_activa', datosTemporalesRegistro.email);
+
+            alert('¡Correo verificado y cuenta creada con éxito en KolabOradoF!');
             comprobarEstadoSesion();
         }
 
