@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control Operativo Pro | KolabOradoF</title>
+    <title>Control Operativo Pro | KolabOradoF VE</title>
     <!-- Librería EmailJS para envío automático -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script type="text/javascript">
@@ -15,34 +15,35 @@
     </script>
     <style>
         :root {
-            --kof-red: #E60000;
-            --kof-dark-red: #B30000;
-            --kof-black: #121212;
-            --kof-border: #E2E8F0;
-            --kof-white: #FFFFFF;
-            --kof-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            --kolab-red: #E60000;
+            --kolab-dark-red: #B30000;
+            --kolab-black: #121212;
+            --kolab-border: #E2E8F0;
+            --kolab-white: #FFFFFF;
+            --kolab-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
         
         body { 
-            background: linear-gradient(135deg, rgba(230,0,0,0.85), rgba(18,18,18,0.9)), 
-                        url('https://images.unsplash.com/photo-1622483767028-3f66f32aef97?q=80&w=1000&auto=format&fit=crop') no-repeat center center fixed;
+            /* Fondo industrial moderno y abstracto adaptado a KolabOradoF VE */
+            background: linear-gradient(135deg, rgba(18,18,18,0.92), rgba(230,0,0,0.82)), 
+                        url('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=1000&auto=format&fit=crop') no-repeat center center fixed;
             background-size: cover;
-            color: var(--kof-black); 
+            color: var(--kolab-black); 
             padding-bottom: 90px; 
             min-height: 100vh;
         }
         
-        #splashScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--kof-white); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.5s ease; }
-        .splash-logo { font-size: 2.2rem; font-weight: 900; color: var(--kof-red); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; animation: pulse 1.5s infinite; }
+        #splashScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--kolab-white); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.5s ease; }
+        .splash-logo { font-size: 2.2rem; font-weight: 900; color: var(--kolab-red); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; animation: pulse 1.5s infinite; }
         .splash-sub { font-size: 0.85rem; color: #718096; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
-        nav { background-color: rgba(255, 255, 255, 0.95); backdrop-filter: blur(5px); border-bottom: 3px solid var(--kof-red); padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
+        nav { background-color: rgba(255, 255, 255, 0.95); backdrop-filter: blur(5px); border-bottom: 3px solid var(--kolab-red); padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
         .logo-container { display: flex; align-items: center; gap: 10px; }
-        .logo-img { font-size: 1.1rem; font-weight: 900; color: var(--kof-red); text-transform: uppercase; letter-spacing: 1px; background: #fff; padding: 5px 10px; border-radius: 6px; border: 2px solid var(--kof-red); }
+        .logo-img { font-size: 1.1rem; font-weight: 900; color: var(--kolab-red); text-transform: uppercase; letter-spacing: 1px; background: #fff; padding: 5px 10px; border-radius: 6px; border: 2px solid var(--kolab-red); }
         .user-nav-info { font-size: 0.8rem; font-weight: 800; color: #2D3748; text-transform: uppercase; line-height: 1.2; text-align: right; }
-        .user-nav-info span { font-size: 0.65rem; color: var(--kof-red); font-weight: 600; display: block; }
+        .user-nav-info span { font-size: 0.65rem; color: var(--kolab-red); font-weight: 600; display: block; }
 
         header.hero { background: linear-gradient(135deg, rgba(230,0,0,0.9), rgba(153,0,0,0.95)); color: white; padding: 25px 20px; text-align: center; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
         header.hero h1 { font-size: 1.2rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; }
@@ -53,35 +54,35 @@
             .main-layout { grid-template-columns: 1fr 1fr; align-items: start; }
         }
 
-        .card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 14px; padding: 22px; box-shadow: var(--kof-shadow); margin-bottom: 20px; border-top: 5px solid var(--kof-red); }
+        .card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 14px; padding: 22px; box-shadow: var(--kolab-shadow); margin-bottom: 20px; border-top: 5px solid var(--kolab-red); }
         
         h2.section-title { font-size: 1rem; color: #1A202C; margin-bottom: 18px; text-transform: uppercase; letter-spacing: 0.6px; border-bottom: 2px solid #EDF2F7; padding-bottom: 8px; display: flex; align-items: center; gap: 8px; font-weight: 700; }
         
         .form-group { margin-bottom: 16px; }
         label { display: block; font-size: 0.78rem; font-weight: 700; color: #4A5568; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.4px; }
-        input, select, textarea { width: 100%; padding: 12px 14px; border: 1.5px solid var(--kof-border); border-radius: 8px; font-size: 0.95rem; background: #F7FAFC; color: #2D3748; transition: all 0.2s; }
-        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--kof-red); background: white; box-shadow: 0 0 0 3px rgba(230,0,0,0.1); }
+        input, select, textarea { width: 100%; padding: 12px 14px; border: 1.5px solid var(--kolab-border); border-radius: 8px; font-size: 0.95rem; background: #F7FAFC; color: #2D3748; transition: all 0.2s; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--kolab-red); background: white; box-shadow: 0 0 0 3px rgba(230,0,0,0.1); }
         textarea { resize: vertical; height: 80px; }
         
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .email-input-group { display: grid; grid-template-columns: 1.2fr 1fr; gap: 8px; align-items: center; }
 
         .auth-switch { text-align: center; margin-top: 15px; font-size: 0.85rem; color: #4A5568; }
-        .auth-switch a { color: var(--kof-red); font-weight: 700; text-decoration: none; cursor: pointer; }
+        .auth-switch a { color: var(--kolab-red); font-weight: 700; text-decoration: none; cursor: pointer; }
         .auth-switch a:hover { text-decoration: underline; }
 
         .checkbox-group { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; background: #FFF5F5; padding: 12px 14px; border-radius: 8px; border: 1.5px solid #FEB2B2; }
-        .checkbox-group input { width: 22px; height: 22px; accent-color: var(--kof-red); cursor: pointer; }
+        .checkbox-group input { width: 22px; height: 22px; accent-color: var(--kolab-red); cursor: pointer; }
         .checkbox-group label { margin-bottom: 0; color: #C53030; font-weight: 700; cursor: pointer; font-size: 0.85rem; }
 
         .live-calc-panel { background: #EDF2F7; border-radius: 10px; padding: 14px; margin-bottom: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: center; border: 1px solid #E2E8F0; }
         .calc-box { background: white; padding: 10px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         .calc-box span { display: block; font-size: 0.7rem; color: #718096; text-transform: uppercase; font-weight: 700; }
-        .calc-box strong { font-size: 1.15rem; color: var(--kof-black); font-weight: 800; }
+        .calc-box strong { font-size: 1.15rem; color: var(--kolab-black); font-weight: 800; }
         .calc-box.highlight { background: #FFF5F5; border: 1px solid #FEB2B2; }
-        .calc-box.highlight strong { color: var(--kof-red); }
+        .calc-box.highlight strong { color: var(--kolab-red); }
 
-        .btn-primary { width: 100%; background: linear-gradient(135deg, var(--kof-red), var(--kof-dark-red)); color: white; border: none; padding: 14px; border-radius: 8px; font-size: 0.95rem; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 0.8px; box-shadow: 0 4px 12px rgba(230,0,0,0.3); transition: transform 0.1s, filter 0.2s; margin-top: 5px; }
+        .btn-primary { width: 100%; background: linear-gradient(135deg, var(--kolab-red), var(--kolab-dark-red)); color: white; border: none; padding: 14px; border-radius: 8px; font-size: 0.95rem; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 0.8px; box-shadow: 0 4px 12px rgba(230,0,0,0.3); transition: transform 0.1s, filter 0.2s; margin-top: 5px; }
         .btn-primary:active { transform: scale(0.98); filter: brightness(0.9); }
 
         .btn-email { width: 100%; background: linear-gradient(135deg, #3182CE, #2B6CB0); color: white; border: none; padding: 14px; border-radius: 8px; font-size: 0.9rem; font-weight: 700; cursor: pointer; margin-top: 12px; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 10px rgba(49,130,206,0.3); transition: filter 0.2s; }
@@ -90,35 +91,35 @@
         .btn-danger { width: 100%; background: #E53E3E; color: white; border: none; padding: 10px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; cursor: pointer; margin-top: 15px; text-transform: uppercase; letter-spacing: 0.5px; transition: background 0.2s; }
         .btn-danger:hover { background: #C53030; }
 
-        .history-card-item { background: #FFFFFF; border-radius: 12px; padding: 16px; margin-bottom: 14px; border-left: 5px solid var(--kof-red); box-shadow: 0 4px 12px rgba(0,0,0,0.06); border-top: 1px solid #E2E8F0; border-right: 1px solid #E2E8F0; border-bottom: 1px solid #E2E8F0; }
+        .history-card-item { background: #FFFFFF; border-radius: 12px; padding: 16px; margin-bottom: 14px; border-left: 5px solid var(--kolab-red); box-shadow: 0 4px 12px rgba(0,0,0,0.06); border-top: 1px solid #E2E8F0; border-right: 1px solid #E2E8F0; border-bottom: 1px solid #E2E8F0; }
         .history-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #EDF2F7; padding-bottom: 8px; margin-bottom: 10px; }
-        .history-day { font-weight: 800; color: var(--kof-red); font-size: 0.95rem; text-transform: uppercase; }
+        .history-day { font-weight: 800; color: var(--kolab-red); font-size: 0.95rem; text-transform: uppercase; }
         .history-date { font-size: 0.75rem; color: #718096; font-weight: 600; }
         
-        .collab-badge-card { background: #FFF5F5; padding: 8px 10px; border-radius: 6px; margin-bottom: 10px; font-size: 0.8rem; border: 1px dashed var(--kof-red); }
+        .collab-badge-card { background: #FFF5F5; padding: 8px 10px; border-radius: 6px; margin-bottom: 10px; font-size: 0.8rem; border: 1px dashed var(--kolab-red); }
         .collab-badge-card strong { color: #1A202C; }
         
         .history-body span { display: block; font-size: 0.8rem; color: #4A5568; margin-bottom: 4px; }
         
         .empty-history { text-align: center; color: #A0AEC0; font-size: 0.85rem; padding: 30px 0; font-style: italic; }
-        .profile-summary { background: #FFF5F5; border: 1px dashed var(--kof-red); padding: 12px 14px; border-radius: 8px; margin-bottom: 18px; font-size: 0.85rem; color: #2D3748; font-weight: 500; display: flex; justify-content: space-between; align-items: center; }
+        .profile-summary { background: #FFF5F5; border: 1px dashed var(--kolab-red); padding: 12px 14px; border-radius: 8px; margin-bottom: 18px; font-size: 0.85rem; color: #2D3748; font-weight: 500; display: flex; justify-content: space-between; align-items: center; }
         
-        .bottom-banner { background: rgba(18, 18, 18, 0.95); color: white; padding: 12px 20px; display: flex; flex-direction: column; justify-content: space-between; align-items: center; border-top: 3px solid var(--kof-red); position: fixed; bottom: 0; left: 0; width: 100%; z-index: 99; gap: 6px; }
+        .bottom-banner { background: rgba(18, 18, 18, 0.95); color: white; padding: 12px 20px; display: flex; flex-direction: column; justify-content: space-between; align-items: center; border-top: 3px solid var(--kolab-red); position: fixed; bottom: 0; left: 0; width: 100%; z-index: 99; gap: 6px; }
         @media(min-width: 600px) { .bottom-banner { flex-direction: row; } }
-        .zero-tag { background: var(--kof-red); color: white; font-weight: 900; font-size: 0.7rem; padding: 4px 8px; border-radius: 4px; letter-spacing: 1px; }
+        .zero-tag { background: var(--kolab-red); color: white; font-weight: 900; font-size: 0.7rem; padding: 4px 8px; border-radius: 4px; letter-spacing: 1px; }
         footer.legal { font-size: 0.65rem; color: #E2E8F0; text-align: left; max-width: 700px; line-height: 1.3; }
     </style>
 </head>
 <body>
 
     <div id="splashScreen">
-        <div class="splash-logo">KolabOradoF</div>
+        <div class="splash-logo">KolabOradoF VE</div>
         <div class="splash-sub">Cargando Sistema Operativo...</div>
     </div>
 
     <nav>
         <div class="logo-container">
-            <div class="logo-img">KolabOradoF</div>
+            <div class="logo-img">KolabOradoF VE</div>
         </div>
         <div class="user-nav-info" id="navUserInfo">
             <span>Venezuela</span> Sistema Pro
@@ -208,7 +209,7 @@
             <div class="card" id="formCard" style="display: none;">
                 <div class="profile-summary" id="profileDisplay"></div>
                 <h2 class="section-title">📋 Registro y Carga Operativa</h2>
-                <form id="kofForm" onsubmit="event.preventDefault();">
+                <form id="kolabForm" onsubmit="event.preventDefault();">
                     <div class="form-group">
                         <label for="fecha">Fecha</label>
                         <input type="date" id="fecha" required>
@@ -300,10 +301,10 @@
 
     <div class="bottom-banner">
         <div>
-            <span class="zero-tag">SISTEMA: KOLABORADOF</span>
+            <span class="zero-tag">SISTEMA: KOLABORADOF VE</span>
         </div>
         <footer class="legal">
-            <p><strong>Aviso Legal y Propiedad Intelectual: El contenido, marcas comerciales, logotipos y diseños de esta interfaz pertenecen exclusivamente a KolabOradoF. Uso operativo interno bajo estricta responsabilidad del colaborador. Copyright © 2026 Todos los derechos reservados.</strong></p>
+            <p><strong>Aviso Legal y Propiedad Intelectual: El contenido, marcas comerciales, logotipos y diseños de esta interfaz pertenecen exclusivamente a KolabOradoF VE. Uso operativo interno bajo estricta responsabilidad del colaborador. Copyright © 2026 Todos los derechos reservados.</strong></p>
         </footer>
     </div>
 
@@ -393,7 +394,7 @@
                 hora_salida: "--",
                 carga_f1: 0, carga_f2: 0, carga_g1: 0, carga_g2: 0,
                 carga_total: 0, total_entregado: 0, cajas_devueltas: 0,
-                productos_pendientes: `Tu código de verificación de KolabOradoF es: ${codigoGeneradoTemp}`
+                productos_pendientes: `Tu código de verificación de KolabOradoF VE es: ${codigoGeneradoTemp}`
             };
 
             emailjs.send('service_khebtmo', 'template_bmxna4o', templateParams)
@@ -420,7 +421,7 @@
             localStorage.setItem('kolab_profile_' + datosTemporalesRegistro.email, JSON.stringify(datosTemporalesRegistro));
             localStorage.setItem('kolab_sesion_activa', datosTemporalesRegistro.email);
 
-            alert('¡Correo verificado y cuenta creada con éxito en KolabOradoF!');
+            alert('¡Correo verificado y cuenta creada con éxito en KolabOradoF VE!');
             comprobarEstadoSesion();
         }
 
@@ -609,7 +610,7 @@
 
             emailjs.send('service_khebtmo', 'template_bmxna4o', templateParams)
                 .then(function(response) {
-                    alert(`¡Guardado y reporte enviado con éxito por KolabOradoF a:\n${perfil.email}!`);
+                    alert(`¡Guardado y reporte enviado con éxito por KolabOradoF VE a:\n${perfil.email}!`);
                     
                     document.getElementById('nroRuta').value = '';
                     document.getElementById('sinCarga').checked = false;
