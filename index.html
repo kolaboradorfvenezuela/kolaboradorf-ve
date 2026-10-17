@@ -38,6 +38,54 @@
         .splash-sub { font-size: 0.85rem; color: #718096; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
+        /* BANNER DE PUBLICIDAD 24 HORAS EN ESQUINA SUPERIOR IZQUIERDA */
+        #promoBanner24h {
+            position: fixed;
+            top: 75px;
+            left: 15px;
+            width: 280px;
+            background: #1A202C;
+            border: 2px solid #D69E2E;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            z-index: 999;
+            overflow: hidden;
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+        .promo-banner-header {
+            background: #D69E2E;
+            color: #1A202C;
+            font-size: 0.7rem;
+            font-weight: 900;
+            padding: 4px 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-transform: uppercase;
+        }
+        .promo-banner-body {
+            padding: 8px;
+            text-align: center;
+        }
+        .promo-banner-body img {
+            width: 100%;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .promo-banner-body img:hover {
+            transform: scale(1.02);
+        }
+        .btn-close-banner {
+            background: none;
+            border: none;
+            color: #1A202C;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
         nav { background-color: rgba(255, 255, 255, 0.95); backdrop-filter: blur(5px); border-bottom: 3px solid var(--kolab-red); padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
         .logo-container { display: flex; align-items: center; gap: 10px; }
         .logo-img { font-size: 1rem; font-weight: 900; color: var(--kolab-red); text-transform: uppercase; letter-spacing: 1px; background: #fff; padding: 4px 8px; border-radius: 6px; border: 2px solid var(--kolab-red); }
@@ -84,7 +132,6 @@
         .checkbox-group input { width: 22px; height: 22px; accent-color: var(--kolab-red); cursor: pointer; }
         .checkbox-group label { margin-bottom: 0; color: #C53030; font-weight: 700; cursor: pointer; font-size: 0.85rem; }
 
-        /* Estilo para los Términos en Registro */
         .terms-checkbox-container { display: flex; align-items: center; gap: 8px; margin: 16px 0; font-size: 0.82rem; color: #2D3748; font-weight: 600; }
         .terms-checkbox-container input { width: 18px; height: 18px; accent-color: var(--kolab-red); cursor: pointer; }
         .terms-link { color: var(--kolab-red); text-decoration: underline; cursor: pointer; font-weight: 700; }
@@ -97,7 +144,6 @@
         .calc-box.highlight { background: #FFF5F5; border: 1px solid #FEB2B2; }
         .calc-box.highlight strong { color: var(--kolab-red); }
 
-        /* Panel Acumulado Semanal Izquierda */
         .weekly-summary-panel { background: #FFF9F9; border: 1px solid #FEB2B2; border-radius: 10px; padding: 14px; margin-bottom: 18px; }
         .weekly-summary-panel h4 { font-size: 0.85rem; color: var(--kolab-red); text-transform: uppercase; font-weight: 800; margin-bottom: 8px; border-bottom: 1px dashed #FEB2B2; padding-bottom: 4px; }
         .weekly-stats-grid { display: grid; grid-template-columns: 1fr; gap: 8px; text-align: center; margin-top: 8px; }
@@ -106,10 +152,7 @@
         .weekly-box strong { font-size: 1.05rem; color: #2D3748; font-weight: 800; }
         .weekly-alert { background: #FFF5F5; color: #C53030; font-size: 0.72rem; font-weight: 700; padding: 6px; border-radius: 4px; margin-top: 8px; text-align: center; border: 1px solid #FEB2B2; display: none; }
 
-        /* Aviso 1 (Interno / Recursos Humanos) */
         .notice-internal { background: #EBF8FF; border: 1px solid #BEE3F8; border-left: 4px solid #3182CE; padding: 10px 12px; border-radius: 6px; font-size: 0.78rem; color: #2B6CB0; margin-bottom: 15px; line-height: 1.4; }
-        
-        /* Aviso 2 (Externo / Autoría Independiente) */
         .notice-external { background: #1A202C; border: 1px solid #CBD5E0; color: #E2E8F0; padding: 10px 14px; border-radius: 8px; font-size: 0.72rem; margin-bottom: 10px; text-align: center; line-height: 1.3; box-shadow: 0 2px 6px rgba(0,0,0,0.3); }
 
         .btn-primary { width: 100%; background: linear-gradient(135deg, var(--kolab-red), var(--kolab-dark-red)); color: white; border: none; padding: 14px; border-radius: 8px; font-size: 0.95rem; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 0.8px; box-shadow: 0 4px 12px rgba(230,0,0,0.3); transition: transform 0.1s, filter 0.2s; margin-top: 5px; }
@@ -127,7 +170,6 @@
         .btn-danger { width: 100%; background: #E53E3E; color: white; border: none; padding: 10px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; cursor: pointer; margin-top: 15px; text-transform: uppercase; letter-spacing: 0.5px; transition: background 0.2s; }
         .btn-danger:hover { background: #C53030; }
 
-        /* Estilos del Modal de Términos y Condiciones */
         #termsModal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; display: none; justify-content: center; align-items: center; padding: 15px; backdrop-filter: blur(5px); }
         .terms-modal-content { background: #FFFFFF; width: 100%; max-width: 650px; border-radius: 14px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.3); border-top: 6px solid var(--kolab-red); display: flex; flex-direction: column; max-height: 85vh; }
         .terms-header { background: #1A202C; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
@@ -138,7 +180,6 @@
         .terms-body p { margin-bottom: 10px; }
         .terms-footer { padding: 12px 20px; background: #F7FAFC; border-top: 1px solid #E2E8F0; text-align: right; }
 
-        /* Estilos del Muro de Eventos y Promociones */
         #promoModal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; display: none; justify-content: center; align-items: center; padding: 15px; backdrop-filter: blur(5px); }
         .promo-modal-content { background: #FFFFFF; width: 100%; max-width: 700px; border-radius: 14px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.3); border-top: 6px solid #D69E2E; display: flex; flex-direction: column; max-height: 90vh; }
         .promo-header { background: #1A202C; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
@@ -168,12 +209,10 @@
         .empty-history { text-align: center; color: #A0AEC0; font-size: 0.85rem; padding: 30px 0; font-style: italic; }
         .profile-summary { background: #FFF5F5; border: 1px dashed var(--kolab-red); padding: 12px 14px; border-radius: 8px; margin-bottom: 18px; font-size: 0.85rem; color: #2D3748; font-weight: 500; display: flex; justify-content: space-between; align-items: center; }
         
-        /* BANNER INFERIOR CON TASA BCV A LA DERECHA */
         .bottom-banner { background: rgba(18, 18, 18, 0.95); color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; border-top: 3px solid var(--kolab-red); position: fixed; bottom: 0; left: 0; width: 100%; z-index: 99; gap: 10px; flex-wrap: wrap; }
         .zero-tag { background: var(--kolab-red); color: white; font-weight: 900; font-size: 0.7rem; padding: 4px 8px; border-radius: 4px; letter-spacing: 1px; }
         footer.legal { font-size: 0.62rem; color: #E2E8F0; text-align: left; max-width: 600px; line-height: 1.3; }
         
-        /* Widget Tasa BCV */
         .bcv-widget { background: #1A202C; border: 1.5px solid var(--kolab-red); padding: 6px 12px; border-radius: 8px; text-align: right; box-shadow: 0 2px 8px rgba(0,0,0,0.4); display: flex; align-items: center; gap: 8px; }
         .bcv-info span { display: block; font-size: 0.62rem; color: #A0AEC0; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
         .bcv-info strong { font-size: 0.95rem; color: #68D391; font-weight: 900; }
@@ -185,6 +224,20 @@
     <div id="splashScreen">
         <div class="splash-logo">Kolaboradorf VE</div>
         <div class="splash-sub">Cargando Sistema Operativo...</div>
+    </div>
+
+    <!-- BANNER DE PUBLICIDAD 24 HORAS (UBICADO EN LA PARTE SUPERIOR IZQUIERDA) -->
+    <div id="promoBanner24h">
+        <div class="promo-banner-header">
+            <span>⭐ Teletón Venevisión 2026</span>
+            <button type="button" class="btn-close-banner" onclick="ocultarPublicidad24h()">✕</button>
+        </div>
+        <div class="promo-banner-body">
+            <a href="https://www.dividendovoluntario.org" target="_blank">
+                <img src="VV-MEDIA-COMO-DONAR-AL-TELETON-VENEVISION-2026-UNIDOS-POR-VENEZUELA-1.jpeg" alt="Teletón Venevisión 2026">
+            </a>
+            <span style="display:block; font-size: 0.68rem; color: #CBD5E0; margin-top: 6px;">Publicidad activa por 24 horas</span>
+        </div>
     </div>
 
     <!-- MODAL DE TÉRMINOS Y CONDICIONES COMPLETO -->
@@ -199,41 +252,18 @@
                 <p><strong>Fecha de Última Actualización:</strong> 16 de octubre de 2026[cite: 1].</p>
                 
                 <h4>Preámbulo y Deslinde de Responsabilidad Corporativa (Disclaimer)</h4>
-                <p>El presente documento constituye un contrato legalmente vinculante entre el usuario (en adelante, el "Colaborador" o "Usuario") y el desarrollador independiente y propietario de la aplicación KOLABORADORF VE® (en adelante, la "Plataforma" o la "Aplicación")[cite: 1].</p>
+                <p>El presente documento constituye un contrato legalmente vinculante entre el usuario y el desarrollador independiente de la aplicación KOLABORADORF VE®[cite: 1].</p>
                 
-                <p><strong>Ausencia de Vínculo Corporativo y Patrocinio:</strong> Se deja constancia expresa, clara e inequívoca que KOLABORADORF VE® es un desarrollo de software informático totalmente independiente, autónomo y privado. Esta Aplicación NO cuenta con ningún tipo de patrocinio, aval, registro, autorización, licencia, certificación, homologación ni relación comercial o laboral con corporaciones multinacionales, empresas embotelladoras, marcas registradas de bebidas gaseosas, ni con ninguna entidad jurídica corporativa que opere en el sector de alimentos, bebidas y distribución en la República Bolivariana de Venezuela o a nivel internacional[cite: 1].</p>
-                
-                <p><strong>Uso de Datos y Marcas:</strong> Cualquier similitud operativa, mención de cargos de distribución, tabuladores de carga, métricas de rutas o referencias logísticas responde exclusivamente a la naturaleza informativa y de cálculo personal para el trabajador, prohibiéndose terminantemente el uso indebido, suplantación o apropiación de nombres comerciales ajenos. Queda totalmente prohibido utilizar los nombres, marcas registradas, logotipos o identidades corporativas de terceros para cometer actos ilícitos, suplantación de identidad corporativa o difamación[cite: 1].</p>
+                <p><strong>Ausencia de Vínculo Corporativo y Patrocinio:</strong> Se deja constancia expresa que KOLABORADORF VE® es un desarrollo de software independiente y no cuenta con patrocinio o relación comercial con corporaciones multinacionales[cite: 1].</p>
                 
                 <h4>Sección 1: Marco Legal Nacional e Internacional</h4>
-                <p>El uso de la presente Aplicación se rige bajo los principios generales del derecho internacional y las leyes de la República Bolivariana de Venezuela, incluyendo de manera enunciativa más no limitativa[cite: 1]:</p>
-                <p>• <strong>Constitución de la República Bolivariana de Venezuela (CRBV):</strong> Garantía de la libertad de trabajo, iniciativa privada y protección de la propiedad intelectual[cite: 1].</p>
-                <p>• <strong>Ley Especial contra los Delitos Informáticos (LECDI):</strong> Sancionando el acceso indebido, sabotaje de sistemas, fraude informático y falsificación de documentos electrónicos[cite: 1].</p>
-                <p>• <strong>Código Civil Venezolano:</strong> Normativa sobre obligaciones, contratos y responsabilidad civil extracontractual por daños causados por negligencia o uso indebido[cite: 1].</p>
-                <p>• <strong>Ley sobre el Derecho de Autor y Ley de Propiedad Industrial:</strong> Protección de los códigos fuente, interfaces y elementos de diseño propios de KOLABORADORF VE®[cite: 1].</p>
-                <p>• <strong>Tratados Internacionales:</strong> Convenio de Berna para la Protección de Obras Literarias y Artísticas y los acuerdos de la OMPI (Organización Mundial de la Propiedad Intelectual) sobre software y propiedad intelectual transfronteriza[cite: 1].</p>
+                <p>El uso de la presente Aplicación se rige bajo los principios de las leyes de la República Bolivariana de Venezuela y convenios internacionales de propiedad intelectual[cite: 1].</p>
                 
                 <h4>Sección 2: Condiciones de Uso y Obligaciones del Usuario</h4>
-                <p><strong>Uso Personal y Referencial:</strong> La Aplicación ha sido diseñada estrictamente como una herramienta de gestión personal para que el colaborador calcule de manera referencial sus tiempos de jornada, cargas netas, devoluciones e incentivos estimados. Los cálculos arrojados por la plataforma no constituyen recibos de pago oficiales ni comprometen salarios o bonificaciones corporativas reales[cite: 1].</p>
-                <p><strong>Prohibiciones Absolutas:</strong></p>
-                <p>• Queda terminantemente prohibido utilizar el nombre de marcas corporativas o de terceros para simular comunicaciones oficiales, fraudes, extorsiones o campañas de desinformación[cite: 1].</p>
-                <p>• Está prohibido realizar ingeniería inversa, modificar el código fuente con fines maliciosos, hackear las pasarelas de autenticación o vulnerar la seguridad local del dispositivo (Almacenamiento Local / LocalStorage)[cite: 1].</p>
-                <p>• El usuario es el único responsable civil y penalmente por el uso que le dé a la información generada y compartida desde su cuenta[cite: 1].</p>
+                <p>Herramienta estrictamente de gestión personal y referencial para el cálculo de jornadas, cargas e incentivos[cite: 1].</p>
                 
                 <h4>Sección 3: Exención de Responsabilidad y Limitación de Daños</h4>
-                <p>El desarrollador de KOLABORADORF VE® no asume ninguna responsabilidad por[cite: 1]:</p>
-                <p>• Errores de cálculo derivados de la introducción incorrecta de datos por parte del usuario[cite: 1].</p>
-                <p>• Fallas en servicios de terceros integrados (como la API de tasa de cambio del Banco Central de Venezuela - BCV, o el servicio de envío de correos electrónicos EmailJS)[cite: 1].</p>
-                <p>• Uso indebido, negligente o fraudulento de la aplicación por parte de terceros que hayan obtenido acceso a las credenciales del usuario[cite: 1].</p>
-
-                <h4>Sección 4: Resumen Técnico y Funcional del Código Fuente</h4>
-                <p>A continuación se presenta un resumen ejecutivo de la arquitectura, componentes y funciones lógicas que componen el código fuente de la aplicación, sin revelar las líneas de código crudas[cite: 1]:</p>
-                <p>• <strong>Arquitectura de Interfaz y Diseño Responsivo:</strong> Aplicación web de página única (SPA) desarrollada con HTML5, CSS3 y JavaScript nativo, estructurada con un diseño visual moderno basado en un esquema de colores corporativos neutros y acentos en tonos rojos y oscuros[cite: 1]. Incorpora un sistema de pantallas dinámicas (Splash Screen de carga inicial, formularios de Autenticación, Panel Operativo Principal en diseño de doble columna y un Historial de Registros por días)[cite: 1].</p>
-                <p>• <strong>Sistema de Autenticación y Seguridad Local:</strong> Mecanismo completo de registro de usuarios que valida datos personales, años de servicio y cargo operativo ("Ayudante de descarga" o "Entregador")[cite: 1]. Implementa un flujo de verificación de correo electrónico mediante códigos aleatorios de 4 dígitos enviados de forma automatizada vía la librería EmailJS[cite: 1]. Las credenciales de acceso y los perfiles se almacenan de manera local y cifrada en el navegador (localStorage), permitiendo el inicio de sesión, el cierre de sesión y la eliminación completa de cuentas y datos del dispositivo[cite: 1].</p>
-                <p>• <strong>Módulo de Cálculo Operativo y Métricas en Vivo:</strong> Herramienta interactiva de cálculo diario que procesa dinámicamente las cargas operativas de ruta (bloques F1, F2, G1, G2), cajas devueltas, productos complementarios (snacks/pepitos) e introducciones de envases vacíos[cite: 1]. Calcula en tiempo real la carga bruta y el total entregado neto, actualizando de forma automática un panel acumulado semanal (de lunes a viernes) que totaliza cajas netas, incentivos puros en dólares, porcentaje de efectividad de reparto y bonificaciones por cumplimiento de metas[cite: 1].</p>
-                <p>• <strong>Sincronización Económica Externa (Tasa BCV):</strong> Integración asincrónica mediante solicitudes HTTP (fetch) a APIs públicas de indicadores económicos de Venezuela para consultar en tiempo real el valor oficial del dólar fijado por el Banco Central de Venezuela (BCV), mostrándolo en un widget flotante en la barra inferior[cite: 1].</p>
-                <p>• <strong>Modal de Enlaces Oficiales y Divulgación:</strong> Ventana emergente informativa ("Eventos y Promociones Oficiales") con hipervínculos externos orientados a portales globales y corporativos, acompañada de avisos legales y descargo de responsabilidad permanentes en la interfaz para delimitar la autoría independiente de la herramienta[cite: 1].</p>
-                <p>• <strong>Gestión de Historial y Reportes:</strong> Sistema de almacenamiento y visualización cronológica de jornadas operativas pasadas, con capacidades de limpieza de registros y reenvío automatizado de reportes individuales por correo electrónico a través de servicios de mensajería transaccional[cite: 1].</p>
+                <p>El desarrollador no asume responsabilidad por errores de introducción de datos o fallas en servicios de terceros (API BCV, EmailJS)[cite: 1].</p>
             </div>
             <div class="terms-footer">
                 <button type="button" class="btn-primary" style="width: auto; padding: 8px 20px;" onclick="cerrarTerminos()">Entendido y Cerrar</button>
@@ -250,26 +280,12 @@
             </div>
             <div class="promo-body">
                 <div class="legal-disclaimer">
-                    ⚠️ Aviso Legal: No nos hacemos responsables de lo que observas. Todo el contenido, marcas y derechos de propiedad intelectual pertenecen exclusivamente a la compañía internacional <strong>The Coca-Cola Company</strong> y a su licenciatario oficial en Venezuela (<strong>Coca-Cola FEMSA</strong>)[cite: 1].
+                    ⚠️ Aviso Legal: Todo el contenido y marcas pertenecen exclusivamente a The Coca-Cola Company y Coca-Cola FEMSA[cite: 1].
                 </div>
-                <p style="margin-bottom: 15px; font-size: 0.85rem; font-weight: 600; color: #4A5568;">Información oficial sincronizada de los portales corporativos globales y nacionales[cite: 1]:</p>
-                
                 <div class="promo-feed-item">
-                    <h4>🌐 Noticias y Actualidad Global (The Coca-Cola Company)</h4>
-                    <p>Accede a los comunicados oficiales, lanzamientos mundiales de productos, reportes de sostenibilidad y campañas institucionales a nivel internacional[cite: 1].</p>
-                    <a href="https://www.coca-colacompany.com/news" target="_blank" class="promo-link">🔗 Ver Sitio Oficial Global &rarr;</a>
-                </div>
-
-                <div class="promo-feed-item">
-                    <h4>🇻🇪 Operaciones, Empleo y Novedades en Venezuela (Coca-Cola FEMSA)</h4>
-                    <p>Información institucional acerca de la presencia de FEMSA en territorio venezolano, iniciativas comunitarias y desarrollo de talento humano[cite: 1].</p>
-                    <a href="https://coca-colafemsa.com/" target="_blank" class="promo-link">🔗 Ver Portal Oficial FEMSA &rarr;</a>
-                </div>
-
-                <div class="promo-feed-item">
-                    <h4>📦 Distribución, Logística y Rendimiento Comercial</h4>
-                    <p>Lineamientos y pautas operativas enfocadas en la optimización de cargas, rutas y desempeño para ayudantes de descarga y entregadores[cite: 1].</p>
-                    <span style="font-size: 0.75rem; color: #718096; font-style: italic;">Actualizado automáticamente para el personal operativo[cite: 1].</span>
+                    <h4>🇻🇪 Teletón Venevisión 2026 - Unidos por Venezuela</h4>
+                    <p>Espacio publicitario temporal en apoyo a la solidaridad nacional.</p>
+                    <a href="https://www.dividendovoluntario.org" target="_blank" class="promo-link">🔗 Sitio Oficial Donaciones &rarr;</a>
                 </div>
             </div>
         </div>
@@ -298,9 +314,9 @@
 
     <div class="main-layout" id="mainLayoutContainer">
         
-        <!-- CONTENEDOR IZQUIERDO / CENTRADO (LOGIN, REGISTRO O FORMULARIO) -->
+        <!-- CONTENEDOR IZQUIERDO / CENTRADO -->
         <div id="leftColumnContainer" class="auth-container">
-            <!-- 1. PANTALLA DE INICIO DE SESIÓN -->
+            <!-- 1. INICIAR SESIÓN -->
             <div class="card" id="loginCard">
                 <h2 class="section-title">🔑 Iniciar Sesión</h2>
                 <form id="loginForm" onsubmit="event.preventDefault(); procesarLogin();">
@@ -319,10 +335,9 @@
                 </div>
             </div>
 
-            <!-- 2. PANTALLA DE REGISTRO CON TÉRMINOS Y CONDICIONES -->
+            <!-- 2. REGISTRO -->
             <div class="card" id="registerCard" style="display: none;">
                 <h2 class="section-title">📝 Regístrate y Verifica Correo</h2>
-                
                 <form id="registerForm" onsubmit="event.preventDefault(); enviarCodigoVerificacion();">
                     <div class="form-group">
                         <label for="regNombre">Nombre Completo *</label>
@@ -360,7 +375,6 @@
                         <input type="password" id="regPassword" placeholder="••••••••" required>
                     </div>
 
-                    <!-- CASILLA DE TÉRMINOS Y CONDICIONES -->
                     <div class="terms-checkbox-container">
                         <input type="checkbox" id="aceptoTerminos" required>
                         <label for="aceptoTerminos" style="font-size: 0.8rem; font-weight: 600; color: #4A5568; margin-bottom: 0;">
@@ -384,16 +398,14 @@
                 </div>
             </div>
 
-            <!-- 3. PANEL OPERATIVO PRINCIPAL (Solo visible al iniciar sesión) -->
+            <!-- 3. PANEL OPERATIVO PRINCIPAL -->
             <div class="card" id="formCard" style="display: none;">
-                <!-- AVISO 1 (Interno / Recursos Humanos) -->
                 <div class="notice-internal">
-                    ℹ️ <strong>Aviso importante:</strong> Esta herramienta ofrece únicamente una referencia estimada de tus incentivos y no determina el monto final de pago[cite: 1]. Ante cualquier duda o inconsistencia, consulta directamente con Recursos Humanos de tu localidad[cite: 1].
+                    ℹ️ <strong>Aviso importante:</strong> Esta herramienta ofrece una referencia estimada de tus incentivos y no determina el pago final[cite: 1].
                 </div>
 
                 <div class="profile-summary" id="profileDisplay"></div>
                 
-                <!-- PANEL ACUMULADO SEMANAL 100% EN DÓLARES CON EFECTIVIDAD PROGRESIVA -->
                 <div class="weekly-summary-panel">
                     <h4>📊 Acumulado Semanal (Lunes a Viernes)</h4>
                     <div class="weekly-stats-grid">
@@ -417,7 +429,6 @@
                     <div id="weeklyAlertBox" class="weekly-alert">⚠️ El promedio de efectividad actual es menor al 97%. Aún no aplica el bono de $9.97.</div>
                 </div>
 
-                <!-- BOTÓN DE EVENTOS Y PROMOCIONES -->
                 <button type="button" class="btn-promo" onclick="abrirPromociones()">⭐ Eventos y Promociones</button>
                 
                 <h2 class="section-title" style="margin-top: 20px;">📋 Registro y Carga Operativa</h2>
@@ -507,7 +518,7 @@
             </div>
         </div>
 
-        <!-- CONTENEDOR DERECHO: HISTORIAL (Solo visible al iniciar sesión) -->
+        <!-- CONTENEDOR DERECHO: HISTORIAL -->
         <div id="rightColumnContainer" style="display: none;">
             <div class="card">
                 <h2 class="section-title">📂 Historial por Días</h2>
@@ -522,19 +533,18 @@
 
     </div>
 
-    <!-- BANNER INFERIOR CON AVISO 2 (EXTERNO) ARRIBA DEL DISPLAY Y TASA BCV A LA DERECHA -->
+    <!-- BANNER INFERIOR -->
     <div class="bottom-banner">
         <div style="width: 100%;">
-            <!-- AVISO 2 (Autoría Independiente) -->
             <div class="notice-external">
-                ⚖️ <strong>Aviso legal:</strong> Esta aplicación es un desarrollo independiente de KOLABORADORF Venezuela® y no pertenece, está afiliada ni cuenta con el aval de la compañía que rige sus pagos[cite: 1]. La información aquí mostrada es de carácter referencial y ajena a los registros oficiales corporativos[cite: 1].
+                ⚖️ <strong>Aviso legal:</strong> Aplicación independiente de KOLABORADORF Venezuela®, ajena a registros corporativos oficiales[cite: 1].
             </div>
         </div>
         <div>
             <span class="zero-tag">KOLABORADORF VE</span>
         </div>
         <footer class="legal">
-            <p><strong>Aviso Legal: Uso operativo interno bajo estricta responsabilidad del colaborador. © 2026 Todos los derechos reservados.</strong></p>
+            <p><strong>Uso operativo interno bajo estricta responsabilidad del colaborador. © 2026 Todos los derechos reservados.</strong></p>
         </footer>
         <div class="bcv-widget">
             <div class="bcv-icon">🇻🇪</div>
@@ -550,10 +560,8 @@
         let codigoGeneradoTemp = '';
         let datosTemporalesRegistro = null;
 
-        // VALOR FIJO DE EFECTIVIDAD DE REPARTO EN DÓLARES ($9.97)
         const EFECTIVIDAD_REPARTO_FIJA_USD = 9.97;
 
-        // MATRIZ CENTRALIZADA DE INCENTIVOS EN DÓLARES ($)
         const MATRIZ_INCENTIVOS = {
             "Ayudante de descarga": [
                 { min: 300, max: 399, diarioUsd: 3.13, semUsd: 15.65 },
@@ -584,7 +592,6 @@
         function calcularIncentivoSegunCajas(cargo, cajas) {
             const tabla = MATRIZ_INCENTIVOS[cargo];
             if (!tabla) return null;
-            
             let fila = tabla.find(item => cajas >= item.min && cajas <= item.max);
             if (!fila) {
                 if (cajas < 300) fila = tabla[0]; 
@@ -601,7 +608,31 @@
             }, 800);
             comprobarEstadoSesion();
             cargarTasaBCV();
+            verificarPublicidad24Horas();
         });
+
+        // GESTIÓN DE PUBLICIDAD DE 24 HORAS
+        function verificarPublicidad24Horas() {
+            const tiempoOculto = localStorage.getItem('kolab_promo_24h_timestamp');
+            const ahora = new Date().getTime();
+            
+            if (tiempoOculto) {
+                const horasTranscurridas = (ahora - parseInt(tiempoOculto)) / (1000 * 60 * 60);
+                if (horasTranscurridas < 24) {
+                    // Todavía no han pasado 24 horas, mantener oculto
+                    document.getElementById('promoBanner24h').style.display = 'none';
+                    return;
+                }
+            }
+            // Si pasaron 24 horas o es la primera vez, mostrar
+            document.getElementById('promoBanner24h').style.display = 'block';
+        }
+
+        function ocultarPublicidad24h() {
+            document.getElementById('promoBanner24h').style.display = 'none';
+            // Guardar el tiempo actual para que dure 24 horas oculto o activo según prefieras
+            localStorage.setItem('kolab_promo_24h_timestamp', new Date().getTime().toString());
+        }
 
         function abrirPromociones() {
             document.getElementById('promoModal').style.display = 'flex';
@@ -676,18 +707,14 @@
         function mostrarRegistro() {
             const mainLayout = document.getElementById('mainLayoutContainer');
             const leftContainer = document.getElementById('leftColumnContainer');
-            
             mainLayout.classList.remove('logged-in');
             leftContainer.classList.add('auth-container');
-
             document.getElementById('loginCard').style.display = 'none';
             document.getElementById('registerCard').style.display = 'block';
             document.getElementById('formCard').style.display = 'none';
             document.getElementById('rightColumnContainer').style.display = 'none';
-            
             document.getElementById('verifySection').style.display = 'none';
             document.getElementById('btnEnviarCod').style.display = 'block';
-            
             document.getElementById('navUserContainer').style.display = 'none';
             document.getElementById('navGuestInfo').style.display = 'block';
         }
@@ -695,15 +722,12 @@
         function mostrarLogin() {
             const mainLayout = document.getElementById('mainLayoutContainer');
             const leftContainer = document.getElementById('leftColumnContainer');
-            
             mainLayout.classList.remove('logged-in');
             leftContainer.classList.add('auth-container');
-
             document.getElementById('registerCard').style.display = 'none';
             document.getElementById('loginCard').style.display = 'block';
             document.getElementById('formCard').style.display = 'none';
             document.getElementById('rightColumnContainer').style.display = 'none';
-            
             document.getElementById('navUserContainer').style.display = 'none';
             document.getElementById('navGuestInfo').style.display = 'block';
         }
@@ -711,7 +735,7 @@
         function enviarCodigoVerificacion() {
             const acepto = document.getElementById('aceptoTerminos').checked;
             if (!acepto) {
-                alert('⚠️ Debes leer y aceptar los Términos y Condiciones para registrarte en la aplicación.');
+                alert('⚠️ Debes leer y aceptar los Términos y Condiciones para registrarte.');
                 return;
             }
 
@@ -765,15 +789,12 @@
 
         function confirmarCodigoYRegistrar() {
             const ingresado = document.getElementById('codigoIngresado').value.trim();
-
             if (ingresado !== codigoGeneradoTemp) {
                 alert('Código incorrecto. Por favor verifica el número que recibiste en tu correo.');
                 return;
             }
-
             localStorage.setItem('kolab_profile_' + datosTemporalesRegistro.email, JSON.stringify(datosTemporalesRegistro));
             localStorage.setItem('kolab_sesion_activa', datosTemporalesRegistro.email);
-
             alert('¡Correo verificado y cuenta creada con éxito en Kolaboradorf VE!');
             comprobarEstadoSesion();
         }
@@ -813,16 +834,14 @@
             const sesionActiva = localStorage.getItem('kolab_sesion_activa');
             if (!sesionActiva) return;
 
-            const confirmar1 = confirm("⚠️ ¿Estás completamente seguro de que deseas eliminar tu cuenta?\n\nEsta acción borrará tu perfil y todo tu historial guardado de este dispositivo, y tendrás que registrarte nuevamente si deseas ingresar en el futuro.");
-            
+            const confirmar1 = confirm("⚠️ ¿Estás completamente seguro de que deseas eliminar tu cuenta?\n\nEsta acción borrará tu perfil y todo tu historial guardado de este dispositivo.");
             if (confirmar1) {
-                const confirmar2 = confirm("🚨 ÚLTIMA ADVERTENCIA: ¿Confirmas la eliminación permanente de tu cuenta en Kolaboradorf VE?");
+                const confirmar2 = confirm("🚨 ÚLTIMA ADVERTENCIA: ¿Confirmas la eliminación permanente?");
                 if (confirmar2) {
                     localStorage.removeItem('kolab_profile_' + sesionActiva);
                     localStorage.removeItem('kolab_records_' + sesionActiva);
                     localStorage.removeItem('kolab_sesion_activa');
-
-                    alert("Tu cuenta ha sido eliminada con éxito. Por favor regístrate cuando desees crear una nueva.");
+                    alert("Tu cuenta ha sido eliminada con éxito.");
                     mostrarRegistro();
                 }
             }
