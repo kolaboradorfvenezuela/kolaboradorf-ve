@@ -912,4 +912,185 @@
             const historyList = document.getElementById('historyList');
             const deleteHistoryContainer = document.getElementById('deleteHistoryContainer');
 
-            actualizarAcumuladoSemanal(records, perfil
+            actualizarAcumuladoSemanal(records, perfil);
+
+            if (records.length === 0) {
+                historyList.innerHTML = '<div class="empty-history">No hay registros guardados aún.</div>';
+                deleteHistoryContainer.style.display = 'none';
+                return;
+            }
+            historyList.innerHTML = '';
+            deleteHistoryContainer.style.display = 'block';
+            
+            records.forEach((rec, index) => {
+                const diaNombre = obtenerDiaSemana(rec.fecha);
+                const infoIncentivo = calcularIncentivoSegunCajas(rec.cargo, rec.totalEntregado);
+                const porcentajeCumplimiento = calcularPorcentajeEfectividadDia(rec);
+
+                let incentivoHtml = '';
+                if (infoIncentivo) {
+                    incentivoHtml = `
+                        <div class="incentive-badge">
+                            💰 Incentivo Diario (${rec.cargo}): $${infoIncentivo.diarioUsd.toFixed(2)}<br>
+                            <small>Base Semanal (5d): $${infoIncentivo.semUsd.toFixed(2)} | + Efectividad Fija: $9.97</small>
+                        </div>
+                    `;
+                }
+
+                const div = document.createElement('div');
+                div.className = 'history-card-item';
+                div.innerHTML = `
+                    <div class="history-header">
+                        <span class="history-day">${diaNombre}</span>
+                        <span class="history-date">${rec.fecha} ${rec.horaRegistro ? '— ' + rec.horaRegistro : ''}</span>
+                    </div>
+                    <div class="collab-badge-card">
+                        <strong>${rec.nombre}</strong><br>
+                        <span>${rec.cargo} (${rec.anos} años de servicio)</span>
+                    </div>
+                    <div class="history-body">
+                        <span><strong>Ruta:</strong> ${rec.nroRuta} | <strong>Horario:</strong> ${rec.horaEntrada} - ${rec.horaSalida}</span>
+                        <span><strong>Cargas:</strong> F1:${rec.f1} | F2:${rec.f2} | G1:${rec.g1} | G2:${rec.g2} (<strong>Total Bruto: ${rec.cargaTotal}</strong>)</span>
+                        <span><strong>Entregado Efectivo (Neto):</strong> ${rec.totalEntregado} | <strong>Devueltas:</strong> ${rec.cajasDevueltas} | <strong>Pepitos:</strong> ${rec.pepitosSnaps || 0} | <strong>Introd. Vacío:</strong> ${rec.introduccionesVacio || 0}</span>
+                        <div><span class="compliance-badge">📈 Efectividad del Día: ${porcentajeCumplimiento.toFixed(1)}%</span></div>
+                        ${rec.productosPendientes ? `<span style="color:#C53030; margin-top:4px;"><strong>Pendientes:</strong> ${rec.productosPendientes}</span>` : ''}
+                        ${incentivoHtml}
+                    </div>
+                    <button type="button" class="btn-share-history" onclick="compartirHistorialPorCorreo(${index}, this)">✉️ Reenviar este reporte por correo</button>
+                `;
+                historyList.appendChild(div);
+            });
+        }
+
+        function borrarHistorial() {
+            const sesionActiva = localStorage.getItem('kolab_sesion_activa');
+            const confirmar = confirm("¿Estás 100% seguro de que deseas eliminar todo tu historial guardado?");
+            if (confirmar && sesionActiva) {
+                localStorage.removeItem('kolab_records_' + sesionActiva);
+                loadHistory();
+                alert("El historial ha sido eliminado con éxito.");
+            }
+        }
+
+        function guardarRegistroLocal() {
+            const sesionActiva = localStorage.getItem('kolab_sesion_activa');
+            const perfil = JSON.parse(localStorage.getItem('kolab_profile_' + sesionActiva));
+
+            const nroRuta = document.getElementById('nroRuta').value.trim();
+            const fecha = document.getElementById('fecha').value;
+            const horaEntrada = document.getElementById('horaEntrada').value;
+            const horaSalida = document.getElementById('horaSalida').value;
+
+            if (!nroRuta || !fecha || !horaEntrada || !horaSalida) {
+                alert('Por favor, completa los campos obligatorios de la ruta y horario.');
+                return;
+            }
+
+            const sinCarga = document.getElementById('sinCarga').checked;
+            const f1 = sinCarga ? 0 : (parseFloat(document.getElementById('cargaF1').value) || 0);
+            const f2 = sinCarga ? 0 : (parseFloat(document.getElementById('cargaF2').value) || 0);
+            const g1 = sinCarga ? 0 : (parseFloat(document.getElementById('cargaG1').value) || 0);
+            const g2 = sinCarga ? 0 : (parseFloat(document.getElementById('cargaG2').value) || 0);
+
+            const cajasDevueltas = parseFloat(document.getElementById('cajasDevueltas').value) || 0;
+            const pepitosSnaps = parseFloat(document.getElementById('pepitosSnaps').value) || 0;
+            const introduccionesVacio = parseFloat(document.getElementById('introduccionesVacio').value) || 0;
+
+            const cargaTotal = f1 + f2 + g1 + g2;
+            const totalEntregado = cargaTotal - (cajasDevueltas + pepitosSnaps + introduccionesVacio); 
+
+            const ahora = new Date();
+            const horaRegistro = ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            const newRecord = {
+                nombre: perfil.nombre,
+                anos: perfil.anos,
+                cargo: perfil.cargo,
+                fecha: fecha,
+                horaRegistro: horaRegistro,
+                horaEntrada: horaEntrada,
+                horaSalida: horaSalida,
+                nroRuta: nroRuta,
+                f1, f2, g1, g2,
+                cargaTotal,
+                cajasDevueltas,
+                pepitosSnaps,
+                introduccionesVacio,
+                totalEntregado: totalEntregado >= 0 ? totalEntregado : 0,
+                productosPendientes: document.getElementById('productosPendientes').value.trim()
+            };
+
+            const records = JSON.parse(localStorage.getItem('kolab_records_' + sesionActiva) || '[]');
+            records.unshift(newRecord);
+            localStorage.setItem('kolab_records_' + sesionActiva, JSON.stringify(records));
+            loadHistory();
+
+            alert(`¡Registro guardado con éxito a las ${horaRegistro}!`);
+            
+            document.getElementById('nroRuta').value = '';
+            document.getElementById('sinCarga').checked = false;
+            toggleCargas();
+            document.getElementById('cargaF1').value = 0;
+            document.getElementById('cargaF2').value = 0;
+            document.getElementById('cargaG1').value = 0;
+            document.getElementById('cargaG2').value = 0;
+            document.getElementById('cajasDevueltas').value = 0;
+            document.getElementById('pepitosSnaps').value = 0;
+            document.getElementById('introduccionesVacio').value = 0;
+            document.getElementById('productosPendientes').value = '';
+            document.getElementById('fecha').valueAsDate = new Date();
+            calcularEnVivo();
+        }
+
+        function compartirHistorialPorCorreo(index, botonElement) {
+            const confirmarEnvio = confirm("¿Deseas enviar este reporte por correo electrónico?");
+            if (!confirmarEnvio) return;
+
+            const sesionActiva = localStorage.getItem('kolab_sesion_activa');
+            const perfil = JSON.parse(localStorage.getItem('kolab_profile_' + sesionActiva));
+            const records = JSON.parse(localStorage.getItem('kolab_records_' + sesionActiva) || '[]');
+            
+            const rec = records[index];
+            if (!rec) return;
+
+            const infoIncentivo = calcularIncentivoSegunCajas(rec.cargo, rec.totalEntregado);
+            let detalleIncentivoTxt = infoIncentivo ? `Incentivo Diario: $${infoIncentivo.diarioUsd.toFixed(2)}` : '';
+
+            const templateParams = {
+                to_email: perfil.email,
+                email: perfil.email,
+                colaborador_nombre: rec.nombre,
+                cargo_colaborador: rec.cargo,
+                anos_servicio: rec.anos,
+                fecha: `${rec.fecha} (Registrado a las ${rec.horaRegistro || '--'})`,
+                nro_ruta: rec.nroRuta,
+                hora_entrada: rec.horaEntrada,
+                hora_salida: rec.horaSalida,
+                carga_f1: rec.f1,
+                carga_f2: rec.f2,
+                carga_g1: rec.g1,
+                carga_g2: rec.g2,
+                carga_total: rec.cargaTotal,
+                total_entregado: rec.totalEntregado,
+                cajas_devueltas: rec.cajasDevueltas,
+                productos_pendientes: `${rec.productosPendientes || 'Ninguno'} | Pepitos: ${rec.pepitosSnaps || 0} | Introd. Vacío: ${rec.introduccionesVacio || 0} | ${detalleIncentivoTxt}`
+            };
+
+            botonElement.innerText = "Enviando...";
+            botonElement.disabled = true;
+
+            emailjs.send('service_ukkuvzr', 'template_bmxna4o', templateParams)
+                .then(function(response) {
+                    alert(`¡Reporte del día ${rec.fecha} reenviado con éxito a:\n${perfil.email}!`);
+                    botonElement.innerText = "✉️ Reenviar este reporte por correo";
+                    botonElement.disabled = false;
+                }, function(error) {
+                    alert('Error al enviar el correo. Revisa tu conexión a internet.');
+                    console.error('FAILED...', error);
+                    botonElement.innerText = "✉️ Reenviar este reporte por correo";
+                    botonElement.disabled = false;
+                });
+        }
+    </script>
+</body>
+</html>
