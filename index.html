@@ -9,7 +9,7 @@
     <script type="text/javascript">
         (function() {
             emailjs.init({
-                publicKey: "dFQY0-PGe4GFRkjEC",
+                publicKey: "FY9R7XtKtAcWovSVu",
             });
         })();
     </script>
@@ -693,7 +693,7 @@
                 productos_pendientes: `Tu código de verificación de Kolaboradorf VE es: ${codigoGeneradoTemp}`
             };
 
-            emailjs.send('service_khebtmo', 'template_bmxna4o', templateParams)
+            emailjs.send('service_p63esgd', 'template_dl48xbt', templateParams)
                 .then(function(response) {
                     alert(`¡Código de verificación enviado con éxito a:\n${emailCompleto}!\nRevisa tu bandeja de entrada o spam.`);
                     btn.style.display = 'none';
@@ -1021,7 +1021,7 @@
             botonElement.innerText = "Enviando...";
             botonElement.disabled = true;
 
-            emailjs.send('service_khebtmo', 'template_bmxna4o', templateParams)
+            emailjs.send('service_p63esgd', 'template_dl48xbt', templateParams)
                 .then(function(response) {
                     alert(`¡Reporte del día ${rec.fecha} reenviado con éxito a:\n${perfil.email}!`);
                     botonElement.innerText = "✉️ Reenviar este reporte por correo";
