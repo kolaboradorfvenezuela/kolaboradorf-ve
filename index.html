@@ -718,7 +718,7 @@
             const nombre = document.getElementById('regNombre').value.trim();
             const anos = document.getElementById('regAnos').value.trim();
             const cargo = document.getElementById('regCargo').value;
-            const emailUser = document.getElementById('emailUser').value.trim();
+            const emailUser = document.getElementById('emailUser').value.trim().toLowerCase();
             const emailDomain = document.getElementById('emailDomain').value;
             const password = document.getElementById('regPassword').value.trim();
 
@@ -779,12 +779,16 @@
         }
 
         function procesarLogin() {
-            const email = document.getElementById('loginEmail').value.trim();
+            const email = document.getElementById('loginEmail').value.trim().toLowerCase();
             const password = document.getElementById('loginPassword').value.trim();
 
             const perfilGuardado = localStorage.getItem('kolab_profile_' + email);
             if (!perfilGuardado) {
-                alert('No existe ninguna cuenta registrada con este correo. Por favor regístrate.');
+                const irRegistro = confirm('⚠️ No existe ninguna cuenta registrada con este correo en este navegador.\n\n¿Deseas ir al formulario de registro ahora mismo?');
+                if (irRegistro) {
+                    mostrarRegistro();
+                    document.getElementById('emailUser').value = email.split('@')[0];
+                }
                 return;
             }
 
