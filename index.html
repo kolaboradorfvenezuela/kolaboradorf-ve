@@ -84,6 +84,12 @@
         .checkbox-group input { width: 22px; height: 22px; accent-color: var(--kolab-red); cursor: pointer; }
         .checkbox-group label { margin-bottom: 0; color: #C53030; font-weight: 700; cursor: pointer; font-size: 0.85rem; }
 
+        /* Estilo para los Términos en Registro */
+        .terms-checkbox-container { display: flex; align-items: center; gap: 8px; margin: 16px 0; font-size: 0.82rem; color: #2D3748; font-weight: 600; }
+        .terms-checkbox-container input { width: 18px; height: 18px; accent-color: var(--kolab-red); cursor: pointer; }
+        .terms-link { color: var(--kolab-red); text-decoration: underline; cursor: pointer; font-weight: 700; }
+        .terms-link:hover { color: var(--kolab-dark-red); }
+
         .live-calc-panel { background: #EDF2F7; border-radius: 10px; padding: 14px; margin-bottom: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: center; border: 1px solid #E2E8F0; }
         .calc-box { background: white; padding: 10px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         .calc-box span { display: block; font-size: 0.7rem; color: #718096; text-transform: uppercase; font-weight: 700; }
@@ -118,6 +124,17 @@
 
         .btn-danger { width: 100%; background: #E53E3E; color: white; border: none; padding: 10px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; cursor: pointer; margin-top: 15px; text-transform: uppercase; letter-spacing: 0.5px; transition: background 0.2s; }
         .btn-danger:hover { background: #C53030; }
+
+        /* Estilos del Modal de Términos y Condiciones */
+        #termsModal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; display: none; justify-content: center; align-items: center; padding: 15px; backdrop-filter: blur(5px); }
+        .terms-modal-content { background: #FFFFFF; width: 100%; max-width: 650px; border-radius: 14px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.3); border-top: 6px solid var(--kolab-red); display: flex; flex-direction: column; max-height: 85vh; }
+        .terms-header { background: #1A202C; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .terms-header h3 { font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; color: #FFF; }
+        .btn-close-terms { background: none; border: none; color: white; font-size: 1.2rem; cursor: pointer; font-weight: bold; }
+        .terms-body { padding: 20px; overflow-y: auto; font-size: 0.82rem; color: #2D3748; line-height: 1.6; }
+        .terms-body h4 { font-size: 0.9rem; color: var(--kolab-red); margin-top: 14px; margin-bottom: 6px; text-transform: uppercase; }
+        .terms-body p { margin-bottom: 10px; }
+        .terms-footer { padding: 12px 20px; background: #F7FAFC; border-top: 1px solid #E2E8F0; text-align: right; }
 
         /* Estilos del Muro de Eventos y Promociones */
         #promoModal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; display: none; justify-content: center; align-items: center; padding: 15px; backdrop-filter: blur(5px); }
@@ -168,6 +185,44 @@
         <div class="splash-sub">Cargando Sistema Operativo...</div>
     </div>
 
+    <!-- MODAL DE TÉRMINOS Y CONDICIONES -->
+    <div id="termsModal">
+        <div class="terms-modal-content">
+            <div class="terms-header">
+                <h3>📜 Términos y Condiciones de Uso</h3>
+                <button type="button" class="btn-close-terms" onclick="cerrarTerminos()">✕</button>
+            </div>
+            <div class="terms-body">
+                <p><strong>Fecha de Última Actualización:</strong> 16 de octubre de 2026[cite: 1].</p>
+                <p><strong>Preámbulo y Deslinde de Responsabilidad Corporativa (Disclaimer):</strong> El presente documento constituye un contrato legalmente vinculante entre el usuario (en adelante, el "Colaborador" o "Usuario") y el desarrollador independiente y propietario de la aplicación KOLABORADORF VE® (en adelante, la "Plataforma" o la "Aplicación")[cite: 1].</p>
+                
+                <h4>1. Ausencia de Vínculo Corporativo y Patrocinio</h4>
+                <p>Se deja constancia expresa, clara e inequívoca que KOLABORADORF VE® es un desarrollo de software informático totalmente independiente, autónomo y privado. Esta Aplicación NO cuenta con ningún tipo de patrocinio, aval, registro, autorización, licencia, certificación, homologación ni relación comercial o laboral con corporaciones multinacionales, empresas embotelladoras, marcas registradas de bebidas gaseosas, ni con ninguna entidad jurídica corporativa que opere en el sector de alimentos, bebidas y distribución en la República Bolivariana de Venezuela o a nivel internacional[cite: 1].</p>
+                
+                <h4>2. Uso de Datos y Marcas</h4>
+                <p>Cualquier similitud operativa, mención de cargos de distribución, tabuladores de carga, métricas de rutas o referencias logísticas responde exclusivamente a la naturaleza informativa y de cálculo personal para el trabajador, prohibiéndose terminantemente el uso indebido, suplantación o apropiación de nombres comerciales ajenos. Queda totalmente prohibido utilizar los nombres, marcas registradas, logotipos o identidades corporativas de terceros para cometer actos ilícitos, suplantación de identidad corporativa o difamación[cite: 1].</p>
+                
+                <h4>Sección 1: Marco Legal Nacional e Internacional</h4>
+                <p>El uso de la presente Aplicación se rige bajo los principios generales del derecho internacional y las leyes de la República Bolivariana de Venezuela, incluyendo de manera enunciativa más no limitativa[cite: 1]:</p>
+                <p>• <strong>Constitución de la República Bolivariana de Venezuela (CRBV):</strong> Garantía de la libertad de trabajo, iniciativa privada y protección de la propiedad intelectual[cite: 1].</p>
+                <p>• <strong>Ley Especial contra los Delitos Informáticos (LECDI):</strong> Sancionando el acceso indebido, sabotaje de sistemas, fraude informático y falsificación de documentos electrónicos[cite: 1].</p>
+                <p>• <strong>Código Civil Venezolano:</strong> Normativa sobre obligaciones, contratos y responsabilidad civil extracontractual por daños causados por negligencia o uso indebido[cite: 1].</p>
+                <p>• <strong>Ley sobre el Derecho de Autor y Ley de Propiedad Industrial:</strong> Protección de los códigos fuente, interfaces y elementos de diseño propios de KOLABORADORF VE®[cite: 1].</p>
+                <p>• <strong>Tratados Internacionales:</strong> Convenio de Berna para la Protección de Obras Literarias y Artísticas y los acuerdos de la OMPI sobre software y propiedad intelectual transfronteriza[cite: 1].</p>
+                
+                <h4>Sección 2: Condiciones de Uso y Obligaciones del Usuario</h4>
+                <p>1. <strong>Uso Personal y Referencial:</strong> La Aplicación ha sido diseñada estrictamente como una herramienta de gestión personal para que el colaborador calcule de manera referencial sus tiempos de jornada, cargas netas, devoluciones e incentivos estimados[cite: 1]. Los cálculos arrojados por la plataforma no constituyen recibos de pago oficiales ni comprometen salarios o bonificaciones corporativas reales[cite: 1].</p>
+                <p>2. <strong>Prohibiciones Absolutas:</strong> Queda terminantemente prohibido utilizar el nombre de marcas corporativas o de terceros para simular comunicaciones oficiales, fraudes, extorsiones o campañas de desinformación[cite: 1]. Está prohibido realizar ingeniería inversa, modificar el código fuente con fines maliciosos, hackear las pasarelas de autenticación o vulnerar la seguridad local del dispositivo (LocalStorage)[cite: 1]. El usuario es el único responsable civil y penalmente por el uso que le dé a la información generada y compartida desde su cuenta[cite: 1].</p>
+                
+                <h4>Sección 3: Exención de Responsabilidad y Limitación de Daños</h4>
+                <p>El desarrollador de KOLABORADORF VE® no asume ninguna responsabilidad por errores de cálculo derivados de la introducción incorrecta de datos por parte del usuario, fallas en servicios de terceros integrados (como la API de tasa de cambio del BCV o EmailJS), ni por uso indebido o fraudulento por parte de terceros que obtengan acceso a las credenciales[cite: 1].</p>
+            </div>
+            <div class="terms-footer">
+                <button type="button" class="btn-primary" style="width: auto; padding: 8px 20px;" onclick="cerrarTerminos()">Entendido y Cerrar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL DE EVENTOS Y PROMOCIONES OFICIALES -->
     <div id="promoModal">
         <div class="promo-modal-content">
@@ -177,26 +232,26 @@
             </div>
             <div class="promo-body">
                 <div class="legal-disclaimer">
-                    ⚠️ Aviso Legal: No nos hacemos responsables de lo que observas. Todo el contenido, marcas y derechos de propiedad intelectual pertenecen exclusivamente a la compañía internacional <strong>The Coca-Cola Company</strong> y a su licenciatario oficial en Venezuela (<strong>Coca-Cola FEMSA</strong>).
+                    ⚠️ Aviso Legal: No nos hacemos responsables de lo que observas. Todo el contenido, marcas y derechos de propiedad intelectual pertenecen exclusivamente a la compañía internacional <strong>The Coca-Cola Company</strong> y a su licenciatario oficial en Venezuela (<strong>Coca-Cola FEMSA</strong>)[cite: 1].
                 </div>
-                <p style="margin-bottom: 15px; font-size: 0.85rem; font-weight: 600; color: #4A5568;">Información oficial sincronizada de los portales corporativos globales y nacionales:</p>
+                <p style="margin-bottom: 15px; font-size: 0.85rem; font-weight: 600; color: #4A5568;">Información oficial sincronizada de los portales corporativos globales y nacionales[cite: 1]:</p>
                 
                 <div class="promo-feed-item">
                     <h4>🌐 Noticias y Actualidad Global (The Coca-Cola Company)</h4>
-                    <p>Accede a los comunicados oficiales, lanzamientos mundiales de productos, reportes de sostenibilidad y campañas institucionales a nivel internacional.</p>
+                    <p>Accede a los comunicados oficiales, lanzamientos mundiales de productos, reportes de sostenibilidad y campañas institucionales a nivel internacional[cite: 1].</p>
                     <a href="https://www.coca-colacompany.com/news" target="_blank" class="promo-link">🔗 Ver Sitio Oficial Global &rarr;</a>
                 </div>
 
                 <div class="promo-feed-item">
                     <h4>🇻🇪 Operaciones, Empleo y Novedades en Venezuela (Coca-Cola FEMSA)</h4>
-                    <p>Información institucional acerca de la presencia de FEMSA en territorio venezolano, iniciativas comunitarias y desarrollo de talento humano.</p>
+                    <p>Información institucional acerca de la presencia de FEMSA en territorio venezolano, iniciativas comunitarias y desarrollo de talento humano[cite: 1].</p>
                     <a href="https://coca-colafemsa.com/" target="_blank" class="promo-link">🔗 Ver Portal Oficial FEMSA &rarr;</a>
                 </div>
 
                 <div class="promo-feed-item">
                     <h4>📦 Distribución, Logística y Rendimiento Comercial</h4>
-                    <p>Lineamientos y pautas operativas enfocadas en la optimización de cargas, rutas y desempeño para ayudantes de descarga y entregadores.</p>
-                    <span style="font-size: 0.75rem; color: #718096; font-style: italic;">Actualizado automáticamente para el personal operativo.</span>
+                    <p>Lineamientos y pautas operativas enfocadas en la optimización de cargas, rutas y desempeño para ayudantes de descarga y entregadores[cite: 1].</p>
+                    <span style="font-size: 0.75rem; color: #718096; font-style: italic;">Actualizado automáticamente para el personal operativo[cite: 1].</span>
                 </div>
             </div>
         </div>
@@ -246,7 +301,7 @@
                 </div>
             </div>
 
-            <!-- 2. PANTALLA DE REGISTRO CON SELECTOR DE CARGO -->
+            <!-- 2. PANTALLA DE REGISTRO CON TÉRMINOS Y CONDICIONES -->
             <div class="card" id="registerCard" style="display: none;">
                 <h2 class="section-title">📝 Regístrate y Verifica Correo</h2>
                 
@@ -286,6 +341,15 @@
                         <label for="regPassword">Crea una Contraseña de Acceso *</label>
                         <input type="password" id="regPassword" placeholder="••••••••" required>
                     </div>
+
+                    <!-- CASILLA DE TÉRMINOS Y CONDICIONES -->
+                    <div class="terms-checkbox-container">
+                        <input type="checkbox" id="aceptoTerminos" required>
+                        <label for="aceptoTerminos" style="font-size: 0.8rem; font-weight: 600; color: #4A5568; margin-bottom: 0;">
+                            He leído y acepto los <span class="terms-link" onclick="abrirTerminos()">Términos y Condiciones</span>
+                        </label>
+                    </div>
+
                     <button type="submit" id="btnEnviarCod" class="btn-primary">Enviar Código de Verificación</button>
                 </form>
 
@@ -306,7 +370,7 @@
             <div class="card" id="formCard" style="display: none;">
                 <!-- AVISO INTERNO (Recursos Humanos) -->
                 <div class="notice-internal">
-                    ℹ️ <strong>Aviso importante:</strong> Esta herramienta ofrece únicamente una referencia estimada de tus incentivos y no determina el monto final de pago. Ante cualquier duda o inconsistencia, consulta directamente con Recursos Humanos de tu localidad.
+                    ℹ️ <strong>Aviso importante:</strong> Esta herramienta ofrece únicamente una referencia estimada de tus incentivos y no determina el monto final de pago[cite: 1]. Ante cualquier duda o inconsistencia, consulta directamente con Recursos Humanos de tu localidad[cite: 1].
                 </div>
 
                 <div class="profile-summary" id="profileDisplay"></div>
@@ -445,7 +509,7 @@
         <div style="width: 100%;">
             <!-- AVISO EXTERNO (Autoría Independiente) -->
             <div class="notice-external">
-                ⚖️ <strong>Aviso legal:</strong> Esta aplicación es un desarrollo independiente de KOLABORADORF Venezuela® y no pertenece, está afiliada ni cuenta con el aval de la compañía que rige sus pagos. La información aquí mostrada es de carácter referencial y ajena a los registros oficiales corporativos.
+                ⚖️ <strong>Aviso legal:</strong> Esta aplicación es un desarrollo independiente de KOLABORADORF Venezuela® y no pertenece, está afiliada ni cuenta con el aval de la compañía que rige sus pagos[cite: 1]. La información aquí mostrada es de carácter referencial y ajena a los registros oficiales corporativos[cite: 1].
             </div>
         </div>
         <div>
@@ -528,6 +592,13 @@
             document.getElementById('promoModal').style.display = 'none';
         }
 
+        function abrirTerminos() {
+            document.getElementById('termsModal').style.display = 'flex';
+        }
+        function cerrarTerminos() {
+            document.getElementById('termsModal').style.display = 'none';
+        }
+
         async function cargarTasaBCV() {
             const displayTasa = document.getElementById('tasaBcvValor');
             try {
@@ -564,7 +635,6 @@
             if (sesionActiva) {
                 const perfil = JSON.parse(localStorage.getItem('kolab_profile_' + sesionActiva));
                 if (perfil) {
-                    // Cambiar a diseño de 2 columnas
                     mainLayout.classList.add('logged-in');
                     leftContainer.classList.remove('auth-container');
 
@@ -621,6 +691,12 @@
         }
 
         function enviarCodigoVerificacion() {
+            const acepto = document.getElementById('aceptoTerminos').checked;
+            if (!acepto) {
+                alert('⚠️ Debes leer y aceptar los Términos y Condiciones para registrarte en la aplicación.');
+                return;
+            }
+
             const nombre = document.getElementById('regNombre').value.trim();
             const anos = document.getElementById('regAnos').value.trim();
             const cargo = document.getElementById('regCargo').value;
