@@ -55,10 +55,14 @@
         header.hero h1 { font-size: 1.2rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; }
         header.hero p { font-size: 0.8rem; opacity: 0.9; margin-top: 4px; font-weight: 400; }
 
-        .main-layout { max-width: 1100px; margin: 20px auto; padding: 0 15px; display: grid; grid-template-columns: 1fr; gap: 20px; }
+        /* Contenedor dinámico: Centrado cuando es login/registro, Grid de 2 columnas al iniciar sesión */
+        .main-layout { max-width: 1100px; margin: 20px auto; padding: 0 15px; display: flex; justify-content: center; }
+        .main-layout.logged-in { display: grid; grid-template-columns: 1fr; gap: 20px; }
         @media(min-width: 850px) {
-            .main-layout { grid-template-columns: 1fr 1fr; align-items: start; }
+            .main-layout.logged-in { grid-template-columns: 1fr 1fr; align-items: start; }
         }
+
+        .auth-container { width: 100%; max-width: 480px; margin: 20px auto; }
 
         .card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 14px; padding: 22px; box-shadow: var(--kolab-shadow); margin-bottom: 20px; border-top: 5px solid var(--kolab-red); }
         
@@ -216,9 +220,10 @@
         <p>Gestión Inteligente de Jornada y Cargas</p>
     </header>
 
-    <div class="main-layout">
+    <div class="main-layout" id="mainLayoutContainer">
         
-        <div>
+        <!-- CONTENEDOR IZQUIERDO / CENTRADO (LOGIN, REGISTRO O FORMULARIO) -->
+        <div id="leftColumnContainer" class="auth-container">
             <!-- 1. PANTALLA DE INICIO DE SESIÓN -->
             <div class="card" id="loginCard">
                 <h2 class="section-title">🔑 Iniciar Sesión</h2>
@@ -294,7 +299,7 @@
                 </div>
             </div>
 
-            <!-- 3. PANEL OPERATIVO PRINCIPAL -->
+            <!-- 3. PANEL OPERATIVO PRINCIPAL (Solo visible al iniciar sesión) -->
             <div class="card" id="formCard" style="display: none;">
                 <div class="profile-summary" id="profileDisplay"></div>
                 
@@ -412,7 +417,8 @@
             </div>
         </div>
 
-        <div>
+        <!-- CONTENEDOR DERECHO: HISTORIAL (Solo visible al iniciar sesión) -->
+        <div id="rightColumnContainer" style="display: none;">
             <div class="card">
                 <h2 class="section-title">📂 Historial por Días</h2>
                 <div id="historyList">
@@ -432,7 +438,7 @@
             <span class="zero-tag">KOLABORADORF VE</span>
         </div>
         <footer class="legal">
-            <p><strong>Aviso Legal: Uso operativo interno bajo estricta responsabilidad del KOLABORADORF. ©2026 Todos los derechos reservados.</strong></p>
+            <p><strong>Aviso Legal: Uso operativo interno bajo estricta responsabilidad del kolaboradorf. ©2026 Todos los derechos reservados.</strong></p>
         </footer>
         <div class="bcv-widget">
             <div class="bcv-icon">🇻🇪</div>
@@ -537,13 +543,21 @@
             const navUserContainer = document.getElementById('navUserContainer');
             const navGuestInfo = document.getElementById('navGuestInfo');
             const navUserInfo = document.getElementById('navUserInfo');
+            const mainLayout = document.getElementById('mainLayoutContainer');
+            const leftContainer = document.getElementById('leftColumnContainer');
+            const rightContainer = document.getElementById('rightColumnContainer');
 
             if (sesionActiva) {
                 const perfil = JSON.parse(localStorage.getItem('kolab_profile_' + sesionActiva));
                 if (perfil) {
+                    // Cambiar a diseño de 2 columnas
+                    mainLayout.classList.add('logged-in');
+                    leftContainer.classList.remove('auth-container');
+
                     document.getElementById('registerCard').style.display = 'none';
                     document.getElementById('loginCard').style.display = 'none';
                     document.getElementById('formCard').style.display = 'block';
+                    rightContainer.style.display = 'block';
                     
                     navUserContainer.style.display = 'flex';
                     navGuestInfo.style.display = 'none';
@@ -558,24 +572,35 @@
         }
 
         function mostrarRegistro() {
+            const mainLayout = document.getElementById('mainLayoutContainer');
+            const leftContainer = document.getElementById('leftColumnContainer');
+            
+            mainLayout.classList.remove('logged-in');
+            leftContainer.classList.add('auth-container');
+
             document.getElementById('loginCard').style.display = 'none';
             document.getElementById('registerCard').style.display = 'block';
             document.getElementById('formCard').style.display = 'none';
+            document.getElementById('rightColumnContainer').style.display = 'none';
+            
             document.getElementById('verifySection').style.display = 'none';
             document.getElementById('btnEnviarCod').style.display = 'block';
-            document.getElementById('historyList').innerHTML = '<div class="empty-history">Regístrate o inicia sesión para gestionar tus reportes.</div>';
-            document.getElementById('deleteHistoryContainer').style.display = 'none';
             
             document.getElementById('navUserContainer').style.display = 'none';
             document.getElementById('navGuestInfo').style.display = 'block';
         }
 
         function mostrarLogin() {
+            const mainLayout = document.getElementById('mainLayoutContainer');
+            const leftContainer = document.getElementById('leftColumnContainer');
+            
+            mainLayout.classList.remove('logged-in');
+            leftContainer.classList.add('auth-container');
+
             document.getElementById('registerCard').style.display = 'none';
             document.getElementById('loginCard').style.display = 'block';
             document.getElementById('formCard').style.display = 'none';
-            document.getElementById('historyList').innerHTML = '<div class="empty-history">Inicia sesión para gestionar tus reportes.</div>';
-            document.getElementById('deleteHistoryContainer').style.display = 'none';
+            document.getElementById('rightColumnContainer').style.display = 'none';
             
             document.getElementById('navUserContainer').style.display = 'none';
             document.getElementById('navGuestInfo').style.display = 'block';
@@ -752,12 +777,8 @@
                 sumaPorcentajesEfectividad += calcularPorcentajeEfectividadDia(rec);
             });
 
-            // PROMEDIO ACUMULADO PROGRESIVO DE EFECTIVIDAD
             let promedioEfectividadSemanal = records.length > 0 ? (sumaPorcentajesEfectividad / records.length) : 0;
-
-            // REGLA: Únicamente se evalúa que el promedio acumulado sea >= 97% (sin mínimo de días)
             let cumpleRequisitos = (records.length > 0 && promedioEfectividadSemanal >= 97);
-
             const totalGeneralUsd = incentivoPuroUsd + (cumpleRequisitos ? EFECTIVIDAD_REPARTO_FIJA_USD : 0);
 
             document.getElementById('weeklyTotalCajas').innerText = totalCajasSemana;
