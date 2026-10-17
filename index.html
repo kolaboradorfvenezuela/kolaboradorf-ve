@@ -51,7 +51,6 @@
             z-index: 999;
             overflow: hidden;
             display: none;
-            animation: fadeIn 0.4s ease;
         }
         .promo-banner-header {
             background: #D69E2E;
@@ -234,7 +233,7 @@
         </div>
         <div class="promo-banner-body">
             <a href="https://www.dividendovoluntario.org" target="_blank">
-                <img src="VV-MEDIA-COMO-DONAR-AL-TELETON-VENEVISION-2026-UNIDOS-POR-VENEZUELA-1.jpeg" alt="Teletón Venevisión 2026">
+                <img src="VV-MEDIA-COMO-DONAR-AL-TELETON-VENEVISION-2026-UNIDOS-POR-VENEZUELA-1.jpeg" alt="Teletón Venevisión 2026" onerror="this.src='https://i.ibb.co/3m1K20j/teleton-venevision.jpg'">
             </a>
             <span style="display:block; font-size: 0.68rem; color: #CBD5E0; margin-top: 6px;">Publicidad activa por 24 horas</span>
         </div>
@@ -284,7 +283,7 @@
                 </div>
                 <div class="promo-feed-item">
                     <h4>🇻🇪 Teletón Venevisión 2026 - Unidos por Venezuela</h4>
-                    <p>Espacio publicitario temporal en apoyo a la solidaridad nacional.</p>
+                    <p>Espacio publicitario temporal en apoyo a la solidaridad nacional[cite: 8].</p>
                     <a href="https://www.dividendovoluntario.org" target="_blank" class="promo-link">🔗 Sitio Oficial Donaciones &rarr;</a>
                 </div>
             </div>
@@ -619,18 +618,15 @@
             if (tiempoOculto) {
                 const horasTranscurridas = (ahora - parseInt(tiempoOculto)) / (1000 * 60 * 60);
                 if (horasTranscurridas < 24) {
-                    // Todavía no han pasado 24 horas, mantener oculto
                     document.getElementById('promoBanner24h').style.display = 'none';
                     return;
                 }
             }
-            // Si pasaron 24 horas o es la primera vez, mostrar
             document.getElementById('promoBanner24h').style.display = 'block';
         }
 
         function ocultarPublicidad24h() {
             document.getElementById('promoBanner24h').style.display = 'none';
-            // Guardar el tiempo actual para que dure 24 horas oculto o activo según prefieras
             localStorage.setItem('kolab_promo_24h_timestamp', new Date().getTime().toString());
         }
 
