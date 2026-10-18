@@ -229,22 +229,22 @@
 
                     <!-- Resumen, Carga Inicial, Incentivos y Efectividad -->
                     <div class="lg:col-span-2 space-y-4">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                            <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 text-center">
-                                <span class="text-[10px] font-bold text-slate-400 uppercase">Carga Inicial (Ruta)</span>
-                                <h4 id="statCargaInicial" class="text-2xl font-black text-white mt-1">0</h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                            <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 text-center">
+                                <span class="text-[9px] font-bold text-slate-400 uppercase">Carga Inicial (Salida)</span>
+                                <h4 id="statCargaInicial" class="text-xl font-black text-white mt-1">0</h4>
                             </div>
-                            <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 text-center">
-                                <span class="text-[10px] font-bold text-slate-400 uppercase">Carga Neta Entregada</span>
-                                <h4 id="statCargaNetaDia" class="text-2xl font-black text-emerald-300 mt-1">0</h4>
+                            <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 text-center">
+                                <span class="text-[9px] font-bold text-slate-400 uppercase">Carga Neta Entregada</span>
+                                <h4 id="statCargaNetaDia" class="text-xl font-black text-white mt-1">0</h4>
                             </div>
-                            <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 text-center">
-                                <span class="text-[10px] font-bold text-slate-400 uppercase">Incentivo Diario Acumulado</span>
-                                <h4 id="statIncentivo" class="text-2xl font-black text-emerald-400 mt-1">$0.00</h4>
+                            <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 text-center">
+                                <span class="text-[9px] font-bold text-slate-400 uppercase">Incentivo Diario</span>
+                                <h4 id="statIncentivo" class="text-xl font-black text-emerald-400 mt-1">$0.00</h4>
                             </div>
-                            <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 text-center">
-                                <span class="text-[10px] font-bold text-slate-400 uppercase">Efectividad del Día</span>
-                                <h4 id="statEfectividadSemanal" class="text-2xl font-black text-blue-400 mt-1">100.0%</h4>
+                            <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 text-center">
+                                <span class="text-[9px] font-bold text-slate-400 uppercase">Efectividad del Día</span>
+                                <h4 id="statEfectividadSemanal" class="text-xl font-black text-blue-400 mt-1">100.0%</h4>
                             </div>
                         </div>
 
@@ -592,7 +592,7 @@
             calculateOperational();
         }
 
-        // CÁLCULO OPERATIVO CON CARGA INICIAL, DESCUENTO DE DEVOLUCIONES E INCENTIVO LIMPIO
+        // CÁLCULO OPERATIVO: SEPARANDO CARGAS NETAS, INCENTIVOS Y EFECTIVIDAD
         function calculateOperational() {
             const isNoLoad = document.getElementById('noLoadCheck').checked;
             const efElement = document.getElementById('statEfectividadSemanal');
@@ -602,7 +602,7 @@
                 document.getElementById('statCargaNetaDia').innerText = 0;
                 document.getElementById('statIncentivo').innerText = "$0.00";
                 efElement.innerText = "0.0%";
-                efElement.className = "text-2xl font-black text-amber-500 mt-1";
+                efElement.className = "text-xl font-black text-amber-500 mt-1";
                 return;
             }
 
@@ -616,22 +616,25 @@
             const hasIntro = document.querySelector('input[name="radioIntro"]:checked')?.value === 'si';
             const intro = hasIntro ? (parseInt(document.getElementById('inputIntroducciones').value) || 0) : 0;
             
-            // Carga Bruta Inicial con la que salió la ruta (F1 + F2 + G1 + G2 + Pepitos)
-            const cargaBrutaInicial = (f1 + f2 + g1 + g2) + pep;
-            document.getElementById('statCargaInicial').innerText = cargaBrutaInicial;
+            // Cajas base netas (F1+F2+G1+G2)
+            const cajasBrutas = f1 + f2 + g1 + g2;
 
-            // Carga Neta Entregada (A la carga bruta se le descuentan las devoluciones/devueltas)
-            const cargaNetaEntregada = cargaBrutaInicial - dev;
-            document.getElementById('statCargaNetaDia').innerText = cargaNetaEntregada >= 0 ? cargaNetaEntregada : 0;
+            // CARGA INICIAL (Total de movimiento con el que salió la ruta: cajas brutas + pepitos)
+            const cargaInicial = cajasBrutas + pep;
+            document.getElementById('statCargaInicial').innerText = cargaInicial;
+
+            // CARGA NETA ENTREGADA (Carga inicial menos las devoluciones reales)
+            const cargaNetaDia = Math.max(0, cargaInicial - dev);
+            document.getElementById('statCargaNetaDia').innerText = cargaNetaDia;
             
-            // Cajas base para incentivo (excluye pepitos y descuenta devoluciones)
-            const baseIncentivoCajas = (f1 + f2 + g1 + g2) - dev;
-            const incentivoDiario = baseIncentivoCajas > 0 ? (baseIncentivoCajas * 0.012) : 0;
+            // INCENTIVO DIARIO (Calculado solo sobre cajas base netas, descontando devoluciones e introducciones sin incluir pepitos)
+            const netasIncentivo = Math.max(0, cajasBrutas - dev - (hasIntro ? intro : 0));
+            const incentivoDiario = netasIncentivo * 0.012;
             document.getElementById('statIncentivo').innerText = `$${incentivoDiario.toFixed(2)}`;
 
-            // Efectividad del día
-            const totalEntregadoEfectivo = cargaNetaEntregada + intro;
-            const totalProgramado = totalEntregadoEfectivo + dev;
+            // EFECTIVIDAD DEL DÍA (Integra carga entregada + pepitos + introducciones / carga programada total)
+            const totalProgramado = cargaInicial;
+            const totalEntregadoEfectivo = Math.max(0, cargaNetaDia + (hasIntro ? intro : 0));
             
             let efectividad = totalProgramado > 0 ? (totalEntregadoEfectivo / totalProgramado) * 100 : 100.0;
             if (efectividad < 0) efectividad = 0.0;
@@ -640,11 +643,11 @@
             efElement.innerText = `${efectividad.toFixed(1)}%`;
 
             if (efectividad >= 99) {
-                efElement.className = "text-2xl font-black text-emerald-400 mt-1";
+                efElement.className = "text-xl font-black text-emerald-400 mt-1";
             } else if (efectividad >= 97) {
-                efElement.className = "text-2xl font-black text-blue-400 mt-1";
+                efElement.className = "text-xl font-black text-blue-400 mt-1";
             } else {
-                efElement.className = "text-2xl font-black text-amber-400 mt-1";
+                efElement.className = "text-xl font-black text-amber-400 mt-1";
             }
         }
 
@@ -652,12 +655,13 @@
             alert("¡Registro guardado con éxito y sincronizado en Firestore!");
             const list = document.getElementById('historyList');
             const ruta = document.getElementById('inputRuta').value || 'Sin Ruta';
+            const cargaInicial = document.getElementById('statCargaInicial').innerText;
             const cargaNeta = document.getElementById('statCargaNetaDia').innerText;
             const efectividad = document.getElementById('statEfectividadSemanal').innerText;
             
             const item = document.createElement('div');
             item.className = "bg-slate-900 p-3 rounded-lg border border-slate-700 text-xs flex justify-between items-center";
-            item.innerHTML = `<div><strong>Ruta: ${ruta}</strong> | Carga Neta: ${cargaNeta} | Efec.: ${efectividad}</div><span class="text-emerald-400 font-bold">Guardado</span>`;
+            item.innerHTML = `<div><strong>Ruta: ${ruta}</strong> | Inicial: ${cargaInicial} | Neta: ${cargaNeta} | Efec.: ${efectividad}</div><span class="text-emerald-400 font-bold">Guardado</span>`;
             list.prepend(item);
         }
 
