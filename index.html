@@ -195,7 +195,7 @@
                                     <input type="number" id="inputG2" value="0" oninput="calculateOperational()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
                                 </div>
                             </div>
-                            <div class="grid grid-cols-3 gap-2">
+                            <div class="grid grid-cols-2 gap-2">
                                 <div>
                                     <label class="block text-[10px] font-semibold text-slate-300 mb-1">Devueltas</label>
                                     <input type="number" id="inputDev" value="0" oninput="calculateOperational()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
@@ -204,20 +204,21 @@
                                     <label class="block text-[10px] font-semibold text-slate-300 mb-1">Pepitos (Snacks)</label>
                                     <input type="number" id="inputPep" value="0" oninput="calculateOperational()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
                                 </div>
-                                <div>
-                                    <label class="block text-[10px] font-semibold text-slate-300 mb-1">Vacíos</label>
-                                    <input type="number" id="inputVac" value="0" oninput="calculateOperational()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
-                                </div>
                             </div>
 
-                            <!-- Bloque Introducciones de Envases Vacíos -->
+                            <!-- Selector Interactivo de Introducción de Vacíos (Sustituye al campo suelto) -->
                             <div class="bg-slate-900 p-3 rounded-lg border border-slate-700 space-y-2">
-                                <label class="flex items-center gap-2 text-xs font-semibold text-slate-200 cursor-pointer">
-                                    <input type="checkbox" id="checkIntroducciones" onchange="toggleIntroducciones()" class="rounded bg-slate-800 border-slate-700 text-red-600">
-                                    <span>¿Entregó introducciones de vacíos hoy?</span>
-                                </label>
-                                <div id="introFieldContainer" class="hidden">
-                                    <label class="block text-[10px] font-semibold text-slate-400 mb-1">Cantidad de Introducciones Reales:</label>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">¿Hubo introducción de vacíos?</label>
+                                <div class="flex gap-4 text-xs font-medium">
+                                    <label class="flex items-center gap-1 cursor-pointer">
+                                        <input type="radio" name="radioIntro" value="si" onchange="toggleIntroducciones(true)" class="text-red-600 bg-slate-800 border-slate-700"> Sí
+                                    </label>
+                                    <label class="flex items-center gap-1 cursor-pointer">
+                                        <input type="radio" name="radioIntro" value="no" checked onchange="toggleIntroducciones(false)" class="text-red-600 bg-slate-800 border-slate-700"> No
+                                    </label>
+                                </div>
+                                <div id="introFieldContainer" class="hidden pt-1">
+                                    <label class="block text-[10px] font-semibold text-slate-400 mb-1">Cantidad de Introducciones:</label>
                                     <input type="number" id="inputIntroducciones" value="0" oninput="calculateOperational()" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs text-white">
                                 </div>
                             </div>
@@ -566,8 +567,8 @@
             if (isChecked) {
                 fields.style.opacity = "0.3";
                 fields.style.pointerEvents = "none";
-                ['inputF1', 'inputF2', 'inputG1', 'inputG2', 'inputDev', 'inputPep', 'inputVac', 'inputIntroducciones'].forEach(id => document.getElementById(id).value = 0);
-                document.getElementById('checkIntroducciones').checked = false;
+                ['inputF1', 'inputF2', 'inputG1', 'inputG2', 'inputDev', 'inputPep', 'inputIntroducciones'].forEach(id => document.getElementById(id).value = 0);
+                document.querySelectorAll('input[name="radioIntro"]').forEach(r => r.checked = false);
                 document.getElementById('introFieldContainer').classList.add('hidden');
                 calculateOperational();
             } else {
@@ -576,10 +577,9 @@
             }
         }
 
-        function toggleIntroducciones() {
-            const isChecked = document.getElementById('checkIntroducciones').checked;
+        function toggleIntroducciones(hasIntro) {
             const container = document.getElementById('introFieldContainer');
-            if (isChecked) {
+            if (hasIntro) {
                 container.classList.remove('hidden');
             } else {
                 container.classList.add('hidden');
@@ -588,7 +588,7 @@
             calculateOperational();
         }
 
-        // CÁLCULO OPERATIVO: CARGA NETA DEL DÍA (CON PEPITOS), INCENTIVO (SIN PEPITOS) Y EFECTIVIDAD (0% SI NO HAY CARGA)
+        // CÁLCULO OPERATIVO DEFINITIVO
         function calculateOperational() {
             const isNoLoad = document.getElementById('noLoadCheck').checked;
             const efElement = document.getElementById('statEfectividadSemanal');
@@ -607,25 +607,27 @@
             const g2 = parseInt(document.getElementById('inputG2').value) || 0;
             const dev = parseInt(document.getElementById('inputDev').value) || 0;
             const pep = parseInt(document.getElementById('inputPep').value) || 0;
-            const intro = document.getElementById('checkIntroducciones').checked ? (parseInt(document.getElementById('inputIntroducciones').value) || 0) : 0;
             
-            // Cajas netas base para incentivo (excluye pepitos)
+            const hasIntro = document.querySelector('input[name="radioIntro"]:checked')?.value === 'si';
+            const intro = hasIntro ? (parseInt(document.getElementById('inputIntroducciones').value) || 0) : 0;
+            
+            // Cajas base para incentivo (excluye pepitos)
             const netasIncentivo = f1 + f2 + g1 + g2;
 
-            // Carga neta total entregada en el día (incluye pepitos como solicitaste)
+            // Carga neta total entregada en el día (incluye pepitos)
             const cargaNetaDia = netasIncentivo + pep;
             document.getElementById('statCargaNetaDia').innerText = cargaNetaDia;
             
-            // Incentivo diario calculado solo con las cajas base
+            // Incentivo diario calculado solo con cajas base
             const incentivoDiario = netasIncentivo * 0.012;
             document.getElementById('statIncentivo').innerText = `$${incentivoDiario.toFixed(2)}`;
 
-            // Cálculo de efectividad (Integra carga entregada + pepitos + introducciones reales vs programadas)
+            // Efectividad (Integra carga entregada + pepitos + introducciones vs programado)
             const totalEntregadoEfectivo = cargaNetaDia + intro;
             const totalProgramado = totalEntregadoEfectivo + dev;
             
             let efectividad = totalProgramado > 0 ? (totalEntregadoEfectivo / totalProgramado) * 100 : 100.0;
-            if (efectividad < 97 && totalProgramado > 0) efectividad = 97.0; 
+            if (efectividad < 0) efectividad = 0.0;
             if (efectividad > 100) efectividad = 100.0;
 
             efElement.innerText = `${efectividad.toFixed(1)}%`;
