@@ -133,7 +133,7 @@
                 </div>
             </form>
 
-            <!-- Formulario de Recuperación -->
+            <!-- Formulario de Recuperación (Corregido con EmailJS) -->
             <form id="forgotForm" onsubmit="handleForgot(event)" class="space-y-4 hidden">
                 <div>
                     <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Correo de Recuperación</label>
@@ -157,13 +157,13 @@
         <!-- 3. INTERFAZ PRINCIPAL -->
         <div id="mainAppView" class="hidden space-y-6">
 
-            <!-- Barra de Navegación del Administrador Supremo -->
+            <!-- Barra de Navegación del Administrador Supremo (Incluye Simulador de Roles) -->
             <div id="adminNavTabs" class="hidden bg-slate-800 p-2 rounded-xl border border-slate-700 flex flex-col sm:flex-row gap-2 justify-between items-center">
                 <div class="flex gap-2 w-full sm:w-auto">
                     <button onclick="switchAppTab('worker')" id="btnTabWorker" class="flex-1 sm:flex-none px-4 py-2 text-xs font-bold uppercase rounded-lg transition bg-red-600 text-white shadow">Mi Panel Operativo</button>
                     <button onclick="switchAppTab('admin')" id="btnTabAdmin" class="flex-1 sm:flex-none px-4 py-2 text-xs font-bold uppercase rounded-lg transition bg-slate-700 text-slate-300 hover:bg-slate-600">Centro de Mando (Admin)</button>
                 </div>
-                <!-- Simulador de Vistas para el Admin (Ayudante vs Entregador) -->
+                <!-- Simulador de Vistas exclusivo para el Admin -->
                 <div class="flex items-center gap-2 bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-700 text-xs w-full sm:w-auto justify-between">
                     <span class="text-slate-400 font-semibold">Simular Rol:</span>
                     <select id="adminRoleSimulator" onchange="changeSimulatedRole(this.value)" class="bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white font-bold">
@@ -689,10 +689,12 @@
             }
         }
 
-        // RECUPERACIÓN DE CONTRASEÑA USANDO EMAILJS Y TU PLANTILLA
+        // RECUPERACIÓN DE CONTRASEÑA CORREGIDA CON EMAILJS
         async function handleForgot(event) {
             event.preventDefault();
-            const email = document.getElementById('forgotEmail').value.trim().toLowerCase();
+            const emailInput = document.getElementById('forgotEmail');
+            const email = emailInput.value.trim().toLowerCase();
+
             if (!email) {
                 alert("Por favor ingrese su correo de recuperación.");
                 return;
@@ -701,10 +703,10 @@
             const templateParams = {
                 to_email: email,
                 colaborador_nombre: email,
-                cargo_colaborador: "Recuperación",
+                cargo_colaborador: "Recuperación de Credenciales",
                 anos_servicio: "N/A",
                 fecha: new Date().toISOString().split('T')[0],
-                nro_ruta: "PASSWORD",
+                nro_ruta: "RECUPERACIÓN",
                 hora_entrada: "--:--",
                 hora_salida: "--:--",
                 carga_f1: "0",
@@ -712,16 +714,18 @@
                 carga_g1: "0",
                 carga_g2: "0",
                 carga_total: "0",
-                total_entregado: "RECUPERACIÓN DE ACCESO",
-                productos_pendientes: "Hemos recibido una solicitud para restablecer sus credenciales en Kolaboradorf VE. Contacte al Administrador Supremo si no solicitó este cambio."
+                total_entregado: "SOLICITUD DE NUEVA CLAVE",
+                productos_pendientes: "Hemos recibido una solicitud para restablecer sus credenciales de acceso en Kolaboradorf VE. Si no solicitó este cambio, ignore este mensaje."
             };
 
             try {
                 await emailjs.send('service_p63esgd', 'template_dl48xbt', templateParams);
-                alert("¡Correo de recuperación enviado con éxito a través de EmailJS!");
+                alert("¡Correo de recuperación enviado con éxito a " + email + "!");
+                emailInput.value = '';
                 switchAuthMode('login');
             } catch (error) {
-                alert("Error al enviar correo de recuperación: " + error.message);
+                console.error("Error EmailJS:", error);
+                alert("Error al enviar el correo de recuperación. Verifique su conexión o intente nuevamente.");
             }
         }
 
@@ -998,7 +1002,7 @@
 
         function publishNews() {
             const title = document.getElementById('newsTitle').value;
-            const desc = document.getElementById('newsDesc').value;
+            const desc = document.getElementById('newsDesc'].value;
             if (!title) { alert("Ingrese un título."); return; }
             publishedNewsArray.unshift({ id: Date.now(), title, date: "Hace un momento", desc: desc || "Sin desc.", likes: 0 });
             document.getElementById('newsTitle').value = '';
