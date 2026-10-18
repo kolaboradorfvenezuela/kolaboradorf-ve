@@ -592,7 +592,7 @@
             calculateOperational();
         }
 
-        // CÁLCULO OPERATIVO: SEPARANDO CARGAS NETAS, INCENTIVOS Y EFECTIVIDAD
+        // CÁLCULO OPERATIVO CORREGIDO: EXCLUYENDO PEPITOS DE CARGA INICIAL Y NETA
         function calculateOperational() {
             const isNoLoad = document.getElementById('noLoadCheck').checked;
             const efElement = document.getElementById('statEfectividadSemanal');
@@ -619,22 +619,22 @@
             // Cajas base netas (F1+F2+G1+G2)
             const cajasBrutas = f1 + f2 + g1 + g2;
 
-            // CARGA INICIAL (Total de movimiento con el que salió la ruta: cajas brutas + pepitos)
-            const cargaInicial = cajasBrutas + pep;
+            // CARGA INICIAL (Solo la carga base F1+F2+G1+G2, sin sumar pepitos)
+            const cargaInicial = cajasBrutas;
             document.getElementById('statCargaInicial').innerText = cargaInicial;
 
-            // CARGA NETA ENTREGADA (Carga inicial menos las devoluciones reales)
-            const cargaNetaDia = Math.max(0, cargaInicial - dev);
+            // CARGA NETA ENTREGADA (Carga inicial menos devoluciones y menos los pepitos que no pagan incentivo)
+            const cargaNetaDia = Math.max(0, cargaInicial - dev - pep);
             document.getElementById('statCargaNetaDia').innerText = cargaNetaDia;
             
-            // INCENTIVO DIARIO (Calculado solo sobre cajas base netas, descontando devoluciones e introducciones sin incluir pepitos)
-            const netasIncentivo = Math.max(0, cajasBrutas - dev - (hasIntro ? intro : 0));
+            // INCENTIVO DIARIO (Calculado sobre las cajas netas reales)
+            const netasIncentivo = Math.max(0, cajasBrutas - dev - pep - (hasIntro ? intro : 0));
             const incentivoDiario = netasIncentivo * 0.012;
             document.getElementById('statIncentivo').innerText = `$${incentivoDiario.toFixed(2)}`;
 
-            // EFECTIVIDAD DEL DÍA (Integra carga entregada + pepitos + introducciones / carga programada total)
+            // EFECTIVIDAD DEL DÍA (Integra la entrega sumando los pepitos y las introducciones de forma correcta)
             const totalProgramado = cargaInicial;
-            const totalEntregadoEfectivo = Math.max(0, cargaNetaDia + (hasIntro ? intro : 0));
+            const totalEntregadoEfectivo = Math.max(0, cargaNetaDia + pep + (hasIntro ? intro : 0));
             
             let efectividad = totalProgramado > 0 ? (totalEntregadoEfectivo / totalProgramado) * 100 : 100.0;
             if (efectividad < 0) efectividad = 0.0;
