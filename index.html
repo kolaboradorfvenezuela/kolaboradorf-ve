@@ -239,8 +239,8 @@
                                 <h4 id="statCargaNetaDia" class="text-xl font-black text-white mt-1">0</h4>
                             </div>
                             <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 text-center">
-                                <span class="text-[9px] font-bold text-slate-400 uppercase">Incentivo Diario</span>
-                                <h4 id="statIncentivo" class="text-xl font-black text-emerald-400 mt-1">$0.00</h4>
+                                <span class="text-[9px] font-bold text-slate-400 uppercase">Incentivo Diario (Bs.)</span>
+                                <h4 id="statIncentivo" class="text-xl font-black text-emerald-400 mt-1">0,00 Bs.</h4>
                             </div>
                             <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 text-center">
                                 <span class="text-[9px] font-bold text-slate-400 uppercase">Efectividad del Día</span>
@@ -275,53 +275,43 @@
                 <!-- Encabezado Admin -->
                 <div class="bg-red-950/40 border border-red-800/60 rounded-xl p-5">
                     <h3 class="text-base font-bold text-white">⚙️ Centro de Mando Supremo (Administrador)</h3>
-                    <p class="text-xs text-red-200/80 mt-1">Panel exclusivo de supervisión, control de accesos, gestión de tarifas y publicación de novedades multimedia.</p>
+                    <p class="text-xs text-red-200/80 mt-1">Panel exclusivo de supervisión, control de accesos, gestión de tarifas oficiales y publicación de novedades multimedia.</p>
                 </div>
 
                 <!-- Grid de Administración -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     
-                    <!-- 1. Autorizaciones de Acceso Pendientes -->
+                    <!-- 1. Autorizaciones de Acceso Pendientes (Con depuración real) -->
                     <div class="bg-slate-800 rounded-xl p-5 border border-slate-700 space-y-4">
                         <h4 class="text-sm font-bold text-white border-b border-slate-700 pb-2">👥 Solicitudes de Acceso Pendientes</h4>
                         <div id="pendingApprovalsList" class="space-y-3 max-h-72 overflow-y-auto pr-1">
-                            <!-- Se inyecta dinámicamente -->
+                            <!-- Se inyecta dinámicamente sin solicitudes fantasmas -->
                         </div>
                     </div>
 
-                    <!-- 2. Actualizador Independiente de Incentivos y Bonos -->
+                    <!-- 2. Información Informativa de Tarifas Oficiales (Reparto Ayudantes) -->
                     <div class="bg-slate-800 rounded-xl p-5 border border-slate-700 space-y-5">
-                        <h4 class="text-sm font-bold text-white border-b border-slate-700 pb-2">💰 Configuración de Tarifas e Incentivos</h4>
-                        
-                        <!-- Bloque Matriz de Cajas -->
-                        <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 space-y-3">
-                            <h5 class="text-xs font-bold text-red-400 uppercase">Tarifa por Tramo de Cajas (Base)</h5>
-                            <div class="grid grid-cols-2 gap-2 text-xs">
-                                <div>
-                                    <label class="text-[10px] text-slate-400">Tramo Inicial (300 cajas - $):</label>
-                                    <input type="number" id="adminBaseBoxes" value="2.00" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
-                                </div>
-                                <div>
-                                    <label class="text-[10px] text-slate-400">Multiplicador por caja:</label>
-                                    <input type="number" id="adminBoxRate" value="0.015" step="0.001" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
-                                </div>
-                            </div>
-                            <button onclick="confirmUpdateIncentives()" class="w-full bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-2 rounded transition shadow">Guardar Cambios de Incentivos</button>
-                        </div>
-
-                        <!-- Bloque Bono de Efectividad Fija -->
-                        <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 space-y-3">
-                            <h5 class="text-xs font-bold text-red-400 uppercase">Bono Fijo de Efectividad</h5>
-                            <div>
-                                <label class="text-[10px] text-slate-400">Monto del Bono Fijo ($):</label>
-                                <input type="number" id="adminFixedBonus" value="9.97" step="0.01" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white text-xs">
-                            </div>
-                            <button onclick="confirmUpdateBonus()" class="w-full bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-2 rounded transition shadow">Guardar Bono de Efectividad</button>
+                        <h4 class="text-sm font-bold text-white border-b border-slate-700 pb-2">💰 Tabla Oficial de Incentivos (Reparto Ayudantes)</h4>
+                        <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 text-xs space-y-2 text-slate-300">
+                            <p class="font-bold text-red-400">Tramos Activos en el Sistema:</p>
+                            <ul class="list-disc pl-4 space-y-1">
+                                <li><strong>300 - 399 cajas:</strong> 1.950,00 Bs.</li>
+                                <li><strong>400 - 499 cajas:</strong> 4.325,00 Bs.</li>
+                                <li><strong>500 - 599 cajas:</strong> 4.720,00 Bs.</li>
+                                <li><strong>600 - 699 cajas:</strong> 5.090,00 Bs.</li>
+                                <li><strong>700 - 799 cajas:</strong> 5.495,00 Bs.</li>
+                                <li><strong>800 - 899 cajas:</strong> 5.880,00 Bs.</li>
+                                <li><strong>900 - 999 cajas:</strong> 6.265,00 Bs.</li>
+                                <li><strong>1000 - 1999 cajas:</strong> 6.635,00 Bs.</li>
+                                <li><strong>1100 - 1999 cajas:</strong> 8.055,00 Bs.</li>
+                                <li><strong>1200 - 1299 cajas:</strong> 8.865,00 Bs.</li>
+                            </ul>
+                            <p class="text-[10px] text-slate-400 italic pt-2">Nota: Los cálculos operan de forma automática bajo los parámetros oficiales aprobados.</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- 3. Gestión y Publicación de Novedades Multimedia -->
+                <!-- 3. Gestión y Publicación de Novedades Multimedia (Corregido y Sincronizado) -->
                 <div class="bg-slate-800 rounded-xl p-5 border border-slate-700 space-y-4">
                     <h4 class="text-sm font-bold text-white border-b border-slate-700 pb-2">📢 Publicar Nuevo Comunicado (PDF o Fotos)</h4>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -340,9 +330,9 @@
                     </div>
                     <button onclick="publishNews()" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-4 py-2.5 rounded-lg transition shadow">Publicar en el Tablón</button>
 
-                    <!-- Lista de Novedades Publicadas (Con Métricas y Borrado Admin) -->
+                    <!-- Lista de Novedades Publicadas -->
                     <div class="mt-6 pt-4 border-t border-slate-700">
-                        <h5 class="text-xs font-bold text-white uppercase mb-3">Comunicados Activos (Control de Métricas y Eliminación)</h5>
+                        <h5 class="text-xs font-bold text-white uppercase mb-3">Comunicados Activos (Control y Eliminación)</h5>
                         <div id="adminNewsList" class="space-y-3">
                             <!-- Se inyecta dinámicamente -->
                         </div>
@@ -390,6 +380,10 @@
 
         let currentUser = null;
         let isVacation = false;
+        let publishedNewsArray = [
+            { id: 1, title: "Circular Oficial N° 04: Lineamientos de Diciembre", date: "Hace 2 horas", desc: "Se adjunta el documento con las nuevas disposiciones operativas para el cierre de trimestre.", likes: 14 }
+        ];
+        let pendingUsersArray = []; // Inicializado vacío para evitar solicitudes fantasmas tras rechazo
 
         function switchAuthMode(mode) {
             document.getElementById('loginForm').classList.add('hidden');
@@ -491,8 +485,8 @@
             }
 
             calculateAntiquity();
-            loadMockNews();
-            loadMockPendingApprovals();
+            renderNewsFeed();
+            renderPendingApprovals();
             calculateOperational();
         }
 
@@ -592,7 +586,22 @@
             calculateOperational();
         }
 
-        // CÁLCULO OPERATIVO CORREGIDO: EXCLUYENDO PEPITOS DE CARGA INICIAL Y NETA
+        // TABLA OFICIAL DE INCENTIVOS (REPARTO AYUDANTES)
+        function getOfficialIncentive(cajas) {
+            if (cajas < 300) return 0;
+            if (cajas <= 399) return 1950.00;
+            if (cajas <= 499) return 4325.00;
+            if (cajas <= 599) return 4720.00;
+            if (cajas <= 699) return 5090.00;
+            if (cajas <= 799) return 5495.00;
+            if (cajas <= 899) return 5880.00;
+            if (cajas <= 999) return 6265.00;
+            if (cajas <= 1099) return 6635.00;
+            if (cajas <= 1199) return 8055.00;
+            return 8865.00; // 1200 - 1299+
+        }
+
+        // CÁLCULO OPERATIVO CON LA TABLA OFICIAL Y REGLAS DE PEPITOS/VACÍOS
         function calculateOperational() {
             const isNoLoad = document.getElementById('noLoadCheck').checked;
             const efElement = document.getElementById('statEfectividadSemanal');
@@ -600,7 +609,7 @@
             if (isNoLoad) {
                 document.getElementById('statCargaInicial').innerText = 0;
                 document.getElementById('statCargaNetaDia').innerText = 0;
-                document.getElementById('statIncentivo').innerText = "$0.00";
+                document.getElementById('statIncentivo').innerText = "0,00 Bs.";
                 efElement.innerText = "0.0%";
                 efElement.className = "text-xl font-black text-amber-500 mt-1";
                 return;
@@ -619,20 +628,20 @@
             // Cajas base netas (F1+F2+G1+G2)
             const cajasBrutas = f1 + f2 + g1 + g2;
 
-            // CARGA INICIAL (Solo la carga base F1+F2+G1+G2, sin sumar pepitos)
+            // CARGA INICIAL (Solo carga base, sin pepitos)
             const cargaInicial = cajasBrutas;
             document.getElementById('statCargaInicial').innerText = cargaInicial;
 
-            // CARGA NETA ENTREGADA (Carga inicial menos devoluciones y menos los pepitos que no pagan incentivo)
+            // CARGA NETA ENTREGADA (Carga inicial menos devoluciones y menos pepitos)
             const cargaNetaDia = Math.max(0, cargaInicial - dev - pep);
             document.getElementById('statCargaNetaDia').innerText = cargaNetaDia;
             
-            // INCENTIVO DIARIO (Calculado sobre las cajas netas reales)
+            // INCENTIVO DIARIO (Bajo la tabla oficial de Reparto Ayudantes en Bolívares)
             const netasIncentivo = Math.max(0, cajasBrutas - dev - pep - (hasIntro ? intro : 0));
-            const incentivoDiario = netasIncentivo * 0.012;
-            document.getElementById('statIncentivo').innerText = `$${incentivoDiario.toFixed(2)}`;
+            const incentivoDiarioBs = getOfficialIncentive(netasIncentivo);
+            document.getElementById('statIncentivo').innerText = `${incentivoDiarioBs.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})} Bs.`;
 
-            // EFECTIVIDAD DEL DÍA (Integra la entrega sumando los pepitos y las introducciones de forma correcta)
+            // EFECTIVIDAD DEL DÍA
             const totalProgramado = cargaInicial;
             const totalEntregadoEfectivo = Math.max(0, cargaNetaDia + pep + (hasIntro ? intro : 0));
             
@@ -657,11 +666,12 @@
             const ruta = document.getElementById('inputRuta').value || 'Sin Ruta';
             const cargaInicial = document.getElementById('statCargaInicial').innerText;
             const cargaNeta = document.getElementById('statCargaNetaDia').innerText;
+            const incentivo = document.getElementById('statIncentivo').innerText;
             const efectividad = document.getElementById('statEfectividadSemanal').innerText;
             
             const item = document.createElement('div');
             item.className = "bg-slate-900 p-3 rounded-lg border border-slate-700 text-xs flex justify-between items-center";
-            item.innerHTML = `<div><strong>Ruta: ${ruta}</strong> | Inicial: ${cargaInicial} | Neta: ${cargaNeta} | Efec.: ${efectividad}</div><span class="text-emerald-400 font-bold">Guardado</span>`;
+            item.innerHTML = `<div><strong>Ruta: ${ruta}</strong> | Inicial: ${cargaInicial} | Neta: ${cargaNeta} | Inc: ${incentivo} | Efec.: ${efectividad}</div><span class="text-emerald-400 font-bold">Guardado</span>`;
             list.prepend(item);
         }
 
@@ -669,88 +679,125 @@
             document.getElementById('historyList').innerHTML = '';
         }
 
-        function confirmUpdateIncentives() {
-            if (confirm("⚠️ ¿Estás seguro de que deseas actualizar este monto a nivel general?")) {
-                alert("¡Matriz de incentivos actualizada correctamente en tiempo real!");
-            }
-        }
-
-        function confirmUpdateBonus() {
-            if (confirm("⚠️ ¿Estás seguro de que deseas actualizar este monto a nivel general?")) {
-                alert("¡Bono fijo de efectividad actualizado correctamente en tiempo real!");
-            }
-        }
-
+        // GESTIÓN DE NOVEDADES Y COMUNICADOS
         function publishNews() {
             const title = document.getElementById('newsTitle').value;
+            const desc = document.getElementById('newsDesc').value;
             if (!title) {
                 alert("Por favor ingrese un título para el comunicado.");
                 return;
             }
+            
+            const newObj = {
+                id: Date.now(),
+                title: title,
+                date: "Hace un momento",
+                desc: desc || "Sin descripción adicional.",
+                likes: 0
+            };
+
+            publishedNewsArray.unshift(newObj);
             alert("¡Comunicado publicado con éxito en el tablón!");
             document.getElementById('newsTitle').value = '';
             document.getElementById('newsDesc').value = '';
-            loadMockNews();
+            renderNewsFeed();
         }
 
-        function loadMockNews() {
+        function renderNewsFeed() {
             const feed = document.getElementById('workerNewsFeed');
             const adminList = document.getElementById('adminNewsList');
 
-            const mockHTML = `
-                <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 space-y-2">
-                    <div class="flex justify-between items-start">
-                        <h5 class="text-xs font-bold text-white">Circular Oficial N° 04: Lineamientos de Diciembre</h5>
-                        <span class="text-[10px] text-slate-400">Hace 2 horas</span>
+            if (publishedNewsArray.length === 0) {
+                feed.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">No hay comunicados activos en este momento.</p>`;
+                adminList.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">No hay publicaciones registradas.</p>`;
+                return;
+            }
+
+            let feedHTML = '';
+            let adminHTML = '';
+
+            publishedNewsArray.forEach(news => {
+                feedHTML += `
+                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 space-y-2">
+                        <div class="flex justify-between items-start">
+                            <h5 class="text-xs font-bold text-white">${news.title}</h5>
+                            <span class="text-[10px] text-slate-400">${news.date}</span>
+                        </div>
+                        <p class="text-xs text-slate-300">${news.desc}</p>
+                        <div class="flex justify-between items-center pt-2">
+                            <button class="bg-red-600/20 text-red-400 border border-red-500/40 text-[10px] font-bold px-3 py-1.5 rounded hover:bg-red-600/30 transition">📥 Descargar Archivo PDF</button>
+                            <button onclick="likeNews(${news.id})" class="text-xs text-slate-400 hover:text-red-400 flex items-center gap-1">❤️ <span class="like-count">${news.likes}</span> Me gusta</button>
+                        </div>
                     </div>
-                    <p class="text-xs text-slate-300">Se adjunta el documento con las nuevas disposiciones operativas para el cierre de trimestre.</p>
-                    <div class="flex justify-between items-center pt-2">
-                        <button class="bg-red-600/20 text-red-400 border border-red-500/40 text-[10px] font-bold px-3 py-1.5 rounded hover:bg-red-600/30 transition">📥 Descargar Archivo PDF</button>
-                        <button onclick="likeNews(this)" class="text-xs text-slate-400 hover:text-red-400 flex items-center gap-1">❤️ <span class="like-count">14</span> Me gusta</button>
+                `;
+
+                adminHTML += `
+                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 space-y-2">
+                        <div class="flex justify-between items-start">
+                            <h5 class="text-xs font-bold text-white">${news.title}</h5>
+                            <button onclick="deleteNews(${news.id})" class="bg-red-600 hover:bg-red-700 text-white text-[10px] font-bold px-3 py-1 rounded">🗑️ Eliminar</button>
+                        </div>
+                        <p class="text-xs text-slate-300">${news.desc}</p>
                     </div>
-                </div>
-            `;
-            feed.innerHTML = mockHTML;
-            adminList.innerHTML = mockHTML + `<button onclick="deleteNews(this)" class="mt-2 bg-red-600 hover:bg-red-700 text-white text-[10px] font-bold px-3 py-1 rounded">🗑️ Eliminar Publicación</button>`;
+                `;
+            });
+
+            feed.innerHTML = feedHTML;
+            adminList.innerHTML = adminHTML;
         }
 
-        function likeNews(btn) {
-            const span = btn.querySelector('.like-count');
-            span.innerText = parseInt(span.innerText) + 1;
-            btn.classList.add('text-red-400');
-        }
-
-        function deleteNews(btn) {
-            if (confirm("¿Estás seguro de eliminar este comunicado del tablón?")) {
-                alert("Comunicado eliminado.");
-                loadMockNews();
+        function likeNews(id) {
+            const news = publishedNewsArray.find(n => n.id === id);
+            if (news) {
+                news.likes += 1;
+                renderNewsFeed();
             }
         }
 
-        function loadMockPendingApprovals() {
+        function deleteNews(id) {
+            if (confirm("¿Estás seguro de eliminar este comunicado del tablón?")) {
+                publishedNewsArray = publishedNewsArray.filter(n => n.id !== id);
+                renderNewsFeed();
+            }
+        }
+
+        // GESTIÓN DE SOLICITUDES PENDIENTES (DEPURACIÓN DEFINITIVA)
+        function renderPendingApprovals() {
             const list = document.getElementById('pendingApprovalsList');
-            list.innerHTML = `
-                <div class="bg-slate-900 p-3 rounded-lg border border-slate-700 flex justify-between items-center text-xs">
-                    <div>
-                        <strong class="text-white">Carlos Mendoza</strong>
-                        <p class="text-[10px] text-slate-400">carlos.m@gmail.com — Ayudante</p>
+            if (pendingUsersArray.length === 0) {
+                list.innerHTML = `<p class="text-xs text-slate-400 text-center py-6">No hay solicitudes de acceso pendientes.</p>`;
+                return;
+            }
+
+            let html = '';
+            pendingUsersArray.forEach((user, index) => {
+                html += `
+                    <div class="bg-slate-900 p-3 rounded-lg border border-slate-700 flex justify-between items-center text-xs">
+                        <div>
+                            <strong class="text-white">${user.name}</strong>
+                            <p class="text-[10px] text-slate-400">${user.email} — ${user.cargo}</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="approveUser(${index})" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-2.5 py-1 rounded text-[10px]">Aceptar</button>
+                            <button onclick="rejectUser(${index})" class="bg-red-600 hover:bg-red-700 text-white font-bold px-2.5 py-1 rounded text-[10px]">Rechazar</button>
+                        </div>
                     </div>
-                    <div class="flex gap-2">
-                        <button onclick="approveUser(this)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-2.5 py-1 rounded text-[10px]">Aceptar</button>
-                        <button onclick="rejectUser(this)" class="bg-red-600 hover:bg-red-700 text-white font-bold px-2.5 py-1 rounded text-[10px]">Rechazar</button>
-                    </div>
-                </div>
-            `;
+                `;
+            });
+            list.innerHTML = html;
         }
 
-        function approveUser(btn) {
+        function approveUser(index) {
             alert("Usuario aprobado con éxito.");
-            btn.parentElement.parentElement.remove();
+            pendingUsersArray.splice(index, 1);
+            renderPendingApprovals();
         }
 
-        function rejectUser(btn) {
-            alert("Solicitud rechazada.");
-            btn.parentElement.parentElement.remove();
+        function rejectUser(index) {
+            if (confirm("¿Estás seguro de rechazar y eliminar esta solicitud de acceso?")) {
+                pendingUsersArray.splice(index, 1); // Se remueve permanentemente de la lista en memoria
+                renderPendingApprovals();
+            }
         }
     </script>
 </body>
