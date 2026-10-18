@@ -35,10 +35,10 @@
     <!-- CONTENEDOR PRINCIPAL -->
     <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-6">
 
-        <!-- Pantalla de Carga Inicial para evitar parpadeos al refrescar -->
+        <!-- Pantalla de Carga Inicial -->
         <div id="loadingSessionView" class="text-center py-20">
             <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-red-600 border-t-transparent mb-3"></div>
-            <p class="text-xs text-slate-400 font-medium">Verificando sesión activa en la nube...</p>
+            <p class="text-xs text-slate-400 font-medium">Restaurando sesión corporativa...</p>
         </div>
 
         <!-- 1. VISTA DE AUTENTICACIÓN (LOGIN / REGISTRO / RECUPERACIÓN) -->
@@ -471,7 +471,6 @@
         }
         const db = firebase.firestore();
 
-        // PERSISTENCIA LOCAL ESTRICTA
         firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
             .catch((error) => { console.error("Error de persistencia:", error); });
 
@@ -481,43 +480,57 @@
             { id: 1, title: "Circular Oficial N° 04: Lineamientos de Diciembre", date: "Hace 2 horas", desc: "Se adjunta el documento con las nuevas disposiciones operativas para el cierre de trimestre.", likes: 14 }
         ];
         let pendingUsersArray = [];
-        let authCheckInitialized = false;
 
-        // OBSERVADOR DE SESIÓN BLINDADO CON CONTROL DE TIEMPO DE ESPERA
-        firebase.auth().onAuthStateChanged(async (user) => {
-            authCheckInitialized = true;
-            document.getElementById('loadingSessionView').classList.add('hidden');
-
-            if (user) {
-                const email = user.email.toLowerCase();
-                if (email === "dhermes73@gmail.com") {
-                    currentUser = { email, isAdmin: true, approved: true, name: "DHERMES FERNANDO PEREZ", role: "Ayudante", firebaseUser: user };
-                    launchAppSession(true);
-                } else {
-                    currentUser = { email, isAdmin: false, approved: true, role: "Ayudante", firebaseUser: user };
-                    launchAppSession(false);
+        // VERIFICACIÓN INMEDIATA CON LOCALSTORAGE (IMPIDE QUE LA SESIÓN SE CIERRE AL RECARGAR)
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedSession = localStorage.getItem('kolaboradorf_session');
+            if (savedSession) {
+                try {
+                    const sessionData = JSON.parse(savedSession);
+                    currentUser = sessionData;
+                    document.getElementById('loadingSessionView').classList.add('hidden');
+                    launchAppSession(currentUser.isAdmin);
+                    return;
+                } catch (e) {
+                    localStorage.removeItem('kolaboradorf_session');
                 }
-            } else {
-                logoutAppSessionUI();
             }
-        });
 
-        // REDUNDANCIA DE SEGURIDAD: Si por latencia de red onAuthStateChanged demora más de 1.2 segundos, forzamos comprobación de auth local
-        setTimeout(() => {
-            if (!authCheckInitialized) {
-                authCheckInitialized = true;
+            // Si no hay sesión local previa, dejamos actuar a Firebase Auth
+            firebase.auth().onAuthStateChanged(async (user) => {
                 document.getElementById('loadingSessionView').classList.add('hidden');
-                const cachedUser = firebase.auth().currentUser;
-                if (cachedUser) {
-                    const email = cachedUser.email.toLowerCase();
+                if (user) {
+                    const email = user.email.toLowerCase();
                     const isAdmin = (email === "dhermes73@gmail.com");
-                    currentUser = { email, isAdmin, approved: true, name: isAdmin ? "DHERMES FERNANDO PEREZ" : email, role: "Ayudante", firebaseUser: cachedUser };
+                    currentUser = { email, isAdmin, approved: true, name: isAdmin ? "DHERMES FERNANDO PEREZ" : email, role: "Ayudante", firebaseUser: user };
+                    
+                    // Guardamos en memoria local del navegador
+                    localStorage.setItem('kolaboradorf_session', JSON.stringify(currentUser));
+                    
                     launchAppSession(isAdmin);
                 } else {
                     logoutAppSessionUI();
                 }
-            }
-        }, 1200);
+            });
+
+            // Respaldo de seguridad si Firebase demora más de 1 segundo
+            setTimeout(() => {
+                const currentView = document.getElementById('loadingSessionView');
+                if (currentView && !currentView.classList.contains('hidden')) {
+                    currentView.classList.add('hidden');
+                    const fbUser = firebase.auth().currentUser;
+                    if (fbUser) {
+                        const email = fbUser.email.toLowerCase();
+                        const isAdmin = (email === "dhermes73@gmail.com");
+                        currentUser = { email, isAdmin, approved: true, name: isAdmin ? "DHERMES FERNANDO PEREZ" : email, role: "Ayudante", firebaseUser: fbUser };
+                        localStorage.setItem('kolaboradorf_session', JSON.stringify(currentUser));
+                        launchAppSession(isAdmin);
+                    } else {
+                        logoutAppSessionUI();
+                    }
+                }
+            }, 1000);
+        });
 
         function switchAuthMode(mode) {
             document.getElementById('loginForm').classList.add('hidden');
@@ -591,12 +604,16 @@
             
             if (email === "dhermes73@gmail.com") {
                 currentUser = { email, isAdmin: true, approved: true, name: "DHERMES FERNANDO PEREZ", role: "Ayudante" };
+                localStorage.setItem('kolaboradorf_session', JSON.stringify(currentUser));
                 launchAppSession(true);
                 return;
             }
 
             try {
-                await firebase.auth().signInWithEmailAndPassword(email, pass);
+                const userCred = await firebase.auth().signInWithEmailAndPassword(email, pass);
+                currentUser = { email, isAdmin: false, approved: true, name: email, role: "Ayudante" };
+                localStorage.setItem('kolaboradorf_session', JSON.stringify(currentUser));
+                launchAppSession(false);
             } catch (error) {
                 alert("Error en las credenciales: " + error.message);
             }
@@ -648,7 +665,7 @@
             }
 
             document.getElementById('standardAccountDeleteSection').classList.remove('hidden');
-            document.getElementById('activeRoleBadge').innerText = currentUser.role;
+            document.getElementById('activeRoleBadge').innerText = currentUser.role || 'Ayudante';
 
             await loadIncentiveConfig();
             calculateAntiquity();
@@ -660,11 +677,13 @@
             try {
                 await firebase.auth().signOut();
             } catch(e) {}
+            localStorage.removeItem('kolaboradorf_session');
             logoutAppSessionUI();
         }
 
         function logoutAppSessionUI() {
             currentUser = null;
+            localStorage.removeItem('kolaboradorf_session');
             document.getElementById('mainAppView').classList.add('hidden');
             document.getElementById('authHeaderControls').classList.add('hidden');
             document.getElementById('pendingView').classList.add('hidden');
@@ -708,7 +727,7 @@
                 meses += 12;
             }
 
-            document.getElementById('workerMetaDisplay').innerText = `${currentUser.role} (${anos} años, ${meses} meses, ${dias} días) — dhermes73@gmail.com`;
+            document.getElementById('workerMetaDisplay').innerText = `${currentUser.role || 'Ayudante'} (${anos} años, ${meses} meses, ${dias} días) — dhermes73@gmail.com`;
         }
 
         function toggleVacationMode() {
