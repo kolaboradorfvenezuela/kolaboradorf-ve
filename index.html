@@ -133,7 +133,7 @@
                 </div>
             </form>
 
-            <!-- Formulario de Recuperación (Corregido con EmailJS) -->
+            <!-- Formulario de Recuperación (Vía Firebase Auth) -->
             <form id="forgotForm" onsubmit="handleForgot(event)" class="space-y-4 hidden">
                 <div>
                     <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Correo de Recuperación</label>
@@ -664,7 +664,7 @@
             }
         }
 
-        // RECUPERACIÓN DE CONTRASEÑA CORREGIDA CON EMAILJS
+        // RECUPERACIÓN DE CONTRASEÑA OFICIAL VÍA FIREBASE AUTH
         async function handleForgot(event) {
             event.preventDefault();
             const emailInput = document.getElementById('forgotEmail');
@@ -675,32 +675,14 @@
                 return;
             }
 
-            const templateParams = {
-                to_email: email,
-                colaborador_nombre: email,
-                cargo_colaborador: "Recuperación de Credenciales",
-                anos_servicio: "N/A",
-                fecha: new Date().toISOString().split('T')[0],
-                nro_ruta: "RECUPERACIÓN",
-                hora_entrada: "--:--",
-                hora_salida: "--:--",
-                carga_f1: "0",
-                carga_f2: "0",
-                carga_g1: "0",
-                carga_g2: "0",
-                carga_total: "0",
-                total_entregado: "SOLICITUD DE NUEVA CLAVE",
-                productos_pendientes: "Hemos recibido una solicitud para restablecer sus credenciales de acceso en Kolaboradorf VE. Si no solicitó este cambio, ignore este mensaje."
-            };
-
             try {
-                await emailjs.send('service_p63esgd', 'template_dl48xbt', templateParams);
-                alert("¡Correo de recuperación enviado con éxito a " + email + "!");
+                await firebase.auth().sendPasswordResetEmail(email);
+                alert("¡Se ha enviado un enlace oficial de recuperación a su correo (" + email + ")! Revise su bandeja de entrada o spam.");
                 emailInput.value = '';
                 switchAuthMode('login');
             } catch (error) {
-                console.error("Error EmailJS:", error);
-                alert("Error al enviar el correo de recuperación. Verifique su conexión o intente nuevamente.");
+                console.error("Error Firebase Auth:", error);
+                alert("Error al enviar el correo de recuperación: " + error.message);
             }
         }
 
