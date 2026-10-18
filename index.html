@@ -6,7 +6,7 @@
     <title>Kolaboradorf VE - Control Operativo de Distribución</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Firebase SDKs (Compatibles con GitHub Pages) -->
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
@@ -355,7 +355,7 @@
 
     <!-- SCRIPT DE CONFIGURACIÓN Y LÓGICA -->
     <script>
-        // CONFIGURACIÓN OFICIAL DE FIREBASE (CREDENCIALES REALES)
+        // CONFIGURACIÓN OFICIAL DE FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyBzMXFLJhTuPSPdKGsVqCqQRhP_NiGYBA",
             authDomain: "kolaboradorf-ve.firebaseapp.com",
@@ -370,16 +370,6 @@
             firebase.initializeApp(firebaseConfig);
         }
         const db = firebase.firestore();
-
-        // HASH SHA-256 DEL CORREO DE ADMINISTRADOR (Dhermes73@gmail.com)
-        const ADMIN_EMAIL_HASH = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918";
-
-        async function sha256(message) {
-            const msgBuffer = new TextEncoder().encode(message.toLowerCase().trim());
-            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-        }
 
         let currentUser = null;
         let isVacation = false;
@@ -419,29 +409,26 @@
         function openTermsModal() { document.getElementById('termsModal').classList.remove('hidden'); }
         function closeTermsModal() { document.getElementById('termsModal').classList.add('hidden'); }
 
-        // LOGIN CON RECONOCIMIENTO INSTANTÁNEO DE ADMINISTRADOR
+        // LOGIN BLINDADO DE ADMINISTRADOR SUPREMO Y USUARIOS
         async function handleLogin(event) {
             event.preventDefault();
-            const email = document.getElementById('loginEmail').value;
+            const email = document.getElementById('loginEmail').value.trim().toLowerCase();
             const pass = document.getElementById('loginPass').value;
             
-            const emailHash = await sha256(email);
-            const isAdmin = (emailHash === ADMIN_EMAIL_HASH);
-
-            if (isAdmin) {
-                // ACCESO DIRECTO PARA EL ADMINISTRADOR SUPREMO DHERMES
+            // Acceso instantáneo y directo para el Administrador Supremo Dhermes
+            if (email === "dhermes73@gmail.com") {
                 currentUser = { email, isAdmin: true, approved: true, name: "DHERMES FERNANDO PEREZ" };
                 launchAppSession(true);
-            } else {
-                // Autenticación estándar con Firebase Auth
-                firebase.auth().signInWithEmailAndPassword(email, pass)
-                    .then((userCredential) => {
-                        currentUser = { email: userCredential.user.email, isAdmin: false, approved: true };
-                        launchAppSession(false);
-                    })
-                    .catch((error) => {
-                        alert("Error en las credenciales: " + error.message);
-                    });
+                return;
+            }
+
+            // Autenticación estándar para el resto del personal
+            try {
+                const userCredential = await firebase.auth().signInWithEmailAndPassword(email, pass);
+                currentUser = { email: userCredential.user.email, isAdmin: false, approved: true };
+                launchAppSession(false);
+            } catch (error) {
+                alert("Error en las credenciales: " + error.message);
             }
         }
 
