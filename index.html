@@ -25,7 +25,7 @@
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-slate-950/40 border border-red-500/50 flex items-center justify-center text-white font-black text-lg shadow-inner">K</div>
                 <div>
-                    <h1 class="text-xl font-black tracking-wider uppercase text-white flex items-center gap-2">Kolaboradorf VE <span class="text-[10px] bg-black/40 px-2 py-0.5 rounded border border-red-500/30 font-medium text-red-200">PRO v3.2</span></h1>
+                    <h1 class="text-xl font-black tracking-wider uppercase text-white flex items-center gap-2">Kolaboradorf VE <span class="text-[10px] bg-black/40 px-2 py-0.5 rounded border border-red-500/30 font-medium text-red-200">PRO v3.3</span></h1>
                     <p class="text-[11px] text-red-200 font-medium">Gestión Inteligente Sincronizada en la Nube</p>
                 </div>
             </div>
@@ -58,12 +58,12 @@
             <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-5">
                 <div>
                     <label class="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-2">Correo Electrónico</label>
-                    <input type="email" id="loginEmail" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition shadow-inner">
+                    <input type="email" id="loginEmail" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-red-600 transition shadow-inner">
                 </div>
                 <div>
                     <label class="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-2">Contraseña</label>
                     <div class="relative">
-                        <input type="password" id="loginPass" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white pr-12 focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition shadow-inner">
+                        <input type="password" id="loginPass" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white pr-12 focus:outline-none focus:border-red-600 transition shadow-inner">
                         <button type="button" onclick="togglePassword('loginPass', 'eyeLogin')" class="absolute right-4 top-3.5 text-slate-400 hover:text-white text-sm font-bold transition" id="eyeLogin">👁️</button>
                     </div>
                 </div>
@@ -131,7 +131,7 @@
                 </div>
             </form>
 
-            <!-- Paso 1 Recuperación -->
+            <!-- Paso 1 Recuperación: Solicitar correo -->
             <form id="forgotForm" onsubmit="handleForgotRequest(event)" class="space-y-5 hidden">
                 <div class="text-center bg-slate-950 p-5 rounded-2xl border border-slate-800 shadow-inner">
                     <h3 class="text-sm font-bold text-white">Recuperar Contraseña</h3>
@@ -147,11 +147,12 @@
                 <button type="submit" class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-xl transition text-sm shadow-lg shadow-red-600/30 uppercase tracking-wider">Enviar Código por EmailJS</button>
             </form>
 
-            <!-- Paso 2 Recuperación -->
+            <!-- Paso 2 Recuperación: Ingresar Código y Nueva Clave (CON LOS CAMPOS VISIBLES) -->
             <form id="resetPassForm" onsubmit="handleResetPassword(event)" class="space-y-5 hidden">
                 <div class="text-center bg-slate-950 p-5 rounded-2xl border border-slate-800 shadow-inner">
-                    <h3 class="text-sm font-bold text-white">Establecer Nueva Contraseña</h3>
-                    <p class="text-xs text-slate-400 mt-1 leading-relaxed">Ingrese el código de 6 dígitos que llegó a su correo y su nueva clave de acceso.</p>
+                    <span class="text-3xl">🔑</span>
+                    <h3 class="text-sm font-bold text-white mt-2">Restablecer Contraseña</h3>
+                    <p class="text-xs text-slate-400 mt-1 leading-relaxed">Ingrese el código de 6 dígitos recibido en su correo y defina su nueva clave.</p>
                 </div>
                 <div>
                     <label class="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-2 text-center">Código de Recuperación</label>
@@ -161,7 +162,7 @@
                     <label class="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-2">Nueva Contraseña</label>
                     <input type="password" id="newPasswordInput" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-red-600 transition shadow-inner">
                 </div>
-                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl transition text-sm shadow-lg shadow-emerald-600/30 uppercase tracking-wider">Actualizar e Iniciar Sesión</button>
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl transition text-sm shadow-lg shadow-emerald-600/30 uppercase tracking-wider">Actualizar Contraseña e Iniciar Sesión</button>
                 <div class="text-center">
                     <button type="button" onclick="switchAuthMode('login')" class="text-xs text-slate-400 hover:underline">Cancelar</button>
                 </div>
@@ -282,7 +283,7 @@
                         </div>
                     </div>
 
-                    <!-- Configuración Montos Entregadores -->
+                    <!-- Configuración Montos Entregadores (Con su Botón Guardar Propio) -->
                     <div class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-4 shadow-xl">
                         <h4 class="text-sm font-extrabold text-red-400 border-b border-slate-800 pb-3 flex items-center gap-2">🚛 Configuración Dólares: Entregadores (Chóferes)</h4>
                         <div class="grid grid-cols-2 gap-3 text-xs max-h-60 overflow-y-auto pr-1 bg-slate-950 p-4 rounded-xl border border-slate-800 shadow-inner">
@@ -300,7 +301,7 @@
                         <button onclick="saveEntregadorConfig()" class="w-full bg-red-600 hover:bg-red-500 text-white text-xs font-bold py-3 rounded-xl transition shadow-lg shadow-red-600/30 uppercase tracking-wider">💾 Guardar Montos Entregadores</button>
                     </div>
 
-                    <!-- Configuración Montos Ayudantes -->
+                    <!-- Configuración Montos Ayudantes (Con su Botón Guardar Propio) -->
                     <div class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-4 lg:col-span-2 shadow-xl">
                         <h4 class="text-sm font-extrabold text-red-400 border-b border-slate-800 pb-3 flex items-center gap-2">🤝 Configuración Dólares: Ayudantes</h4>
                         <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 text-xs bg-slate-950 p-4 rounded-xl border border-slate-800 shadow-inner">
@@ -315,7 +316,7 @@
                             <div><label class="text-[10px] font-bold text-slate-400 uppercase">1100 - 1199 ($):</label><input type="number" step="0.01" id="ayu_1100" value="12.93" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-white font-bold mt-1"></div>
                             <div><label class="text-[10px] font-bold text-slate-400 uppercase">1200 - 1299 ($):</label><input type="number" step="0.01" id="ayu_1200" value="14.23" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-white font-bold mt-1"></div>
                         </div>
-                        <button onclick="saveAyudanteConfig()" class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-red-600/30 uppercase tracking-wider">💾 Guardar Montos Ayudantes</button>
+                        <button onclick="saveAyudanteConfig()" class="w-full bg-red-600 hover:bg-red-500 text-white text-xs font-bold py-3 rounded-xl transition shadow-lg shadow-red-600/30 uppercase tracking-wider">💾 Guardar Montos Ayudantes</button>
                     </div>
                 </div>
             </div>
@@ -399,8 +400,8 @@
                 document.getElementById('authSubtitle').innerText = 'Reciba su código de restablecimiento seguro';
             } else if (mode === 'reset') {
                 document.getElementById('resetPassForm').classList.remove('hidden');
-                document.getElementById('authTitle').innerText = 'Nueva Contraseña';
-                document.getElementById('authSubtitle').innerText = 'Ingrese el código y su nueva clave';
+                document.getElementById('authTitle').innerText = 'Restablecer Clave';
+                document.getElementById('authSubtitle').innerText = 'Ingrese su código y nueva clave';
             }
         }
 
@@ -546,6 +547,7 @@
             try {
                 await emailjs.send('service_p63esgd', 'template_dl48xbt', templateParams);
                 alert("¡Código de recuperación enviado con éxito a " + email + "!");
+                // CAMBIA AUTOMÁTICAMENTE AL FORMULARIO DONDE INTRODUCES EL CÓDIGO Y LA NUEVA CLAVE
                 switchAuthMode('reset');
             } catch (error) {
                 console.error("Error EmailJS:", error);
