@@ -504,7 +504,7 @@
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, deleteUser } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
         import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-        // Tus credenciales oficiales de Firebase
+        // Tus credenciales oficiales de Firebase corregidas
         const firebaseConfig = {
           apiKey: "AIzaSyBzMXFlJhTuPSPDkGsVqCqFQrhP_NiGYBA",
           authDomain: "kolaboradorf-ve.firebaseapp.com",
@@ -584,7 +584,6 @@
 
             if (user) {
                 currentUserEmail = user.email;
-                // Buscar perfil en Firestore
                 try {
                     const docRef = doc(db, "usuarios", user.uid);
                     const docSnap = await getDoc(docRef);
@@ -744,11 +743,9 @@
             }
 
             try {
-                // Crear usuario en Firebase Authentication
                 const userCredential = await createUserWithEmailAndPassword(auth, datosTemporalesRegistro.email, datosTemporalesRegistro.password);
                 const user = userCredential.user;
 
-                // Guardar perfil en Cloud Firestore
                 await setDoc(doc(db, "usuarios", user.uid), {
                     nombre: datosTemporalesRegistro.nombre,
                     anos: datosTemporalesRegistro.anos,
@@ -901,7 +898,6 @@
                     records.push({ id: d.id, ...d.data() });
                 });
 
-                // Ordenar por fecha descendente
                 records.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
 
                 actualizarAcumuladoSemanal(records, perfil);
@@ -1009,7 +1005,6 @@
                     productosPendientes: document.getElementById('productosPendientes').value.trim()
                 };
 
-                // Guardar en la subcolección "registros" de Firestore
                 await addDoc(collection(db, "usuarios", user.uid, "registros"), newRecord);
                 loadHistoryCloud(user.uid);
 
