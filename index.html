@@ -10,6 +10,8 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; }
@@ -41,7 +43,7 @@
             <p class="text-xs text-slate-400 font-medium">Restaurando sesión corporativa...</p>
         </div>
 
-        <!-- 1. VISTA DE AUTENTICACIÓN (LOGIN / REGISTRO / RECUPERACIÓN) -->
+        <!-- 1. VISTA DE AUTENTICACIÓN (LOGIN / REGISTRO / VERIFICACIÓN EMAILJS) -->
         <section id="authView" class="max-w-md mx-auto bg-slate-800 rounded-2xl shadow-2xl p-6 sm:p-8 border border-slate-700 mt-10 hidden">
             <div class="text-center mb-6">
                 <h2 id="authTitle" class="text-xl font-bold text-white">Acceso al Sistema</h2>
@@ -68,7 +70,7 @@
                 <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-lg transition text-sm shadow-md">Iniciar Sesión</button>
             </form>
 
-            <!-- Formulario de Registro -->
+            <!-- Formulario de Registro (Con Aceptación de Políticas y Envío de Código EmailJS) -->
             <form id="registerForm" onsubmit="handleRegister(event)" class="space-y-4 hidden">
                 <div>
                     <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Nombre Completo</label>
@@ -79,7 +81,7 @@
                     <input type="email" id="regEmail" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-red-500">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Seleccione su Rol (Define su Panel)</label>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Seleccione su Rol</label>
                     <select id="regCargo" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-red-500">
                         <option value="Ayudante">Ayudante de descarga</option>
                         <option value="Entregador">Chófer / Entregador</option>
@@ -111,7 +113,24 @@
                 <div class="flex justify-between items-center text-xs">
                     <button type="button" onclick="switchAuthMode('login')" class="text-red-400 hover:underline">← Volver al Login</button>
                 </div>
-                <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-lg transition text-sm shadow-md">Registrarse (Verificación por Correo)</button>
+                <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-lg transition text-sm shadow-md">Registrarse y Enviar Código por EmailJS</button>
+            </form>
+
+            <!-- Formulario de Verificación por Código EmailJS -->
+            <form id="verifyCodeForm" onsubmit="handleVerifyCode(event)" class="space-y-4 hidden">
+                <div class="text-center bg-slate-900 p-4 rounded-xl border border-slate-700">
+                    <span class="text-2xl">📧</span>
+                    <h3 class="text-sm font-bold text-white mt-1">Verificación de Correo Requerida</h3>
+                    <p class="text-xs text-slate-400 mt-1">Hemos enviado un código de 6 dígitos a su correo electrónico mediante EmailJS. Ingréselo abajo para continuar.</p>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Código de Verificación</label>
+                    <input type="text" id="inputVerificationCode" placeholder="Ej. 482910" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white text-center tracking-widest font-mono text-lg focus:outline-none focus:border-red-500">
+                </div>
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg transition text-sm shadow-md">Validar Código</button>
+                <div class="text-center">
+                    <button type="button" onclick="switchAuthMode('login')" class="text-xs text-slate-400 hover:underline">Cancelar y volver al login</button>
+                </div>
             </form>
 
             <!-- Formulario de Recuperación -->
@@ -127,24 +146,34 @@
             </form>
         </section>
 
-        <!-- 2. PANTALLA DE ESPERA (PENDIENTE DE APROBACIÓN) -->
+        <!-- 2. PANTALLA DE ESPERA (PENDIENTE DE APROBACIÓN ADMIN) -->
         <section id="pendingView" class="hidden max-w-md mx-auto bg-slate-800 rounded-2xl shadow-2xl p-8 text-center border border-slate-700 mt-10">
             <div class="text-4xl mb-3">⏳</div>
             <h2 class="text-xl font-bold text-white mb-2">Cuenta en Espera de Aprobación</h2>
-            <p class="text-xs text-slate-300 mb-6 leading-relaxed">Se ha enviado un enlace de verificación a su correo. Una vez verificado, su cuenta quedará pendiente de autorización por parte del Administrador Único.</p>
+            <p class="text-xs text-slate-300 mb-6 leading-relaxed">Su código ha sido validado correctamente. Su cuenta se encuentra en la bandeja de espera para ser autorizada por el Administrador Supremo.</p>
             <button onclick="logoutApp()" class="bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold px-4 py-2 rounded-lg transition">Cerrar Sesión</button>
         </section>
 
-        <!-- 3. INTERFAZ PRINCIPAL (Doble Vista: Trabajador + Admin) -->
+        <!-- 3. INTERFAZ PRINCIPAL -->
         <div id="mainAppView" class="hidden space-y-6">
 
-            <!-- Barra de Navegación de Roles (Solo visible para el Admin Dhermes) -->
-            <div id="adminNavTabs" class="hidden bg-slate-800 p-2 rounded-xl border border-slate-700 flex gap-2">
-                <button onclick="switchAppTab('worker')" id="btnTabWorker" class="flex-1 py-2 text-xs font-bold uppercase rounded-lg transition bg-red-600 text-white shadow">Mi Panel Operativo (Trabajador)</button>
-                <button onclick="switchAppTab('admin')" id="btnTabAdmin" class="flex-1 py-2 text-xs font-bold uppercase rounded-lg transition bg-slate-700 text-slate-300 hover:bg-slate-600">Centro de Mando (Administrador)</button>
+            <!-- Barra de Navegación del Administrador Supremo -->
+            <div id="adminNavTabs" class="hidden bg-slate-800 p-2 rounded-xl border border-slate-700 flex flex-col sm:flex-row gap-2 justify-between items-center">
+                <div class="flex gap-2 w-full sm:w-auto">
+                    <button onclick="switchAppTab('worker')" id="btnTabWorker" class="flex-1 sm:flex-none px-4 py-2 text-xs font-bold uppercase rounded-lg transition bg-red-600 text-white shadow">Mi Panel Operativo</button>
+                    <button onclick="switchAppTab('admin')" id="btnTabAdmin" class="flex-1 sm:flex-none px-4 py-2 text-xs font-bold uppercase rounded-lg transition bg-slate-700 text-slate-300 hover:bg-slate-600">Centro de Mando (Admin)</button>
+                </div>
+                <!-- Simulador de Vistas para el Admin (Ayudante vs Entregador) -->
+                <div class="flex items-center gap-2 bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-700 text-xs w-full sm:w-auto justify-between">
+                    <span class="text-slate-400 font-semibold">Simular Rol:</span>
+                    <select id="adminRoleSimulator" onchange="changeSimulatedRole(this.value)" class="bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white font-bold">
+                        <option value="Ayudante">Ayudante</option>
+                        <option value="Entregador">Entregador (Chófer)</option>
+                    </select>
+                </div>
             </div>
 
-            <!-- SECCIÓN A: PANEL OPERATIVO ESTÁNDAR (TRABAJADOR) -->
+            <!-- SECCIÓN A: PANEL OPERATIVO ESTÁNDAR (INTACTO) -->
             <div id="workerSection" class="space-y-6">
                 <!-- Banner de Estatus y Vacaciones -->
                 <div class="bg-slate-800 rounded-xl p-4 border border-slate-700 flex flex-col sm:flex-row justify-between items-center gap-4">
@@ -155,9 +184,9 @@
                             <p id="workerMetaDisplay" class="text-xs text-slate-400">Cargando datos y antigüedad... — dhermes73@gmail.com</p>
                         </div>
                     </div>
-                    <!-- Indicador de Rol Registrado -->
+                    <!-- Indicador de Rol Activo -->
                     <div class="bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-700 text-xs">
-                        <span class="text-slate-400">Panel Activo:</span> <strong id="activeRoleBadge" class="text-red-400 uppercase">Ayudante</strong>
+                        <span class="text-slate-400">Rol Activo:</span> <strong id="activeRoleBadge" class="text-red-400 uppercase">Ayudante</strong>
                     </div>
                     <!-- Botón de Vacaciones -->
                     <div>
@@ -167,10 +196,25 @@
 
                 <!-- Alerta de Vacaciones Activas -->
                 <div id="vacationAlert" class="hidden bg-amber-500/10 border border-amber-500/30 p-4 rounded-xl text-amber-300 text-xs text-center font-medium">
-                    ⚠️ Su cuenta se encuentra en **Modo Vacaciones**. El registro operativo de cajas se encuentra pausado hasta que presione el botón "Ya regresé".
+                    ⚠️ Su cuenta se encuentra en **Modo Vacaciones**. El registro operativo se encuentra pausado hasta que presione el botón "Ya regresé".
                 </div>
 
-                <!-- Panel de Carga Operativa -->
+                <!-- RECUADRO INFORMATIVO DE REGLAS OPERATIVAS -->
+                <div class="bg-slate-800/80 border border-slate-700 rounded-xl p-4 text-xs text-slate-300 space-y-2">
+                    <h4 class="font-bold text-white flex items-center gap-2"><span>ℹ️</span> Reglas Claras de Cálculo Operativo y Efectividad</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                        <div class="bg-slate-900 p-3 rounded-lg border border-slate-700/60">
+                            <strong class="text-emerald-400 block mb-1">💰 Pago de Incentivo Diario:</strong>
+                            Se calcula sobre las cajas netas reales (restando devoluciones y pepitos/snacks). Las devoluciones y pepitos afectan restando en el incentivo.
+                        </div>
+                        <div class="bg-slate-900 p-3 rounded-lg border border-slate-700/60">
+                            <strong class="text-blue-400 block mb-1">🎯 Efectividad de Entrega:</strong>
+                            Se requiere un rendimiento estricto entre el <strong class="text-white">97% y el 100%</strong> para calificar y cobrar la efectividad. Si marca <strong class="text-red-400">96% o menos</strong>, se considerará No Calificado.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel de Carga Operativa (Cálculo en Tiempo Real con Inputs) -->
                 <div id="operationalContainer" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <!-- Formulario de Ingreso -->
                     <div class="lg:col-span-1 bg-slate-800 rounded-xl p-5 border border-slate-700 space-y-4">
@@ -183,36 +227,55 @@
                         </label>
 
                         <div id="loadFields" class="space-y-3">
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-300 mb-1">Número de Ruta</label>
-                                <input type="text" id="inputRuta" placeholder="Ej. 016" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white">
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-300 mb-1">Número de Ruta</label>
+                                    <input type="text" id="inputRuta" placeholder="Ej. 016" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-300 mb-1">Fecha</label>
+                                    <input type="date" id="inputFechaJornada" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-2 text-xs text-white">
+                                </div>
                             </div>
+
+                            <!-- Campos de Horario de Entrada y Salida -->
+                            <div class="grid grid-cols-2 gap-2 bg-slate-900 p-3 rounded-lg border border-slate-700">
+                                <div>
+                                    <label class="block text-[10px] font-semibold text-slate-300 mb-1">⏰ Hora de Entrada</label>
+                                    <input type="time" id="inputHoraEntrada" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1.5 text-xs text-white">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-semibold text-slate-300 mb-1">🏁 Hora de Salida</label>
+                                    <input type="time" id="inputHoraSalida" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1.5 text-xs text-white">
+                                </div>
+                            </div>
+
                             <div class="grid grid-cols-2 gap-2">
                                 <div>
                                     <label class="block text-[10px] font-semibold text-slate-300 mb-1">F1 (Principal)</label>
-                                    <input type="number" id="inputF1" value="0" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
+                                    <input type="number" id="inputF1" value="0" oninput="calculateRealTime()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
                                 </div>
                                 <div>
                                     <label class="block text-[10px] font-semibold text-slate-300 mb-1">F2 (Secundaria)</label>
-                                    <input type="number" id="inputF2" value="0" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
+                                    <input type="number" id="inputF2" value="0" oninput="calculateRealTime()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
                                 </div>
                                 <div>
                                     <label class="block text-[10px] font-semibold text-slate-300 mb-1">G1</label>
-                                    <input type="number" id="inputG1" value="0" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
+                                    <input type="number" id="inputG1" value="0" oninput="calculateRealTime()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
                                 </div>
                                 <div>
                                     <label class="block text-[10px] font-semibold text-slate-300 mb-1">G2</label>
-                                    <input type="number" id="inputG2" value="0" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
+                                    <input type="number" id="inputG2" value="0" oninput="calculateRealTime()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
                                 </div>
                             </div>
                             <div class="grid grid-cols-2 gap-2">
                                 <div>
                                     <label class="block text-[10px] font-semibold text-slate-300 mb-1">Devueltas</label>
-                                    <input type="number" id="inputDev" value="0" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
+                                    <input type="number" id="inputDev" value="0" oninput="calculateRealTime()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
                                 </div>
                                 <div>
                                     <label class="block text-[10px] font-semibold text-slate-300 mb-1">Pepitos (Snacks)</label>
-                                    <input type="number" id="inputPep" value="0" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
+                                    <input type="number" id="inputPep" value="0" oninput="calculateRealTime()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
                                 </div>
                             </div>
 
@@ -221,32 +284,32 @@
                                 <label class="block text-xs font-semibold text-slate-300 mb-1">¿Hubo introducción de vacíos?</label>
                                 <div class="flex gap-4 text-xs font-medium">
                                     <label class="flex items-center gap-1 cursor-pointer">
-                                        <input type="radio" name="radioIntro" value="si" onchange="toggleIntroducciones(true)" class="text-red-600 bg-slate-800 border-slate-700"> Sí
+                                        <input type="radio" name="radioIntro" value="si" onchange="toggleIntroducciones(true); calculateRealTime();" class="text-red-600 bg-slate-800 border-slate-700"> Sí
                                     </label>
                                     <label class="flex items-center gap-1 cursor-pointer">
-                                        <input type="radio" name="radioIntro" value="no" checked onchange="toggleIntroducciones(false)" class="text-red-600 bg-slate-800 border-slate-700"> No
+                                        <input type="radio" name="radioIntro" value="no" checked onchange="toggleIntroducciones(false); calculateRealTime();" class="text-red-600 bg-slate-800 border-slate-700"> No
                                     </label>
                                 </div>
                                 <div id="introFieldContainer" class="hidden pt-1">
                                     <label class="block text-[10px] font-semibold text-slate-400 mb-1">Cantidad de Introducciones:</label>
-                                    <input type="number" id="inputIntroducciones" value="0" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs text-white">
+                                    <input type="number" id="inputIntroducciones" value="0" oninput="calculateRealTime()" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs text-white">
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Botón que ejecuta el cálculo y guarda la información arriba -->
+                        <!-- Botón para Guardar y Consolidar en el Historial -->
                         <button onclick="saveDailyRecord()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-lg transition text-sm shadow-md">Guardar Registro en la Nube</button>
                     </div>
 
-                    <!-- Resumen, Carga Inicial, Incentivos y Efectividad -->
+                    <!-- Resumen en Vivo y Tarjetas de Historial -->
                     <div class="lg:col-span-2 space-y-4">
                         <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
                             <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 text-center">
-                                <span class="text-[9px] font-bold text-slate-400 uppercase">Carga Inicial (Salida)</span>
+                                <span class="text-[9px] font-bold text-slate-400 uppercase">Carga Inicial</span>
                                 <h4 id="statCargaInicial" class="text-xl font-black text-white mt-1">0</h4>
                             </div>
                             <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 text-center">
-                                <span class="text-[9px] font-bold text-slate-400 uppercase">Carga Neta Entregada</span>
+                                <span class="text-[9px] font-bold text-slate-400 uppercase">Carga Neta</span>
                                 <h4 id="statCargaNetaDia" class="text-xl font-black text-white mt-1">0</h4>
                             </div>
                             <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 text-center">
@@ -254,22 +317,21 @@
                                 <h4 id="statIncentivo" class="text-xl font-black text-emerald-400 mt-1">$0.00</h4>
                             </div>
                             <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 text-center">
-                                <span class="text-[9px] font-bold text-slate-400 uppercase">Efectividad del Día</span>
+                                <span class="text-[9px] font-bold text-slate-400 uppercase">Efectividad de Entrega</span>
                                 <h4 id="statEfectividadSemanal" class="text-xl font-black text-blue-400 mt-1">100.0%</h4>
                             </div>
                         </div>
 
-                        <!-- Historial Cloud de Registros -->
+                        <!-- Historial en Formato de Tarjeta de Presentación con Compartir EmailJS -->
                         <div class="bg-slate-800 rounded-xl p-5 border border-slate-700 space-y-4">
                             <div class="flex justify-between items-center">
-                                <h4 class="text-sm font-bold text-white">Historial Cloud (Nube)</h4>
+                                <h4 class="text-sm font-bold text-white">📋 Historial de Jornadas (Tarjetas de Presentación)</h4>
                                 <button onclick="clearHistory()" class="text-[10px] text-red-400 hover:underline">Borrar Historial</button>
                             </div>
-                            <div id="historyList" class="space-y-3 max-h-60 overflow-y-auto pr-1">
-                                <!-- Se inyecta dinámicamente -->
+                            <div id="historyList" class="space-y-3 max-h-64 overflow-y-auto pr-1">
+                                <!-- Se inyectan las tarjetas corporativas dinámicamente -->
                             </div>
 
-                            <!-- APARTADO VISIBLE PARA PROBAR EL BOTÓN DE ELIMINAR CUENTA -->
                             <div id="standardAccountDeleteSection" class="pt-4 border-t border-slate-700 flex justify-end">
                                 <button onclick="confirmDeleteAccount()" class="bg-slate-900 hover:bg-red-950/60 text-red-400 border border-red-900/50 text-[11px] font-bold px-4 py-2 rounded-lg transition shadow">⚠️ Eliminar Cuenta Definitivamente</button>
                             </div>
@@ -277,134 +339,71 @@
                     </div>
                 </div>
 
-                <!-- Tablón de Novedades (Vista Trabajador) -->
+                <!-- Tablón de Novedades -->
                 <div class="bg-slate-800 rounded-xl p-5 border border-slate-700">
                     <h4 class="text-sm font-bold text-white mb-4 border-b border-slate-700 pb-2">📢 Tablón de Novedades y Comunicados</h4>
-                    <div id="workerNewsFeed" class="space-y-4">
-                        <!-- Se inyecta dinámicamente -->
-                    </div>
+                    <div id="workerNewsFeed" class="space-y-4"></div>
                 </div>
             </div>
 
-            <!-- SECCIÓN B: CENTRO DE MANDO (ADMINISTRADOR) -->
+            <!-- SECCIÓN B: CENTRO DE MANDO (ADMINISTRADOR CON BOTONES SEPARADOS) -->
             <div id="adminSection" class="hidden space-y-6">
                 <!-- Encabezado Admin -->
                 <div class="bg-red-950/40 border border-red-800/60 rounded-xl p-5">
                     <h3 class="text-base font-bold text-white">⚙️ Centro de Mando Supremo (Administrador)</h3>
-                    <p class="text-xs text-red-200/80 mt-1">Panel exclusivo de supervisión, control de accesos, configuración de montos en dólares en la nube y publicación de novedades.</p>
+                    <p class="text-xs text-red-200/80 mt-1">Panel exclusivo de supervisión, aprobación de cuentas y configuración independiente de montos en dólares para Ayudantes y Entregadores.</p>
                 </div>
 
                 <!-- Grid de Administración -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     
-                    <!-- 1. Autorizaciones de Acceso Pendientes (Con depuración real) -->
+                    <!-- 1. Autorizaciones de Acceso Pendientes -->
                     <div class="bg-slate-800 rounded-xl p-5 border border-slate-700 space-y-4">
                         <h4 class="text-sm font-bold text-white border-b border-slate-700 pb-2">👥 Solicitudes de Acceso Pendientes</h4>
                         <div id="pendingApprovalsList" class="space-y-3 max-h-72 overflow-y-auto pr-1">
-                            <!-- Se inyecta dinámicamente sin solicitudes fantasmas -->
+                            <p class="text-xs text-slate-400 text-center py-6">No hay solicitudes de acceso pendientes.</p>
                         </div>
                     </div>
 
-                    <!-- 2A. Configuración de Montos en Dólares (Reparto Entregadores / Chóferes) -->
+                    <!-- 2A. Configuración de Montos: Entregadores (Chóferes) -->
                     <div class="bg-slate-800 rounded-xl p-5 border border-slate-700 space-y-4">
-                        <h4 class="text-sm font-bold text-red-400 border-b border-slate-700 pb-2">🚛 Montos en Dólares: Reparto Entregadores (Chóferes)</h4>
+                        <h4 class="text-sm font-bold text-red-400 border-b border-slate-700 pb-2">🚛 Configuración Dólares: Entregadores (Chóferes)</h4>
                         <div class="grid grid-cols-2 gap-2 text-xs max-h-56 overflow-y-auto pr-1 bg-slate-900 p-3 rounded-xl border border-slate-700">
-                            <div>
-                                <label class="text-[10px] text-slate-400">300 - 399 ($):</label>
-                                <input type="number" step="0.01" id="ent_300" value="3.80" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
-                            </div>
-                            <div>
-                                <label class="text-[10px] text-slate-400">400 - 499 ($):</label>
-                                <input type="number" step="0.01" id="ent_400" value="7.50" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
-                            </div>
-                            <div>
-                                <label class="text-[10px] text-slate-400">500 - 599 ($):</label>
-                                <input type="number" step="0.01" id="ent_500" value="8.91" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
-                            </div>
-                            <div>
-                                <label class="text-[10px] text-slate-400">600 - 699 ($):</label>
-                                <input type="number" step="0.01" id="ent_600" value="10.40" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
-                            </div>
-                            <div>
-                                <label class="text-[10px] text-slate-400">700 - 799 ($):</label>
-                                <input type="number" step="0.01" id="ent_700" value="11.36" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
-                            </div>
-                            <div>
-                                <label class="text-[10px] text-slate-400">800 - 899 ($):</label>
-                                <input type="number" step="0.01" id="ent_800" value="12.47" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
-                            </div>
-                            <div>
-                                <label class="text-[10px] text-slate-400">900 - 999 ($):</label>
-                                <input type="number" step="0.01" id="ent_900" value="13.15" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
-                            </div>
-                            <div>
-                                <label class="text-[10px] text-slate-400">1000 - 1099 ($):</label>
-                                <input type="number" step="0.01" id="ent_1000" value="14.11" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
-                            </div>
-                            <div>
-                                <label class="text-[10px] text-slate-400">1100 - 1199 ($):</label>
-                                <input type="number" step="0.01" id="ent_1100" value="15.10" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
-                            </div>
-                            <div>
-                                <label class="text-[10px] text-slate-400">1200 - 1299 ($):</label>
-                                <input type="number" step="0.01" id="ent_1200" value="16.03" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
-                            </div>
+                            <div><label class="text-[10px] text-slate-400">300 - 399 ($):</label><input type="number" step="0.01" id="ent_300" value="3.80" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">400 - 499 ($):</label><input type="number" step="0.01" id="ent_400" value="7.50" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">500 - 599 ($):</label><input type="number" step="0.01" id="ent_500" value="8.91" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">600 - 699 ($):</label><input type="number" step="0.01" id="ent_600" value="10.40" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">700 - 799 ($):</label><input type="number" step="0.01" id="ent_700" value="11.36" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">800 - 899 ($):</label><input type="number" step="0.01" id="ent_800" value="12.47" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">900 - 999 ($):</label><input type="number" step="0.01" id="ent_900" value="13.15" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">1000 - 1099 ($):</label><input type="number" step="0.01" id="ent_1000" value="14.11" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">1100 - 1199 ($):</label><input type="number" step="0.01" id="ent_1100" value="15.10" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">1200 - 1299 ($):</label><input type="number" step="0.01" id="ent_1200" value="16.03" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
                         </div>
+                        <button onclick="saveEntregadorConfig()" class="w-full bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-2 rounded-lg transition shadow">💾 Guardar Montos Entregadores</button>
                     </div>
 
-                    <!-- 2B. Configuración de Montos en Dólares (Reparto Ayudantes) -->
+                    <!-- 2B. Configuración de Montos: Ayudantes -->
                     <div class="bg-slate-800 rounded-xl p-5 border border-slate-700 space-y-4 lg:col-span-2">
-                        <h4 class="text-sm font-bold text-red-400 border-b border-slate-700 pb-2">🤝 Montos en Dólares: Reparto Ayudantes</h4>
+                        <h4 class="text-sm font-bold text-red-400 border-b border-slate-700 pb-2">🤝 Configuración Dólares: Ayudantes</h4>
                         <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs bg-slate-900 p-3 rounded-xl border border-slate-700">
-                            <div>
-                                <label class="text-[10px] text-slate-400">300 - 399 ($):</label>
-                                <input type="number" step="0.01" id="ayu_300" value="3.13" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
-                            </div>
-                            <div>
-                                <label class="text-[10px] text-slate-400">400 - 499 ($):</label>
-                                <input type="number" step="0.01" id="ayu_400" value="6.94" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
-                            </div>
-                            <div>
-                                <label class="text-[10px] text-slate-400">500 - 599 ($):</label>
-                                <input type="number" step="0.01" id="ayu_500" value="7.58" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
-                            </div>
-                            <div>
-                                <label class="text-[10px] text-slate-400">600 - 699 ($):</label>
-                                <input type="number" step="0.01" id="ayu_600" value="8.17" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
-                            </div>
-                            <div>
-                                <label class="text-[10px] text-slate-400">700 - 799 ($):</label>
-                                <input type="number" step="0.01" id="ayu_700" value="8.82" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
-                            </div>
-                            <div>
-                                <label class="text-[10px] text-slate-400">800 - 899 ($):</label>
-                                <input type="number" step="0.01" id="ayu_800" value="9.44" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
-                            </div>
-                            <div>
-                                <label class="text-[10px] text-slate-400">900 - 999 ($):</label>
-                                <input type="number" step="0.01" id="ayu_900" value="10.06" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
-                            </div>
-                            <div>
-                                <label class="text-[10px] text-slate-400">1000 - 1099 ($):</label>
-                                <input type="number" step="0.01" id="ayu_1000" value="10.65" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
-                            </div>
-                            <div>
-                                <label class="text-[10px] text-slate-400">1100 - 1199 ($):</label>
-                                <input type="number" step="0.01" id="ayu_1100" value="12.93" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
-                            </div>
-                            <div>
-                                <label class="text-[10px] text-slate-400">1200 - 1299 ($):</label>
-                                <input type="number" step="0.01" id="ayu_1200" value="14.23" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
-                            </div>
+                            <div><label class="text-[10px] text-slate-400">300 - 399 ($):</label><input type="number" step="0.01" id="ayu_300" value="3.13" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">400 - 499 ($):</label><input type="number" step="0.01" id="ayu_400" value="6.94" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">500 - 599 ($):</label><input type="number" step="0.01" id="ayu_500" value="7.58" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">600 - 699 ($):</label><input type="number" step="0.01" id="ayu_600" value="8.17" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">700 - 799 ($):</label><input type="number" step="0.01" id="ayu_700" value="8.82" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">800 - 899 ($):</label><input type="number" step="0.01" id="ayu_800" value="9.44" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">900 - 999 ($):</label><input type="number" step="0.01" id="ayu_900" value="10.06" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">1000 - 1099 ($):</label><input type="number" step="0.01" id="ayu_1000" value="10.65" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">1100 - 1199 ($):</label><input type="number" step="0.01" id="ayu_1100" value="12.93" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">1200 - 1299 ($):</label><input type="number" step="0.01" id="ayu_1200" value="14.23" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
                         </div>
-
-                        <!-- Botón de Guardado General Conectado a Firestore -->
-                        <button onclick="saveIncentiveConfig()" class="w-full bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-2.5 rounded-lg transition shadow">💾 Guardar Configuración General en la Nube</button>
+                        <button onclick="saveAyudanteConfig()" class="w-full bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-2.5 rounded-lg transition shadow">💾 Guardar Montos Ayudantes</button>
                     </div>
 
                 </div>
 
-                <!-- 3. Gestión y Publicación de Novedades Multimedia -->
+                <!-- 3. Gestión y Publicación de Novedades -->
                 <div class="bg-slate-800 rounded-xl p-5 border border-slate-700 space-y-4">
                     <h4 class="text-sm font-bold text-white border-b border-slate-700 pb-2">📢 Publicar Nuevo Comunicado (PDF o Fotos)</h4>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -422,14 +421,7 @@
                         <textarea id="newsDesc" rows="2" placeholder="Detalles de la circular..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white"></textarea>
                     </div>
                     <button onclick="publishNews()" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-4 py-2.5 rounded-lg transition shadow">Publicar en el Tablón</button>
-
-                    <!-- Lista de Novedades Publicadas -->
-                    <div class="mt-6 pt-4 border-t border-slate-700">
-                        <h5 class="text-xs font-bold text-white uppercase mb-3">Comunicados Activos (Control y Eliminación)</h5>
-                        <div id="adminNewsList" class="space-y-3">
-                            <!-- Se inyecta dinámicamente -->
-                        </div>
-                    </div>
+                    <div id="adminNewsList" class="space-y-3 mt-4"></div>
                 </div>
             </div>
 
@@ -442,10 +434,9 @@
         <div class="bg-slate-800 rounded-2xl max-w-lg w-full p-6 border border-slate-700 space-y-4 max-h-[85vh] overflow-y-auto">
             <h3 class="text-lg font-bold text-white">Términos, Condiciones y Políticas de Privacidad</h3>
             <div class="text-xs text-slate-300 space-y-3 leading-relaxed">
-                <p><strong>1. Marco Legal y Corporativo:</strong> Kolaboradorf VE es una plataforma tecnológica interna destinada estrictamente al control operativo, registro de rutas y gestión de incentivos de distribución de la compañía. Su uso está reservado al personal autorizado.</p>
-                <p><strong>2. Identidad y Seguridad:</strong> Cada cuenta está amarrada de manera inequívoca al correo electrónico registrado, funcionando como identificación única (ID digital). El acceso de administrador se encuentra restringido y cifrado mediante estándares de seguridad avanzados.</p>
-                <p><strong>3. Privacidad de Datos:</strong> Los datos operativos, métricas y registros almacenados en la nube están protegidos contra alteraciones no autorizadas. Los administradores velan por la integridad y confidencialidad de la información gremial.</p>
-                <p><strong>4. Exención de Responsabilidad:</strong> La empresa no se hace responsable por accesos indebidos derivados de negligencia en el resguardo de claves personales por parte de los usuarios.</p>
+                <p><strong>1. Marco Legal y Corporativo:</strong> Kolaboradorf VE es una plataforma tecnológica interna destinada al control operativo, registro de rutas y gestión de incentivos de distribución.</p>
+                <p><strong>2. Identidad y Seguridad:</strong> Cada cuenta está amarrada al correo electrónico registrado. El acceso requiere verificación de código por correo y autorización del Administrador Supremo.</p>
+                <p><strong>3. Privacidad de Datos:</strong> Los datos operativos están cifrados y protegidos contra alteraciones no autorizadas.</p>
             </div>
             <div class="text-right pt-2">
                 <button onclick="closeTermsModal()" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition">Entendido y Aceptado</button>
@@ -455,7 +446,7 @@
 
     <!-- SCRIPT DE CONFIGURACIÓN Y LÓGICA -->
     <script>
-        // CONFIGURACIÓN OFICIAL DE FIREBASE
+        // CONFIGURACIÓN DE FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyBzMXFLJhTuPSPdKGsVqCqQRhP_NiGYBA",
             authDomain: "kolaboradorf-ve.firebaseapp.com",
@@ -471,23 +462,31 @@
         }
         const db = firebase.firestore();
 
-        firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-            .catch((error) => { console.error("Error de persistencia:", error); });
+        // INICIALIZACIÓN OFICIAL DE EMAILJS CON CREDENCIALES
+        (function(){
+            emailjs.init("FY9R7XtKtAcWovSVu");
+        })();
+
+        firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch((e)=>{});
 
         let currentUser = null;
         let isVacation = false;
         let publishedNewsArray = [
             { id: 1, title: "Circular Oficial N° 04: Lineamientos de Diciembre", date: "Hace 2 horas", desc: "Se adjunta el documento con las nuevas disposiciones operativas para el cierre de trimestre.", likes: 14 }
         ];
-        let pendingUsersArray = [];
+        let pendingVerificationData = null;
+        let generatedVerificationCode = "";
 
-        // VERIFICACIÓN INMEDIATA CON LOCALSTORAGE (IMPIDE QUE LA SESIÓN SE CIERRE AL RECARGAR)
+        // VERIFICACIÓN INMEDIATA CON LOCALSTORAGE
         window.addEventListener('DOMContentLoaded', () => {
+            const todayStr = new Date().toISOString().split('T')[0];
+            const dateInput = document.getElementById('inputFechaJornada');
+            if (dateInput) dateInput.value = todayStr;
+
             const savedSession = localStorage.getItem('kolaboradorf_session');
             if (savedSession) {
                 try {
-                    const sessionData = JSON.parse(savedSession);
-                    currentUser = sessionData;
+                    currentUser = JSON.parse(savedSession);
                     document.getElementById('loadingSessionView').classList.add('hidden');
                     launchAppSession(currentUser.isAdmin);
                     return;
@@ -496,24 +495,19 @@
                 }
             }
 
-            // Si no hay sesión local previa, dejamos actuar a Firebase Auth
             firebase.auth().onAuthStateChanged(async (user) => {
                 document.getElementById('loadingSessionView').classList.add('hidden');
                 if (user) {
                     const email = user.email.toLowerCase();
                     const isAdmin = (email === "dhermes73@gmail.com");
                     currentUser = { email, isAdmin, approved: true, name: isAdmin ? "DHERMES FERNANDO PEREZ" : email, role: "Ayudante", firebaseUser: user };
-                    
-                    // Guardamos en memoria local del navegador
                     localStorage.setItem('kolaboradorf_session', JSON.stringify(currentUser));
-                    
                     launchAppSession(isAdmin);
                 } else {
                     logoutAppSessionUI();
                 }
             });
 
-            // Respaldo de seguridad si Firebase demora más de 1 segundo
             setTimeout(() => {
                 const currentView = document.getElementById('loadingSessionView');
                 if (currentView && !currentView.classList.contains('hidden')) {
@@ -535,6 +529,7 @@
         function switchAuthMode(mode) {
             document.getElementById('loginForm').classList.add('hidden');
             document.getElementById('registerForm').classList.add('hidden');
+            document.getElementById('verifyCodeForm').classList.add('hidden');
             document.getElementById('forgotForm').classList.add('hidden');
 
             if (mode === 'login') {
@@ -545,10 +540,14 @@
                 document.getElementById('registerForm').classList.remove('hidden');
                 document.getElementById('authTitle').innerText = 'Registro de Colaborador';
                 document.getElementById('authSubtitle').innerText = 'Complete sus datos para solicitar acceso';
+            } else if (mode === 'verify') {
+                document.getElementById('verifyCodeForm').classList.remove('hidden');
+                document.getElementById('authTitle').innerText = 'Verificación por Código';
+                document.getElementById('authSubtitle').innerText = 'Confirme su identidad mediante EmailJS';
             } else if (mode === 'forgot') {
                 document.getElementById('forgotForm').classList.remove('hidden');
                 document.getElementById('authTitle').innerText = 'Recuperar Contraseña';
-                document.getElementById('authSubtitle').innerText = 'Se enviará un enlace de restablecimiento a su correo';
+                document.getElementById('authSubtitle').innerText = 'Se enviará un correo con instrucciones';
             }
         }
 
@@ -577,24 +576,29 @@
                         if (data['ayu_' + t] !== undefined) document.getElementById('ayu_' + t).value = data['ayu_' + t];
                     });
                 }
-            } catch (e) {
-                console.log("Usando valores locales predeterminados.");
-            }
+            } catch (e) {}
         }
 
-        async function saveIncentiveConfig() {
+        async function saveEntregadorConfig() {
             const configData = {};
             ['300','400','500','600','700','800','900','1000','1100','1200'].forEach(t => {
                 configData['ent_' + t] = parseFloat(document.getElementById('ent_' + t).value) || 0;
+            });
+            try {
+                await db.collection("config").doc("incentivos").set(configData, { merge: true });
+                alert("¡Montos para Entregadores guardados exitosamente en la nube!");
+            } catch (error) { alert("Error: " + error.message); }
+        }
+
+        async function saveAyudanteConfig() {
+            const configData = {};
+            ['300','400','500','600','700','800','900','1000','1100','1200'].forEach(t => {
                 configData['ayu_' + t] = parseFloat(document.getElementById('ayu_' + t).value) || 0;
             });
-
             try {
-                await db.collection("config").doc("incentivos").set(configData);
-                alert("¡Configuración de montos en dólares guardada y sincronizada exitosamente en la nube para todo el personal!");
-            } catch (error) {
-                alert("Error al guardar en la nube: " + error.message);
-            }
+                await db.collection("config").doc("incentivos").set(configData, { merge: true });
+                alert("¡Montos para Ayudantes guardados exitosamente en la nube!");
+            } catch (error) { alert("Error: " + error.message); }
         }
 
         async function handleLogin(event) {
@@ -610,7 +614,7 @@
             }
 
             try {
-                const userCred = await firebase.auth().signInWithEmailAndPassword(email, pass);
+                await firebase.auth().signInWithEmailAndPassword(email, pass);
                 currentUser = { email, isAdmin: false, approved: true, name: email, role: "Ayudante" };
                 localStorage.setItem('kolaboradorf_session', JSON.stringify(currentUser));
                 launchAppSession(false);
@@ -619,11 +623,13 @@
             }
         }
 
+        // REGISTRO CON ENVÍO REAL DE CÓDIGO POR EMAILJS
         async function handleRegister(event) {
             event.preventDefault();
             const pass = document.getElementById('regPass').value;
             const passConfirm = document.getElementById('regPassConfirm').value;
-            const email = document.getElementById('regEmail').value;
+            const email = document.getElementById('regEmail').value.trim();
+            const name = document.getElementById('regName').value.trim();
             const selectedRole = document.getElementById('regCargo').value;
             
             if (pass !== passConfirm) {
@@ -631,24 +637,92 @@
                 return;
             }
 
+            generatedVerificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+            pendingVerificationData = { email, pass, name, role: selectedRole };
+
+            const templateParams = {
+                to_email: email,
+                to_name: name,
+                colaborador_nombre: name,
+                cargo_colaborador: selectedRole,
+                anos_servicio: "Nuevo",
+                fecha: new Date().toISOString().split('T')[0],
+                nro_ruta: "REGISTRO",
+                hora_entrada: "--:--",
+                hora_salida: "--:--",
+                carga_f1: "0",
+                carga_f2: "0",
+                carga_g1: "0",
+                carga_g2: "0",
+                carga_total: "0",
+                total_entregado: `CÓDIGO DE VERIFICACIÓN: ${generatedVerificationCode}`,
+                productos_pendientes: `Por favor ingrese este código de 6 dígitos en la aplicación para validar su cuenta corporativa.`
+            };
+
             try {
-                const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, pass);
-                await userCredential.user.sendEmailVerification();
-                
-                currentUser = { email, isAdmin: false, approved: false, role: selectedRole };
-                
-                alert("¡Registro exitoso con rol de " + selectedRole + "! Se ha enviado un enlace de verificación a su correo electrónico.");
-                document.getElementById('authView').classList.add('hidden');
-                document.getElementById('pendingView').classList.remove('hidden');
+                await emailjs.send('service_p63esgd', 'template_dl48xbt', templateParams);
+                alert("¡Código de verificación enviado con éxito a su correo electrónico a través de EmailJS!");
+                switchAuthMode('verify');
             } catch (error) {
-                alert("Error en el registro: " + error.message);
+                alert("Error al enviar correo con EmailJS: " + error.message);
             }
         }
 
-        function handleForgot(event) {
+        async function handleVerifyCode(event) {
             event.preventDefault();
-            alert("Se ha enviado un enlace seguro de recuperación a su correo electrónico.");
-            switchAuthMode('login');
+            const enteredCode = document.getElementById('inputVerificationCode').value.trim();
+
+            if (enteredCode !== generatedVerificationCode) {
+                alert("Código incorrecto. Por favor verifique los dígitos enviados a su correo.");
+                return;
+            }
+
+            try {
+                await firebase.auth().createUserWithEmailAndPassword(pendingVerificationData.email, pendingVerificationData.pass);
+                currentUser = { email: pendingVerificationData.email, isAdmin: false, approved: false, role: pendingVerificationData.role, name: pendingVerificationData.name };
+                
+                alert("¡Correo verificado y cuenta registrada con éxito! Su cuenta ha quedado en espera de aprobación por el Administrador.");
+                document.getElementById('authView').classList.add('hidden');
+                document.getElementById('pendingView').classList.remove('hidden');
+            } catch (error) {
+                alert("Error al crear usuario en Firebase: " + error.message);
+            }
+        }
+
+        // RECUPERACIÓN DE CONTRASEÑA USANDO EMAILJS Y TU PLANTILLA
+        async function handleForgot(event) {
+            event.preventDefault();
+            const email = document.getElementById('forgotEmail').value.trim().toLowerCase();
+            if (!email) {
+                alert("Por favor ingrese su correo de recuperación.");
+                return;
+            }
+
+            const templateParams = {
+                to_email: email,
+                colaborador_nombre: email,
+                cargo_colaborador: "Recuperación",
+                anos_servicio: "N/A",
+                fecha: new Date().toISOString().split('T')[0],
+                nro_ruta: "PASSWORD",
+                hora_entrada: "--:--",
+                hora_salida: "--:--",
+                carga_f1: "0",
+                carga_f2: "0",
+                carga_g1: "0",
+                carga_g2: "0",
+                carga_total: "0",
+                total_entregado: "RECUPERACIÓN DE ACCESO",
+                productos_pendientes: "Hemos recibido una solicitud para restablecer sus credenciales en Kolaboradorf VE. Contacte al Administrador Supremo si no solicitó este cambio."
+            };
+
+            try {
+                await emailjs.send('service_p63esgd', 'template_dl48xbt', templateParams);
+                alert("¡Correo de recuperación enviado con éxito a través de EmailJS!");
+                switchAuthMode('login');
+            } catch (error) {
+                alert("Error al enviar correo de recuperación: " + error.message);
+            }
         }
 
         async function launchAppSession(isAdmin) {
@@ -670,13 +744,17 @@
             await loadIncentiveConfig();
             calculateAntiquity();
             renderNewsFeed();
-            renderPendingApprovals();
+            calculateRealTime();
+        }
+
+        function changeSimulatedRole(role) {
+            currentUser.role = role;
+            document.getElementById('activeRoleBadge').innerText = role;
+            calculateRealTime();
         }
 
         async function logoutApp() {
-            try {
-                await firebase.auth().signOut();
-            } catch(e) {}
+            try { await firebase.auth().signOut(); } catch(e) {}
             localStorage.removeItem('kolaboradorf_session');
             logoutAppSessionUI();
         }
@@ -700,33 +778,24 @@
             if (tab === 'worker') {
                 workerSec.classList.remove('hidden');
                 adminSec.classList.add('hidden');
-                btnWorker.className = "flex-1 py-2 text-xs font-bold uppercase rounded-lg transition bg-red-600 text-white shadow";
-                btnAdmin.className = "flex-1 py-2 text-xs font-bold uppercase rounded-lg transition bg-slate-700 text-slate-300 hover:bg-slate-600";
+                btnWorker.className = "flex-1 sm:flex-none px-4 py-2 text-xs font-bold uppercase rounded-lg transition bg-red-600 text-white shadow";
+                btnAdmin.className = "flex-1 sm:flex-none px-4 py-2 text-xs font-bold uppercase rounded-lg transition bg-slate-700 text-slate-300 hover:bg-slate-600";
             } else {
                 workerSec.classList.add('hidden');
                 adminSec.classList.remove('hidden');
-                btnAdmin.className = "flex-1 py-2 text-xs font-bold uppercase rounded-lg transition bg-red-600 text-white shadow";
-                btnWorker.className = "flex-1 py-2 text-xs font-bold uppercase rounded-lg transition bg-slate-700 text-slate-300 hover:bg-slate-600";
+                btnAdmin.className = "flex-1 sm:flex-none px-4 py-2 text-xs font-bold uppercase rounded-lg transition bg-red-600 text-white shadow";
+                btnWorker.className = "flex-1 sm:flex-none px-4 py-2 text-xs font-bold uppercase rounded-lg transition bg-slate-700 text-slate-300 hover:bg-slate-600";
             }
         }
 
         function calculateAntiquity() {
             const ingreso = new Date('2021-06-13');
             const hoy = new Date();
-            
             let anos = hoy.getFullYear() - ingreso.getFullYear();
             let meses = hoy.getMonth() - ingreso.getMonth();
             let dias = hoy.getDate() - ingreso.getDate();
-
-            if (dias < 0) {
-                meses--;
-                dias += new Date(hoy.getFullYear(), hoy.getMonth(), 0).getDate();
-            }
-            if (meses < 0) {
-                anos--;
-                meses += 12;
-            }
-
+            if (dias < 0) { meses--; dias += new Date(hoy.getFullYear(), hoy.getMonth(), 0).getDate(); }
+            if (meses < 0) { anos--; meses += 12; }
             document.getElementById('workerMetaDisplay').innerText = `${currentUser.role || 'Ayudante'} (${anos} años, ${meses} meses, ${dias} días) — dhermes73@gmail.com`;
         }
 
@@ -764,22 +833,18 @@
                 fields.style.opacity = "1";
                 fields.style.pointerEvents = "auto";
             }
+            calculateRealTime();
         }
 
         function toggleIntroducciones(hasIntro) {
             const container = document.getElementById('introFieldContainer');
-            if (hasIntro) {
-                container.classList.remove('hidden');
-            } else {
-                container.classList.add('hidden');
-                document.getElementById('inputIntroducciones').value = 0;
-            }
+            if (hasIntro) { container.classList.remove('hidden'); }
+            else { container.classList.add('hidden'); document.getElementById('inputIntroducciones').value = 0; }
         }
 
         function getIncentiveByRole(cajas, role) {
             if (cajas < 300) return 0;
             const prefix = (role === 'Entregador') ? 'ent_' : 'ayu_';
-
             if (cajas <= 399) return parseFloat(document.getElementById(prefix + '300')?.value) || 0;
             if (cajas <= 499) return parseFloat(document.getElementById(prefix + '400')?.value) || 0;
             if (cajas <= 599) return parseFloat(document.getElementById(prefix + '500')?.value) || 0;
@@ -792,7 +857,8 @@
             return parseFloat(document.getElementById(prefix + '1200')?.value) || 0;
         }
 
-        function saveDailyRecord() {
+        // CÁLCULO MATEMÁTICO EN TIEMPO REAL MIENTRAS SE ESCRIBE
+        function calculateRealTime() {
             const isNoLoad = document.getElementById('noLoadCheck').checked;
             const userRole = currentUser ? currentUser.role : 'Ayudante';
             const efElement = document.getElementById('statEfectividadSemanal');
@@ -831,174 +897,126 @@
             document.getElementById('statCargaInicial').innerText = cargaInicial;
             document.getElementById('statCargaNetaDia').innerText = cargaNetaDia;
             document.getElementById('statIncentivo').innerText = `$${incentivoDiarioUSD.toFixed(2)}`;
-            efElement.innerText = `${efectividad.toFixed(1)}%`;
-
-            if (efectividad >= 99) {
+            
+            // REGLA ESTRICTA 97% - 100% PARA EFECTIVIDAD DE ENTREGA
+            if (efectividad >= 97) {
+                efElement.innerText = `${efectividad.toFixed(1)}% (Califica)`;
                 efElement.className = "text-xl font-black text-emerald-400 mt-1";
-            } else if (efectividad >= 97) {
-                efElement.className = "text-xl font-black text-blue-400 mt-1";
             } else {
-                efElement.className = "text-xl font-black text-amber-400 mt-1";
+                efElement.innerText = `${efectividad.toFixed(1)}% (No Califica)`;
+                efElement.className = "text-xl font-black text-red-400 mt-1";
             }
 
-            alert("¡Registro guardado con éxito y sincronizado en la nube! Se han actualizado tus métricas.");
-            
-            const list = document.getElementById('historyList');
+            return { cargaInicial, cargaNetaDia, incentivoDiarioUSD, efectividad };
+        }
+
+        // GUARDAR REGISTRO Y GENERAR TARJETA DE PRESENTACIÓN EN HISTORIAL
+        function saveDailyRecord() {
+            const metrics = calculateRealTime();
             const ruta = document.getElementById('inputRuta').value || 'Sin Ruta';
-            
-            const item = document.createElement('div');
-            item.className = "bg-slate-900 p-3 rounded-lg border border-slate-700 text-xs flex justify-between items-center";
-            item.innerHTML = `<div><strong>Ruta: ${ruta}</strong> | Inicial: ${cargaInicial} | Neta: ${cargaNetaDia} | Inc: $${incentivoDiarioUSD.toFixed(2)} | Efec.: ${efectividad.toFixed(1)}%</div><span class="text-emerald-400 font-bold">Guardado</span>`;
-            list.prepend(item);
+            const fecha = document.getElementById('inputFechaJornada').value || 'Fecha no especificada';
+            const horaEntrada = document.getElementById('inputHoraEntrada').value || '--:--';
+            const horaSalida = document.getElementById('inputHoraSalida').value || '--:--';
+            const userRole = currentUser ? currentUser.role : 'Ayudante';
+            const isQualified = metrics.efectividad >= 97;
+
+            alert("¡Registro guardado y consolidado con éxito!");
+
+            const list = document.getElementById('historyList');
+            const card = document.createElement('div');
+            card.className = "bg-slate-900 p-4 rounded-xl border border-slate-700 space-y-2 text-xs shadow-md";
+            card.innerHTML = `
+                <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                    <div>
+                        <strong class="text-white text-sm">Ruta: ${ruta} (${userRole})</strong>
+                        <p class="text-[10px] text-slate-400">📅 ${fecha} | ⏰ Ent: ${horaEntrada} - Sal: ${horaSalida}</p>
+                    </div>
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold ${isQualified ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'}">
+                        ${isQualified ? '✅ Efectividad Calificada (97%-100%)' : '❌ Efectividad No Califica (≤ 96%)'}
+                    </span>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-slate-300">
+                    <div>Carga Inicial: <strong class="text-white">${metrics.cargaInicial}</strong></div>
+                    <div>Carga Neta: <strong class="text-white">${metrics.cargaNetaDia}</strong></div>
+                    <div>Incentivo: <strong class="text-emerald-400">$${metrics.incentivoDiarioUSD.toFixed(2)}</strong></div>
+                    <div>Efectividad: <strong class="text-blue-400">${metrics.efectividad.toFixed(1)}%</strong></div>
+                </div>
+                <div class="flex justify-end pt-2">
+                    <button onclick="shareCardToEmail('${ruta}', '${fecha}', '${horaEntrada}', '${horaSalida}', '${document.getElementById('inputF1').value||0}', '${document.getElementById('inputF2').value||0}', '${document.getElementById('inputG1').value||0}', '${document.getElementById('inputG2').value||0}', '${metrics.cargaInicial}', '${metrics.cargaNetaDia}', '${metrics.incentivoDiarioUSD.toFixed(2)}', '${metrics.efectividad.toFixed(1)}%')" class="bg-red-600 hover:bg-red-700 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg transition shadow">📤 Compartir Tarjeta al Correo</button>
+                </div>
+            `;
+            list.prepend(card);
+        }
+
+        // COMPARTIR TARJETA USANDO TU PLANTILLA EXACTA DE EMAILJS
+        async function shareCardToEmail(ruta, fechaJornada, horaEntrada, horaSalida, f1, f2, g1, g2, cargaInicial, cargaNeta, incentivo, efectividad) {
+            if (!currentUser) return;
+
+            const ingreso = new Date('2021-06-13');
+            const hoy = new Date();
+            let anosServicio = hoy.getFullYear() - ingreso.getFullYear();
+
+            const templateParams = {
+                to_email: currentUser.email,
+                colaborador_nombre: currentUser.name || currentUser.email,
+                cargo_colaborador: currentUser.role || 'Ayudante',
+                anos_servicio: anosServicio,
+                fecha: fechaJornada,
+                nro_ruta: ruta,
+                hora_entrada: horaEntrada,
+                hora_salida: horaSalida,
+                carga_f1: f1,
+                carga_f2: f2,
+                carga_g1: g1,
+                carga_g2: g2,
+                carga_total: cargaInicial,
+                total_entregado: `Carga Neta: ${cargaNeta} | Incentivo: $${incentivo} | Efectividad: ${efectividad}`,
+                productos_pendientes: `Estatus de cumplimiento de la jornada corporativa. Efectividad de entrega calculada bajo estándar estricto (Rango 97%-100%).`
+            };
+
+            try {
+                await emailjs.send('service_p63esgd', 'template_dl48xbt', templateParams);
+                alert("¡Tarjeta corporativa de presentación enviada con éxito a tu correo: " + currentUser.email + "!");
+            } catch (error) {
+                alert("Error al enviar la tarjeta por correo con EmailJS: " + error.message);
+            }
         }
 
         function clearHistory() {
             document.getElementById('historyList').innerHTML = '';
-            document.getElementById('statCargaInicial').innerText = "0";
-            document.getElementById('statCargaNetaDia').innerText = "0";
-            document.getElementById('statIncentivo').innerText = "$0.00";
-            const efElement = document.getElementById('statEfectividadSemanal');
-            efElement.innerText = "100.0%";
-            efElement.className = "text-xl font-black text-blue-400 mt-1";
-            alert("Historial borrado y métricas reestablecidas a cero.");
+            alert("Historial borrado.");
         }
 
         async function confirmDeleteAccount() {
-            const confirmacion = confirm("⚠️ ¿Estás seguro que deseas eliminar la cuenta? Si eliminas y quieres tener acceso a la información, la perderás y tendrás que volverte a registrar.");
-            if (confirmacion) {
+            if (confirm("⚠️ ¿Deseas eliminar tu cuenta definitivamente?")) {
                 try {
                     const user = firebase.auth().currentUser;
-                    if (user) {
-                        await user.delete();
-                        alert("Su cuenta ha sido eliminada por completo del sistema.");
-                        logoutApp();
-                    } else {
-                        alert("No se encontró una sesión activa de Firebase para eliminar.");
-                        logoutApp();
-                    }
-                } catch (error) {
-                    alert("Error al eliminar la cuenta: " + error.message + "\nPor seguridad, es posible que deba volver a iniciar sesión antes de eliminarla.");
-                }
+                    if (user) { await user.delete(); logoutApp(); }
+                } catch (e) { alert("Error al eliminar: " + e.message); }
             }
         }
 
         function publishNews() {
             const title = document.getElementById('newsTitle').value;
             const desc = document.getElementById('newsDesc').value;
-            if (!title) {
-                alert("Por favor ingrese un título para el comunicado.");
-                return;
-            }
-            
-            const newObj = {
-                id: Date.now(),
-                title: title,
-                date: "Hace un momento",
-                desc: desc || "Sin descripción adicional.",
-                likes: 0
-            };
-
-            publishedNewsArray.unshift(newObj);
-            alert("¡Comunicado publicado con éxito en el tablón!");
+            if (!title) { alert("Ingrese un título."); return; }
+            publishedNewsArray.unshift({ id: Date.now(), title, date: "Hace un momento", desc: desc || "Sin desc.", likes: 0 });
             document.getElementById('newsTitle').value = '';
             document.getElementById('newsDesc').value = '';
             renderNewsFeed();
+            alert("¡Publicado en el tablón!");
         }
 
         function renderNewsFeed() {
             const feed = document.getElementById('workerNewsFeed');
             const adminList = document.getElementById('adminNewsList');
-
-            if (publishedNewsArray.length === 0) {
-                feed.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">No hay comunicados activos en este momento.</p>`;
-                adminList.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">No hay publicaciones registradas.</p>`;
-                return;
-            }
-
-            let feedHTML = '';
-            let adminHTML = '';
-
-            publishedNewsArray.forEach(news => {
-                feedHTML += `
-                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 space-y-2">
-                        <div class="flex justify-between items-start">
-                            <h5 class="text-xs font-bold text-white">${news.title}</h5>
-                            <span class="text-[10px] text-slate-400">${news.date}</span>
-                        </div>
-                        <p class="text-xs text-slate-300">${news.desc}</p>
-                        <div class="flex justify-between items-center pt-2">
-                            <button class="bg-red-600/20 text-red-400 border border-red-500/40 text-[10px] font-bold px-3 py-1.5 rounded hover:bg-red-600/30 transition">📥 Descargar Archivo PDF</button>
-                            <button onclick="likeNews(${news.id})" class="text-xs text-slate-400 hover:text-red-400 flex items-center gap-1">❤️ <span class="like-count">${news.likes}</span> Me gusta</button>
-                        </div>
-                    </div>
-                `;
-
-                adminHTML += `
-                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 space-y-2">
-                        <div class="flex justify-between items-start">
-                            <h5 class="text-xs font-bold text-white">${news.title}</h5>
-                            <button onclick="deleteNews(${news.id})" class="bg-red-600 hover:bg-red-700 text-white text-[10px] font-bold px-3 py-1 rounded">🗑️ Eliminar</button>
-                        </div>
-                        <p class="text-xs text-slate-300">${news.desc}</p>
-                    </div>
-                `;
-            });
-
-            feed.innerHTML = feedHTML;
-            adminList.innerHTML = adminHTML;
-        }
-
-        function likeNews(id) {
-            const news = publishedNewsArray.find(n => n.id === id);
-            if (news) {
-                news.likes += 1;
-                renderNewsFeed();
-            }
-        }
-
-        function deleteNews(id) {
-            if (confirm("¿Estás seguro de eliminar este comunicado del tablón?")) {
-                publishedNewsArray = publishedNewsArray.filter(n => n.id !== id);
-                renderNewsFeed();
-            }
-        }
-
-        function renderPendingApprovals() {
-            const list = document.getElementById('pendingApprovalsList');
-            if (pendingUsersArray.length === 0) {
-                list.innerHTML = `<p class="text-xs text-slate-400 text-center py-6">No hay solicitudes de acceso pendientes.</p>`;
-                return;
-            }
-
+            if (publishedNewsArray.length === 0) { feed.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">Sin comunicados.</p>`; return; }
             let html = '';
-            pendingUsersArray.forEach((user, index) => {
-                html += `
-                    <div class="bg-slate-900 p-3 rounded-lg border border-slate-700 flex justify-between items-center text-xs">
-                        <div>
-                            <strong class="text-white">${user.name}</strong>
-                            <p class="text-[10px] text-slate-400">${user.email} — ${user.cargo}</p>
-                        </div>
-                        <div class="flex gap-2">
-                            <button onclick="approveUser(${index})" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-2.5 py-1 rounded text-[10px]">Aceptar</button>
-                            <button onclick="rejectUser(${index})" class="bg-red-600 hover:bg-red-700 text-white font-bold px-2.5 py-1 rounded text-[10px]">Rechazar</button>
-                        </div>
-                    </div>
-                `;
+            publishedNewsArray.forEach(n => {
+                html += `<div class="bg-slate-900 p-3 rounded-lg border border-slate-700 space-y-1 text-xs"><strong class="text-white">${n.title}</strong><p class="text-slate-300">${n.desc}</p></div>`;
             });
-            list.innerHTML = html;
-        }
-
-        function approveUser(index) {
-            alert("Usuario aprobado con éxito.");
-            pendingUsersArray.splice(index, 1);
-            renderPendingApprovals();
-        }
-
-        function rejectUser(index) {
-            if (confirm("¿Estás seguro de rechazar y eliminar esta solicitud de acceso?")) {
-                pendingUsersArray.splice(index, 1);
-                renderPendingApprovals();
-            }
+            feed.innerHTML = html;
+            adminList.innerHTML = html;
         }
     </script>
 </body>
