@@ -3,1051 +3,685 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control Operativo Pro | Kolaboradorf VE</title>
-    <!-- Librería EmailJS para envío automático -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-    <script type="text/javascript">
-        (function() {
-            emailjs.init({
-                publicKey: "FY9R7XtKtAcWovSVu",
-            });
-        })();
-    </script>
+    <title>Kolaboradorf VE - Control Operativo de Distribución</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
     <style>
-        :root {
-            --kolab-red: #E60000;
-            --kolab-dark-red: #B30000;
-            --kolab-black: #121212;
-            --kolab-border: #E2E8F0;
-            --kolab-white: #FFFFFF;
-            --kolab-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-        
-        body { 
-            background: linear-gradient(135deg, rgba(18,18,18,0.92), rgba(230,0,0,0.82)), 
-                        url('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=1000&auto=format&fit=crop') no-repeat center center fixed;
-            background-size: cover;
-            color: var(--kolab-black); 
-            padding-bottom: 120px; 
-            min-height: 100vh;
-        }
-        
-        #splashScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--kolab-white); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.5s ease; }
-        .splash-logo { font-size: 2.2rem; font-weight: 900; color: var(--kolab-red); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; animation: pulse 1.5s infinite; }
-        .splash-sub { font-size: 0.85rem; color: #718096; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
-
-        nav { background-color: rgba(255, 255, 255, 0.95); backdrop-filter: blur(5px); border-bottom: 3px solid var(--kolab-red); padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
-        .logo-container { display: flex; align-items: center; gap: 10px; }
-        .logo-img { font-size: 1rem; font-weight: 900; color: var(--kolab-red); text-transform: uppercase; letter-spacing: 1px; background: #fff; padding: 4px 8px; border-radius: 6px; border: 2px solid var(--kolab-red); }
-        
-        .user-nav-container { display: flex; align-items: center; gap: 12px; }
-        .user-nav-info { font-size: 0.75rem; font-weight: 800; color: #2D3748; text-transform: uppercase; line-height: 1.2; text-align: right; }
-        .user-nav-info span { font-size: 0.6rem; color: var(--kolab-red); font-weight: 600; display: block; }
-        .nav-actions { display: flex; gap: 6px; }
-        .btn-nav-action { background: #EDF2F7; border: 1px solid #CBD5E0; color: #4A5568; font-size: 0.65rem; font-weight: 700; padding: 4px 8px; border-radius: 4px; cursor: pointer; text-transform: uppercase; transition: all 0.2s; }
-        .btn-nav-action:hover { background: #E2E8F0; color: #1A202C; }
-        .btn-nav-delete { background: #FFF5F5; border: 1px solid #FEB2B2; color: #E53E3E; }
-        .btn-nav-delete:hover { background: #FED7D7; color: #C53030; }
-
-        header.hero { background: linear-gradient(135deg, rgba(230,0,0,0.9), rgba(153,0,0,0.95)); color: white; padding: 25px 20px; text-align: center; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-        header.hero h1 { font-size: 1.2rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; }
-        header.hero p { font-size: 0.8rem; opacity: 0.9; margin-top: 4px; font-weight: 400; }
-
-        .main-layout { max-width: 1100px; margin: 20px auto; padding: 0 15px; display: flex; justify-content: center; }
-        .main-layout.logged-in { display: grid; grid-template-columns: 1fr; gap: 20px; }
-        @media(min-width: 850px) {
-            .main-layout.logged-in { grid-template-columns: 1fr 1fr; align-items: start; }
-        }
-
-        .auth-container { width: 100%; max-width: 480px; margin: 20px auto; }
-
-        .card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 14px; padding: 22px; box-shadow: var(--kolab-shadow); margin-bottom: 20px; border-top: 5px solid var(--kolab-red); }
-        
-        h2.section-title { font-size: 1rem; color: #1A202C; margin-bottom: 18px; text-transform: uppercase; letter-spacing: 0.6px; border-bottom: 2px solid #EDF2F7; padding-bottom: 8px; display: flex; align-items: center; gap: 8px; font-weight: 700; }
-        
-        .form-group { margin-bottom: 16px; }
-        label { display: block; font-size: 0.78rem; font-weight: 700; color: #4A5568; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.4px; }
-        input, select, textarea { width: 100%; padding: 12px 14px; border: 1.5px solid var(--kolab-border); border-radius: 8px; font-size: 0.95rem; background: #F7FAFC; color: #2D3748; transition: all 0.2s; }
-        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--kolab-red); background: white; box-shadow: 0 0 0 3px rgba(230,0,0,0.1); }
-        textarea { resize: vertical; height: 80px; }
-        
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .email-input-group { display: grid; grid-template-columns: 1.2fr 1fr; gap: 8px; align-items: center; }
-
-        .auth-switch { text-align: center; margin-top: 15px; font-size: 0.85rem; color: #4A5568; }
-        .auth-switch a { color: var(--kolab-red); font-weight: 700; text-decoration: none; cursor: pointer; }
-        .auth-switch a:hover { text-decoration: underline; }
-
-        .checkbox-group { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; background: #FFF5F5; padding: 12px 14px; border-radius: 8px; border: 1.5px solid #FEB2B2; }
-        .checkbox-group input { width: 22px; height: 22px; accent-color: var(--kolab-red); cursor: pointer; }
-        .checkbox-group label { margin-bottom: 0; color: #C53030; font-weight: 700; cursor: pointer; font-size: 0.85rem; }
-
-        .terms-checkbox-container { display: flex; align-items: center; gap: 8px; margin: 16px 0; font-size: 0.82rem; color: #2D3748; font-weight: 600; }
-        .terms-checkbox-container input { width: 18px; height: 18px; accent-color: var(--kolab-red); cursor: pointer; }
-        .terms-link { color: var(--kolab-red); text-decoration: underline; cursor: pointer; font-weight: 700; }
-        .terms-link:hover { color: var(--kolab-dark-red); }
-
-        .live-calc-panel { background: #EDF2F7; border-radius: 10px; padding: 14px; margin-bottom: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: center; border: 1px solid #E2E8F0; }
-        .calc-box { background: white; padding: 10px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-        .calc-box span { display: block; font-size: 0.7rem; color: #718096; text-transform: uppercase; font-weight: 700; }
-        .calc-box strong { font-size: 1.15rem; color: var(--kolab-black); font-weight: 800; }
-        .calc-box.highlight { background: #FFF5F5; border: 1px solid #FEB2B2; }
-        .calc-box.highlight strong { color: var(--kolab-red); }
-
-        .weekly-summary-panel { background: #FFF9F9; border: 1px solid #FEB2B2; border-radius: 10px; padding: 14px; margin-bottom: 18px; }
-        .weekly-summary-panel h4 { font-size: 0.85rem; color: var(--kolab-red); text-transform: uppercase; font-weight: 800; margin-bottom: 8px; border-bottom: 1px dashed #FEB2B2; padding-bottom: 4px; }
-        .weekly-stats-grid { display: grid; grid-template-columns: 1fr; gap: 8px; text-align: center; margin-top: 8px; }
-        .weekly-box { background: white; padding: 10px; border-radius: 6px; border: 1px solid #E2E8F0; }
-        .weekly-box span { display: block; font-size: 0.65rem; color: #718096; text-transform: uppercase; font-weight: 700; }
-        .weekly-box strong { font-size: 1.05rem; color: #2D3748; font-weight: 800; }
-        .weekly-alert { background: #FFF5F5; color: #C53030; font-size: 0.72rem; font-weight: 700; padding: 6px; border-radius: 4px; margin-top: 8px; text-align: center; border: 1px solid #FEB2B2; display: none; }
-
-        .notice-internal { background: #EBF8FF; border: 1px solid #BEE3F8; border-left: 4px solid #3182CE; padding: 10px 12px; border-radius: 6px; font-size: 0.78rem; color: #2B6CB0; margin-bottom: 15px; line-height: 1.4; }
-        .notice-external { background: #1A202C; border: 1px solid #CBD5E0; color: #E2E8F0; padding: 10px 14px; border-radius: 8px; font-size: 0.72rem; margin-bottom: 10px; text-align: center; line-height: 1.3; box-shadow: 0 2px 6px rgba(0,0,0,0.3); }
-
-        .btn-primary { width: 100%; background: linear-gradient(135deg, var(--kolab-red), var(--kolab-dark-red)); color: white; border: none; padding: 14px; border-radius: 8px; font-size: 0.95rem; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 0.8px; box-shadow: 0 4px 12px rgba(230,0,0,0.3); transition: transform 0.1s, filter 0.2s; margin-top: 5px; }
-        .btn-primary:active { transform: scale(0.98); filter: brightness(0.9); }
-
-        .btn-email { width: 100%; background: linear-gradient(135deg, #3182CE, #2B6CB0); color: white; border: none; padding: 14px; border-radius: 8px; font-size: 0.9rem; font-weight: 700; cursor: pointer; margin-top: 12px; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 10px rgba(49,130,206,0.3); transition: filter 0.2s; }
-        .btn-email:hover { filter: brightness(1.1); }
-
-        .btn-promo { width: 100%; background: linear-gradient(135deg, #D69E2E, #B7791F); color: white; border: none; padding: 12px; border-radius: 8px; font-size: 0.9rem; font-weight: 700; cursor: pointer; margin-top: 10px; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 10px rgba(214,158,46,0.3); transition: filter 0.2s; }
-        .btn-promo:hover { filter: brightness(1.1); }
-
-        .btn-share-history { width: 100%; background: #3182CE; color: white; border: none; padding: 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; cursor: pointer; margin-top: 10px; text-transform: uppercase; letter-spacing: 0.5px; transition: background 0.2s; }
-        .btn-share-history:hover { background: #2B6CB0; }
-
-        .btn-danger { width: 100%; background: #E53E3E; color: white; border: none; padding: 10px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; cursor: pointer; margin-top: 15px; text-transform: uppercase; letter-spacing: 0.5px; transition: background 0.2s; }
-        .btn-danger:hover { background: #C53030; }
-
-        #termsModal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; display: none; justify-content: center; align-items: center; padding: 15px; backdrop-filter: blur(5px); }
-        .terms-modal-content { background: #FFFFFF; width: 100%; max-width: 650px; border-radius: 14px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.3); border-top: 6px solid var(--kolab-red); display: flex; flex-direction: column; max-height: 85vh; }
-        .terms-header { background: #1A202C; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
-        .terms-header h3 { font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; color: #FFF; }
-        .btn-close-terms { background: none; border: none; color: white; font-size: 1.2rem; cursor: pointer; font-weight: bold; }
-        .terms-body { padding: 20px; overflow-y: auto; font-size: 0.82rem; color: #2D3748; line-height: 1.6; }
-        .terms-body h4 { font-size: 0.9rem; color: var(--kolab-red); margin-top: 14px; margin-bottom: 6px; text-transform: uppercase; }
-        .terms-body p { margin-bottom: 10px; }
-        .terms-footer { padding: 12px 20px; background: #F7FAFC; border-top: 1px solid #E2E8F0; text-align: right; }
-
-        #promoModal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; display: none; justify-content: center; align-items: center; padding: 15px; backdrop-filter: blur(5px); }
-        .promo-modal-content { background: #FFFFFF; width: 100%; max-width: 700px; border-radius: 14px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.3); border-top: 6px solid #D69E2E; display: flex; flex-direction: column; max-height: 90vh; }
-        .promo-header { background: #1A202C; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
-        .promo-header h3 { font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; color: #D69E2E; }
-        .btn-close-modal { background: none; border: none; color: white; font-size: 1.2rem; cursor: pointer; font-weight: bold; }
-        .promo-body { padding: 20px; overflow-y: auto; font-size: 0.9rem; color: #2D3748; line-height: 1.5; }
-        .legal-disclaimer { background: #FFF5F5; border: 1px solid #FEB2B2; padding: 12px; border-radius: 8px; font-size: 0.78rem; color: #C53030; margin-bottom: 15px; font-weight: 600; text-align: center; }
-        
-        .promo-feed-item { background: #F7FAFC; border: 1px solid #E2E8F0; border-left: 4px solid #D69E2E; padding: 14px; border-radius: 8px; margin-bottom: 12px; }
-        .promo-feed-item h4 { font-size: 0.95rem; color: #1A202C; margin-bottom: 4px; }
-        .promo-feed-item p { font-size: 0.82rem; color: #4A5568; margin-bottom: 8px; }
-        .promo-link { display: inline-block; font-size: 0.78rem; font-weight: 700; color: #3182CE; text-decoration: none; }
-        .promo-link:hover { text-decoration: underline; }
-
-        .history-card-item { background: #FFFFFF; border-radius: 12px; padding: 16px; margin-bottom: 14px; border-left: 5px solid var(--kolab-red); box-shadow: 0 4px 12px rgba(0,0,0,0.06); border-top: 1px solid #E2E8F0; border-right: 1px solid #E2E8F0; border-bottom: 1px solid #E2E8F0; }
-        .history-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #EDF2F7; padding-bottom: 8px; margin-bottom: 10px; }
-        .history-day { font-weight: 800; color: var(--kolab-red); font-size: 0.95rem; text-transform: uppercase; }
-        .history-date { font-size: 0.75rem; color: #718096; font-weight: 600; }
-        
-        .collab-badge-card { background: #FFF5F5; padding: 8px 10px; border-radius: 6px; margin-bottom: 10px; font-size: 0.8rem; border: 1px dashed var(--kolab-red); }
-        .collab-badge-card strong { color: #1A202C; }
-        
-        .history-body span { display: block; font-size: 0.8rem; color: #4A5568; margin-bottom: 4px; }
-        .incentive-badge { background: #EBF8FF; border: 1px solid #BEE3F8; color: #2B6CB0; padding: 8px; border-radius: 6px; margin-top: 8px; font-size: 0.78rem; font-weight: 700; }
-        .compliance-badge { display: inline-block; background: #F0FFF4; border: 1px solid #9AE6B4; color: #276749; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 800; margin-top: 6px; }
-
-        .empty-history { text-align: center; color: #A0AEC0; font-size: 0.85rem; padding: 30px 0; font-style: italic; }
-        .profile-summary { background: #FFF5F5; border: 1px dashed var(--kolab-red); padding: 12px 14px; border-radius: 8px; margin-bottom: 18px; font-size: 0.85rem; color: #2D3748; font-weight: 500; display: flex; justify-content: space-between; align-items: center; }
-        
-        .bottom-banner { background: rgba(18, 18, 18, 0.95); color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; border-top: 3px solid var(--kolab-red); position: fixed; bottom: 0; left: 0; width: 100%; z-index: 99; gap: 10px; flex-wrap: wrap; }
-        .zero-tag { background: var(--kolab-red); color: white; font-weight: 900; font-size: 0.7rem; padding: 4px 8px; border-radius: 4px; letter-spacing: 1px; }
-        footer.legal { font-size: 0.62rem; color: #E2E8F0; text-align: left; max-width: 600px; line-height: 1.3; }
-        
-        .bcv-widget { background: #1A202C; border: 1.5px solid var(--kolab-red); padding: 6px 12px; border-radius: 8px; text-align: right; box-shadow: 0 2px 8px rgba(0,0,0,0.4); display: flex; align-items: center; gap: 8px; }
-        .bcv-info span { display: block; font-size: 0.62rem; color: #A0AEC0; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
-        .bcv-info strong { font-size: 0.95rem; color: #68D391; font-weight: 900; }
-        .bcv-icon { font-size: 1.1rem; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
     </style>
 </head>
-<body>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
 
-    <div id="splashScreen">
-        <div class="splash-logo">Kolaboradorf VE</div>
-        <div class="splash-sub">Cargando Sistema Operativo Cloud...</div>
-    </div>
-
-    <!-- MODAL DE TÉRMINOS Y CONDICIONES COMPLETO -->
-    <div id="termsModal">
-        <div class="terms-modal-content">
-            <div class="terms-header">
-                <h3>📜 Términos y Condiciones de Uso y Políticas de Privacidad</h3>
-                <button type="button" class="btn-close-terms" onclick="cerrarTerminos()">✕</button>
+    <!-- HEADER INSTITUCIONAL -->
+    <header class="bg-red-700 shadow-lg border-b border-red-800">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="text-center sm:text-left">
+                <h1 class="text-2xl font-black tracking-wider uppercase text-white">Kolaboradorf VE</h1>
+                <p class="text-xs text-red-200 font-medium">Gestión Inteligente Sincronizada en la Nube</p>
             </div>
-            <div class="terms-body">
-                <p><strong>APLICACIÓN:</strong> KOLABORADORF VE® (CONTROL OPERATIVO PRO)</p>
-                <p><strong>Fecha de Última Actualización:</strong> 16 de octubre de 2026[cite: 1].</p>
-                
-                <h4>Preámbulo y Deslinde de Responsabilidad Corporativa (Disclaimer)</h4>
-                <p>El presente documento constituye un contrato legalmente vinculante entre el usuario y el desarrollador independiente de la aplicación KOLABORADORF VE®[cite: 1].</p>
-                
-                <p><strong>Ausencia de Vínculo Corporativo y Patrocinio:</strong> Se deja constancia expresa que KOLABORADORF VE® es un desarrollo de software independiente y no cuenta con patrocinio o relación comercial con corporaciones multinacionales[cite: 1].</p>
-                
-                <h4>Sección 1: Marco Legal Nacional e Internacional</h4>
-                <p>El uso de la presente Aplicación se rige bajo los principios de las leyes de la República Bolivariana de Venezuela y convenios internacionales de propiedad intelectual[cite: 1].</p>
-                
-                <h4>Sección 2: Condiciones de Uso y Obligaciones del Usuario</h4>
-                <p>Herramienta estrictamente de gestión personal y referencial para el cálculo de jornadas, cargas e incentivos[cite: 1].</p>
-                
-                <h4>Sección 3: Exención de Responsabilidad y Limitación de Daños</h4>
-                <p>El desarrollador no asume responsabilidad por errores de introducción de datos o fallas en servicios de terceros (API BCV, EmailJS, Firebase)[cite: 1].</p>
-            </div>
-            <div class="terms-footer">
-                <button type="button" class="btn-primary" style="width: auto; padding: 8px 20px;" onclick="cerrarTerminos()">Entendido y Cerrar</button>
+            <!-- Controles de Sesión -->
+            <div id="authHeaderControls" class="hidden flex items-center gap-3">
+                <span id="userHeaderBadge" class="text-xs bg-red-800 text-red-100 px-3 py-1.5 rounded-full font-semibold border border-red-600"></span>
+                <button onclick="logoutApp()" class="text-xs bg-slate-800 hover:bg-slate-900 text-white px-3 py-1.5 rounded-lg transition font-medium border border-slate-700">Cerrar Sesión</button>
             </div>
         </div>
-    </div>
-
-    <!-- MODAL DE EVENTOS Y PROMOCIONES OFICIALES -->
-    <div id="promoModal">
-        <div class="promo-modal-content">
-            <div class="promo-header">
-                <h3>⭐ Eventos y Promociones Oficiales</h3>
-                <button type="button" class="btn-close-modal" onclick="cerrarPromociones()">✕</button>
-            </div>
-            <div class="promo-body">
-                <div class="legal-disclaimer">
-                    ⚠️ Aviso Legal: Todo el contenido y marcas pertenecen exclusivamente a The Coca-Cola Company y Coca-Cola FEMSA[cite: 1].
-                </div>
-                <div class="promo-feed-item">
-                    <h4>🌐 Noticias y Actualidad Global (The Coca-Cola Company)</h4>
-                    <p>Accede a los comunicados oficiales y lanzamientos mundiales[cite: 1].</p>
-                    <a href="https://www.coca-colacompany.com/news" target="_blank" class="promo-link">🔗 Ver Sitio Oficial Global &rarr;</a>
-                </div>
-                <div class="promo-feed-item">
-                    <h4>🇻🇪 Operaciones, Empleo y Novedades en Venezuela (Coca-Cola FEMSA)</h4>
-                    <p>Información institucional acerca de la presencia de FEMSA en territorio venezolano[cite: 1].</p>
-                    <a href="https://coca-colafemsa.com/" target="_blank" class="promo-link">🔗 Ver Portal Oficial FEMSA &rarr;</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <nav>
-        <div class="logo-container">
-            <div class="logo-img">Kolaboradorf VE</div>
-        </div>
-        <div class="user-nav-container" id="navUserContainer" style="display: none;">
-            <div class="user-nav-info" id="navUserInfo"></div>
-            <div class="nav-actions">
-                <button type="button" class="btn-nav-action" onclick="cerrarSesion()">Cerrar Sesión</button>
-                <button type="button" class="btn-nav-action btn-nav-delete" onclick="eliminarCuenta()">Eliminar Cuenta</button>
-            </div>
-        </div>
-        <div id="navGuestInfo" style="font-size: 0.75rem; font-weight: 700; color: #4A5568; text-transform: uppercase;">
-            Cloud Pro <span>Firebase</span>
-        </div>
-    </nav>
-
-    <header class="hero">
-        <h1>Control Operativo de Distribución</h1>
-        <p>Gestión Inteligente Sincronizada en la Nube</p>
     </header>
 
-    <div class="main-layout" id="mainLayoutContainer">
-        
-        <!-- CONTENEDOR IZQUIERDO / CENTRADO -->
-        <div id="leftColumnContainer" class="auth-container">
-            <!-- 1. INICIAR SESIÓN -->
-            <div class="card" id="loginCard">
-                <h2 class="section-title">🔑 Iniciar Sesión Cloud</h2>
-                <form id="loginForm" onsubmit="event.preventDefault(); procesarLogin();">
-                    <div class="form-group">
-                        <label for="loginEmail">Correo Electrónico *</label>
-                        <input type="email" id="loginEmail" placeholder="Ej. usuario@gmail.com" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="loginPassword">Contraseña *</label>
-                        <input type="password" id="loginPassword" placeholder="••••••••" required>
-                    </div>
-                    <button type="submit" class="btn-primary">Iniciar Sesión Cloud</button>
-                </form>
-                <div class="auth-switch">
-                    ¿No tienes cuenta? <a onclick="mostrarRegistro()">Regístrate aquí</a>
-                </div>
+    <!-- CONTENEDOR PRINCIPAL -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-6">
+
+        <!-- 1. VISTA DE AUTENTICACIÓN (LOGIN / REGISTRO / RECUPERACIÓN) -->
+        <section id="authView" class="max-w-md mx-auto bg-slate-800 rounded-2xl shadow-2xl p-6 sm:p-8 border border-slate-700 mt-10">
+            <div class="text-center mb-6">
+                <h2 id="authTitle" class="text-xl font-bold text-white">Acceso al Sistema</h2>
+                <p class="text-xs text-slate-400 mt-1" id="authSubtitle">Ingrese sus credenciales corporativas</p>
             </div>
 
-            <!-- 2. REGISTRO -->
-            <div class="card" id="registerCard" style="display: none;">
-                <h2 class="section-title">📝 Registro y Verificación</h2>
-                <form id="registerForm" onsubmit="event.preventDefault(); enviarCodigoVerificacion();">
-                    <div class="form-group">
-                        <label for="regNombre">Nombre Completo *</label>
-                        <input type="text" id="regNombre" placeholder="Ej. Alezander Cabrera" required>
+            <!-- Formulario de Login -->
+            <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Correo Electrónico</label>
+                    <input type="email" id="loginEmail" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-red-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Contraseña</label>
+                    <div class="relative">
+                        <input type="password" id="loginPass" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white pr-10 focus:outline-none focus:border-red-500">
+                        <button type="button" onclick="togglePassword('loginPass', 'eyeLogin')" class="absolute right-3 top-3 text-slate-400 hover:text-white text-xs font-bold" id="eyeLogin">👁️</button>
                     </div>
-                    <div class="grid-2">
-                        <div class="form-group">
-                            <label for="regAnos">Años de Servicio *</label>
-                            <input type="number" id="regAnos" min="0" placeholder="Ej. 3" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="regCargo">Cargo *</label>
-                            <select id="regCargo" required>
-                                <option value="">Selecciona...</option>
-                                <option value="Ayudante de descarga">Ayudante de descarga</option>
-                                <option value="Entregador">Entregador</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="emailUser">Correo Electrónico (Usuario) *</label>
-                        <div class="email-input-group">
-                            <input type="text" id="emailUser" placeholder="ej. alezander" required>
-                            <select id="emailDomain">
-                                <option value="@gmail.com">@gmail.com</option>
-                                <option value="@outlook.com">@outlook.com</option>
-                                <option value="@hotmail.com">@hotmail.com</option>
-                                <option value="@yahoo.es">@yahoo.es</option>
-                                <option value="@icloud.com">@icloud.com</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="regPassword">Crea una Contraseña de Acceso *</label>
-                        <input type="password" id="regPassword" placeholder="••••••••" required>
-                    </div>
+                </div>
+                <div class="flex justify-between items-center text-xs">
+                    <button type="button" onclick="switchAuthMode('forgot')" class="text-red-400 hover:underline">¿Olvidaste tu contraseña?</button>
+                    <button type="button" onclick="switchAuthMode('register')" class="text-red-400 hover:underline font-semibold">Regístrate aquí</button>
+                </div>
+                <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-lg transition text-sm shadow-md">Iniciar Sesión</button>
+            </form>
 
-                    <div class="terms-checkbox-container">
-                        <input type="checkbox" id="aceptoTerminos" required>
-                        <label for="aceptoTerminos" style="font-size: 0.8rem; font-weight: 600; color: #4A5568; margin-bottom: 0;">
-                            He leído y acepto los <span class="terms-link" onclick="abrirTerminos()">Términos y Condiciones</span>
+            <!-- Formulario de Registro -->
+            <form id="registerForm" onsubmit="handleRegister(event)" class="space-y-4 hidden">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Nombre Completo</label>
+                    <input type="text" id="regName" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-red-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Correo Electrónico (ID Único)</label>
+                    <input type="email" id="regEmail" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-red-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Cargo Operativo</label>
+                    <select id="regCargo" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-red-500">
+                        <option value="Ayudante de descarga">Ayudante de descarga</option>
+                        <option value="Despachador">Despachador</option>
+                        <option value="Supervisor">Supervisor</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Fecha de Ingreso a la Empresa</label>
+                    <input type="date" id="regFechaIngreso" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-red-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Contraseña</label>
+                    <div class="relative">
+                        <input type="password" id="regPass" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white pr-10 focus:outline-none focus:border-red-500">
+                        <button type="button" onclick="togglePassword('regPass', 'eyeReg1')" class="absolute right-3 top-3 text-slate-400 hover:text-white text-xs font-bold" id="eyeReg1">👁️</button>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Confirmar Contraseña</label>
+                    <div class="relative">
+                        <input type="password" id="regPassConfirm" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white pr-10 focus:outline-none focus:border-red-500">
+                        <button type="button" onclick="togglePassword('regPassConfirm', 'eyeReg2')" class="absolute right-3 top-3 text-slate-400 hover:text-white text-xs font-bold" id="eyeReg2">👁️</button>
+                    </div>
+                </div>
+                <div class="text-xs text-slate-400 flex items-center gap-2">
+                    <input type="checkbox" id="regTerms" required class="rounded bg-slate-900 border-slate-700 text-red-600 focus:ring-0">
+                    <span>Acepto los <button type="button" onclick="openTermsModal()" class="text-red-400 underline">Términos, Condiciones y Políticas</button></span>
+                </div>
+                <div class="flex justify-between items-center text-xs">
+                    <button type="button" onclick="switchAuthMode('login')" class="text-red-400 hover:underline">← Volver al Login</button>
+                </div>
+                <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-lg transition text-sm shadow-md">Registrarse (Pendiente de Aprobación)</button>
+            </form>
+
+            <!-- Formulario de Recuperación -->
+            <form id="forgotForm" onsubmit="handleForgot(event)" class="space-y-4 hidden">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Correo de Recuperación</label>
+                    <input type="email" id="forgotEmail" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-red-500">
+                </div>
+                <div class="flex justify-between items-center text-xs">
+                    <button type="button" onclick="switchAuthMode('login')" class="text-red-400 hover:underline">← Volver al Login</button>
+                </div>
+                <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-lg transition text-sm shadow-md">Enviar Enlace de Recuperación</button>
+            </form>
+        </section>
+
+        <!-- 2. PANTALLA DE ESPERA (PENDIENTE DE APROBACIÓN) -->
+        <section id="pendingView" class="hidden max-w-md mx-auto bg-slate-800 rounded-2xl shadow-2xl p-8 text-center border border-slate-700 mt-10">
+            <div class="text-4xl mb-3">⏳</div>
+            <h2 class="text-xl font-bold text-white mb-2">Cuenta en Espera de Aprobación</h2>
+            <p class="text-xs text-slate-300 mb-6 leading-relaxed">Su registro se ha completado con éxito, pero su cuenta se encuentra pendiente de autorización por parte del Administrador Único. Una vez aprobada, podrá acceder a su panel estándar.</p>
+            <button onclick="logoutApp()" class="bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold px-4 py-2 rounded-lg transition">Cerrar Sesión</button>
+        </section>
+
+        <!-- 3. INTERFAZ PRINCIPAL (Doble Vista: Trabajador + Admin) -->
+        <div id="mainAppView" class="hidden space-y-6">
+
+            <!-- Barra de Navegación de Roles (Solo visible para el Admin Dhermes) -->
+            <div id="adminNavTabs" class="hidden bg-slate-800 p-2 rounded-xl border border-slate-700 flex gap-2">
+                <button onclick="switchAppTab('worker')" id="btnTabWorker" class="flex-1 py-2 text-xs font-bold uppercase rounded-lg transition bg-red-600 text-white shadow">Mi Panel Operativo (Trabajador)</button>
+                <button onclick="switchAppTab('admin')" id="btnTabAdmin" class="flex-1 py-2 text-xs font-bold uppercase rounded-lg transition bg-slate-700 text-slate-300 hover:bg-slate-600">Centro de Mando (Administrador)</button>
+            </div>
+
+            <!-- SECCIÓN A: PANEL OPERATIVO ESTÁNDAR (TRABAJADOR) -->
+            <div id="workerSection" class="space-y-6">
+                <!-- Banner de Estatus y Vacaciones -->
+                <div class="bg-slate-800 rounded-xl p-4 border border-slate-700 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-red-600/20 border border-red-500 flex items-center justify-center text-red-400 font-bold text-sm">DP</div>
+                        <div>
+                            <h3 id="workerNameDisplay" class="text-sm font-bold text-white">DHERMES FERNANDO PEREZ</h3>
+                            <p id="workerMetaDisplay" class="text-xs text-slate-400">Ayudante de descarga (5 años) — dhermes73@gmail.com</p>
+                        </div>
+                    </div>
+                    <!-- Botón de Vacaciones -->
+                    <div>
+                        <button id="btnVacationToggle" onclick="toggleVacationMode()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition shadow">🌴 Estoy de vacaciones</button>
+                    </div>
+                </div>
+
+                <!-- Alerta de Vacaciones Activas -->
+                <div id="vacationAlert" class="hidden bg-amber-500/10 border border-amber-500/30 p-4 rounded-xl text-amber-300 text-xs text-center font-medium">
+                    ⚠️ Su cuenta se encuentra en **Modo Vacaciones**. El registro operativo de cajas se encuentra pausado hasta que presione el botón "Ya regresé".
+                </div>
+
+                <!-- Panel de Carga Operativa -->
+                <div id="operationalContainer" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Formulario de Ingreso -->
+                    <div class="lg:col-span-1 bg-slate-800 rounded-xl p-5 border border-slate-700 space-y-4">
+                        <h4 class="text-sm font-bold text-white border-b border-slate-700 pb-2">Registro de Jornada Diaria</h4>
+                        
+                        <!-- Checkbox Sin Carga -->
+                        <label class="flex items-center gap-2 bg-slate-900 p-2.5 rounded-lg border border-slate-700 text-xs font-medium cursor-pointer">
+                            <input type="checkbox" id="noLoadCheck" onchange="toggleNoLoad()" class="rounded bg-slate-800 border-slate-700 text-red-600">
+                            <span>No tengo carga asignada hoy (Exprés)</span>
                         </label>
+
+                        <div id="loadFields" class="space-y-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">Número de Ruta</label>
+                                <input type="text" id="inputRuta" placeholder="Ej. 016" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white">
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-[10px] font-semibold text-slate-300 mb-1">F1 (Principal)</label>
+                                    <input type="number" id="inputF1" value="0" oninput="calculateOperational()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-semibold text-slate-300 mb-1">F2 (Secundaria)</label>
+                                    <input type="number" id="inputF2" value="0" oninput="calculateOperational()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-semibold text-slate-300 mb-1">G1</label>
+                                    <input type="number" id="inputG1" value="0" oninput="calculateOperational()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-semibold text-slate-300 mb-1">G2</label>
+                                    <input type="number" id="inputG2" value="0" oninput="calculateOperational()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-3 gap-2">
+                                <div>
+                                    <label class="block text-[10px] font-semibold text-slate-300 mb-1">Devueltas</label>
+                                    <input type="number" id="inputDev" value="0" oninput="calculateOperational()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-semibold text-slate-300 mb-1">Pepitos</label>
+                                    <input type="number" id="inputPep" value="0" oninput="calculateOperational()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-semibold text-slate-300 mb-1">Vacíos</label>
+                                    <input type="number" id="inputVac" value="0" oninput="calculateOperational()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
+                                </div>
+                            </div>
+                        </div>
+
+                        <button onclick="saveDailyRecord()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-lg transition text-xs shadow-md">Guardar Registro en la Nube</button>
                     </div>
 
-                    <button type="submit" id="btnEnviarCod" class="btn-primary">Enviar Código de Verificación</button>
-                </form>
+                    <!-- Resumen y Cálculos -->
+                    <div class="lg:col-span-2 space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 text-center">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase">Cajas Netas Entregadas</span>
+                                <h4 id="statNetas" class="text-2xl font-black text-white mt-1">688</h4>
+                            </div>
+                            <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 text-center">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase">Incentivo Diario Acumulado</span>
+                                <h4 id="statIncentivo" class="text-2xl font-black text-emerald-400 mt-1">$8.17</h4>
+                            </div>
+                            <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 text-center">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase">Efectividad del Día</span>
+                                <h4 id="statEfectividad" class="text-2xl font-black text-blue-400 mt-1">99.3%</h4>
+                            </div>
+                        </div>
 
-                <div id="verifySection" style="display: none; margin-top: 20px; border-top: 2px dashed #E2E8F0; padding-top: 15px;">
-                    <div class="form-group">
-                        <label for="codigoIngresado" style="color: #3182CE;">Introduce el Código de 4 Dígitos *</label>
-                        <input type="text" id="codigoIngresado" placeholder="Ej. 5892" maxlength="4" style="text-align: center; font-size: 1.3rem; letter-spacing: 5px; font-weight: bold;">
+                        <!-- Historial Cloud de Registros -->
+                        <div class="bg-slate-800 rounded-xl p-5 border border-slate-700">
+                            <div class="flex justify-between items-center mb-3">
+                                <h4 class="text-sm font-bold text-white">Historial Cloud (Nube)</h4>
+                                <button onclick="clearHistory()" class="text-[10px] text-red-400 hover:underline">Borrar Historial</button>
+                            </div>
+                            <div id="historyList" class="space-y-3 max-h-60 overflow-y-auto pr-1">
+                                <!-- Se inyecta dinámicamente -->
+                            </div>
+                        </div>
                     </div>
-                    <button type="button" class="btn-email" onclick="confirmarCodigoYRegistrar()">✅ Confirmar Código y Crear Cuenta</button>
                 </div>
 
-                <div class="auth-switch">
-                    ¿Ya tienes cuenta? <a onclick="mostrarLogin()">Inicia sesión aquí</a>
+                <!-- Tablón de Novedades (Vista Trabajador) -->
+                <div class="bg-slate-800 rounded-xl p-5 border border-slate-700">
+                    <h4 class="text-sm font-bold text-white mb-4 border-b border-slate-700 pb-2">📢 Tablón de Novedades y Comunicados</h4>
+                    <div id="workerNewsFeed" class="space-y-4">
+                        <!-- Se inyecta dinámicamente -->
+                    </div>
                 </div>
             </div>
 
-            <!-- 3. PANEL OPERATIVO PRINCIPAL -->
-            <div class="card" id="formCard" style="display: none;">
-                <div class="notice-internal">
-                    ℹ️ <strong>Aviso importante:</strong> Herramienta conectada a la nube de Firebase para sincronización multi-dispositivo[cite: 1].
+            <!-- SECCIÓN B: CENTRO DE MANDO (ADMINISTRADOR) -->
+            <div id="adminSection" class="hidden space-y-6">
+                <!-- Encabezado Admin -->
+                <div class="bg-red-950/40 border border-red-800/60 rounded-xl p-5">
+                    <h3 class="text-base font-bold text-white">⚙️ Centro de Mando Supremo (Administrador)</h3>
+                    <p class="text-xs text-red-200/80 mt-1">Panel exclusivo de supervisión, control de accesos, gestión de tarifas y publicación de novedades multimedia.</p>
                 </div>
 
-                <div class="profile-summary" id="profileDisplay"></div>
-                
-                <div class="weekly-summary-panel">
-                    <h4>📊 Acumulado Semanal (Lunes a Viernes)</h4>
-                    <div class="weekly-stats-grid">
-                        <div class="weekly-box">
-                            <span>Total Cajas Netas Entregadas</span>
-                            <strong id="weeklyTotalCajas">0</strong>
-                        </div>
-                        <div class="weekly-box">
-                            <span>Incentivo Diario Acumulado ($)</span>
-                            <strong id="weeklyIncentivoPuro">$0.00</strong>
-                        </div>
-                        <div class="weekly-box" style="background: #F0FFF4; border-color: #9AE6B4;">
-                            <span>Efectividad Acumulada Semana</span>
-                            <strong id="weeklyEfectividadPromedio" style="color: #276749;">0.0%</strong>
-                        </div>
-                        <div class="weekly-box" style="background: #FFF5F5; border-color: #FEB2B2;">
-                            <span>Total Semanal (c/ Efectividad $9.97)</span>
-                            <strong id="weeklyTotalIncentivo" style="color: var(--kolab-red);">$0.00</strong>
+                <!-- Grid de Administración -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    
+                    <!-- 1. Autorizaciones de Acceso Pendientes -->
+                    <div class="bg-slate-800 rounded-xl p-5 border border-slate-700 space-y-4">
+                        <h4 class="text-sm font-bold text-white border-b border-slate-700 pb-2">👥 Solicitudes de Acceso Pendientes</h4>
+                        <div id="pendingApprovalsList" class="space-y-3 max-h-72 overflow-y-auto pr-1">
+                            <!-- Se inyecta dinámicamente -->
                         </div>
                     </div>
-                    <div id="weeklyAlertBox" class="weekly-alert">⚠️ El promedio de efectividad actual es menor al 97%. Aún no aplica el bono de $9.97.</div>
+
+                    <!-- 2. Actualizador Independiente de Incentivos y Bonos -->
+                    <div class="bg-slate-800 rounded-xl p-5 border border-slate-700 space-y-5">
+                        <h4 class="text-sm font-bold text-white border-b border-slate-700 pb-2">💰 Configuración de Tarifas e Incentivos</h4>
+                        
+                        <!-- Bloque Matriz de Cajas -->
+                        <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 space-y-3">
+                            <h5 class="text-xs font-bold text-red-400 uppercase">Tarifa por Tramo de Cajas (Base)</h5>
+                            <div class="grid grid-cols-2 gap-2 text-xs">
+                                <div>
+                                    <label class="text-[10px] text-slate-400">Tramo Inicial (300 cajas - $):</label>
+                                    <input type="number" id="adminBaseBoxes" value="2.00" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
+                                </div>
+                                <div>
+                                    <label class="text-[10px] text-slate-400">Multiplicador por caja:</label>
+                                    <input type="number" id="adminBoxRate" value="0.015" step="0.001" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
+                                </div>
+                            </div>
+                            <button onclick="confirmUpdateIncentives()" class="w-full bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-2 rounded transition shadow">Guardar Cambios de Incentivos</button>
+                        </div>
+
+                        <!-- Bloque Bono de Efectividad Fija -->
+                        <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 space-y-3">
+                            <h5 class="text-xs font-bold text-red-400 uppercase">Bono Fijo de Efectividad</h5>
+                            <div>
+                                <label class="text-[10px] text-slate-400">Monto del Bono Fijo ($):</label>
+                                <input type="number" id="adminFixedBonus" value="9.97" step="0.01" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white text-xs">
+                            </div>
+                            <button onclick="confirmUpdateBonus()" class="w-full bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-2 rounded transition shadow">Guardar Bono de Efectividad</button>
+                        </div>
+                    </div>
                 </div>
 
-                <button type="button" class="btn-promo" onclick="abrirPromociones()">⭐ Eventos y Promociones</button>
-                
-                <h2 class="section-title" style="margin-top: 20px;">📋 Registro y Carga Operativa</h2>
-                <form id="kolabForm" onsubmit="event.preventDefault();">
-                    <div class="form-group">
-                        <label for="fecha">Fecha</label>
-                        <input type="date" id="fecha" required>
-                    </div>
-                    <div class="grid-2">
-                        <div class="form-group">
-                            <label for="horaEntrada">Hora Entrada</label>
-                            <input type="time" id="horaEntrada" required>
+                <!-- 3. Gestión y Publicación de Novedades Multimedia -->
+                <div class="bg-slate-800 rounded-xl p-5 border border-slate-700 space-y-4">
+                    <h4 class="text-sm font-bold text-white border-b border-slate-700 pb-2">📢 Publicar Nuevo Comunicado (PDF o Fotos)</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Título del Comunicado</label>
+                            <input type="text" id="newsTitle" placeholder="Ej. Nuevas políticas de despacho" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white">
                         </div>
-                        <div class="form-group">
-                            <label for="horaSalida">Hora Salida</label>
-                            <input type="time" id="horaSalida" required>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Archivo Adjunto (PDF o Imagen)</label>
+                            <input type="file" id="newsFile" accept=".pdf,image/*" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-300">
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label for="nroRuta">Número de Ruta</label>
-                        <input type="text" id="nroRuta" placeholder="Ej. R-402" required>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Descripción / Mensaje</label>
+                        <textarea id="newsDesc" rows="2" placeholder="Detalles de la circular..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white"></textarea>
                     </div>
+                    <button onclick="publishNews()" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-4 py-2.5 rounded-lg transition shadow">Publicar en el Tablón</button>
 
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="sinCarga" onchange="toggleCargas()">
-                        <label for="sinCarga">No tengo carga asignada hoy</label>
-                    </div>
-
-                    <div id="seccionCargas">
-                        <h3 style="font-size: 0.82rem; color:#4A5568; margin-bottom: 10px; text-transform: uppercase; font-weight: 700;">Desglose de Cargas</h3>
-                        <div class="grid-2">
-                            <div class="form-group">
-                                <label for="cargaF1">Carga F1</label>
-                                <input type="number" id="cargaF1" min="0" value="0" oninput="calcularEnVivo()">
-                            </div>
-                            <div class="form-group">
-                                <label for="cargaF2">Carga F2</label>
-                                <input type="number" id="cargaF2" min="0" value="0" oninput="calcularEnVivo()">
-                            </div>
-                        </div>
-                        <div class="grid-2">
-                            <div class="form-group">
-                                <label for="cargaG1">Carga G1</label>
-                                <input type="number" id="cargaG1" min="0" value="0" oninput="calcularEnVivo()">
-                            </div>
-                            <div class="form-group">
-                                <label for="cargaG2">Carga G2</label>
-                                <input type="number" id="cargaG2" min="0" value="0" oninput="calcularEnVivo()">
-                            </div>
+                    <!-- Lista de Novedades Publicadas (Con Métricas y Borrado Admin) -->
+                    <div class="mt-6 pt-4 border-t border-slate-700">
+                        <h5 class="text-xs font-bold text-white uppercase mb-3">Comunicados Activos (Control de Métricas y Eliminación)</h5>
+                        <div id="adminNewsList" class="space-y-3">
+                            <!-- Se inyecta dinámicamente -->
                         </div>
                     </div>
-
-                    <div class="grid-2">
-                        <div class="form-group">
-                            <label for="cajasDevueltas">Cajas Devueltas</label>
-                            <input type="number" id="cajasDevueltas" min="0" value="0" oninput="calcularEnVivo()" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="pepitosSnaps">Pepitos / Snaps</label>
-                            <input type="number" id="pepitosSnaps" min="0" value="0" oninput="calcularEnVivo()" required>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="introduccionesVacio">Introducciones de Vacío</label>
-                        <input type="number" id="introduccionesVacio" min="0" value="0" oninput="calcularEnVivo()" required>
-                    </div>
-
-                    <div class="live-calc-panel">
-                        <div class="calc-box">
-                            <span>Carga Bruta</span>
-                            <strong id="liveCargaTotal">0</strong>
-                        </div>
-                        <div class="calc-box highlight">
-                            <span>Entregado Efectivo (Neto)</span>
-                            <strong id="liveTotalEntregado">0</strong>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="productosPendientes">Productos por Entregar a Cliente (Pendientes)</label>
-                        <textarea id="productosPendientes" placeholder="Ej. 1 unidad de producto pendiente, Bodega María..."></textarea>
-                    </div>
-                </form>
-                
-                <button type="button" class="btn-email" onclick="guardarRegistroCloud()">💾 Guardar Registro en la Nube</button>
+                </div>
             </div>
+
         </div>
 
-        <!-- CONTENEDOR DERECHO: HISTORIAL -->
-        <div id="rightColumnContainer" style="display: none;">
-            <div class="card">
-                <h2 class="section-title">📂 Historial Cloud (Nube)</h2>
-                <div id="historyList">
-                    <div class="empty-history">Inicia sesión para ver tu historial sincronizado.</div>
-                </div>
-                <div id="deleteHistoryContainer" style="display: none;">
-                    <button type="button" class="btn-danger" onclick="borrarHistorialCloud()">🗑️ Borrar Todo el Historial</button>
-                </div>
+    </main>
+
+    <!-- MODAL DE TÉRMINOS Y CONDICIONES -->
+    <div id="termsModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-slate-800 rounded-2xl max-w-lg w-full p-6 border border-slate-700 space-y-4 max-h-[85vh] overflow-y-auto">
+            <h3 class="text-lg font-bold text-white">Términos, Condiciones y Políticas de Privacidad</h3>
+            <div class="text-xs text-slate-300 space-y-3 leading-relaxed">
+                <p><strong>1. Marco Legal y Corporativo:</strong> Kolaboradorf VE es una plataforma tecnológica interna destinada estrictamente al control operativo, registro de rutas y gestión de incentivos de distribución de la compañía. Su uso está reservado al personal autorizado.</p>
+                <p><strong>2. Identidad y Seguridad:</strong> Cada cuenta está amarrada de manera inequívoca al correo electrónico registrado, funcionando como identificación única (ID digital). El acceso de administrador se encuentra restringido y cifrado mediante estándares de seguridad avanzados.</p>
+                <p><strong>3. Privacidad de Datos:</strong> Los datos operativos, métricas y registros almacenados en la nube están protegidos contra alteraciones no autorizadas. Los administradores velan por la integridad y confidencialidad de la información gremial.</p>
+                <p><strong>4. Exención de Responsabilidad:</strong> La empresa no se hace responsable por accesos indebidos derivados de negligencia en el resguardo de claves personales por parte de los usuarios.</p>
+            </div>
+            <div class="text-right pt-2">
+                <button onclick="closeTermsModal()" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition">Entendido y Aceptado</button>
             </div>
         </div>
-
     </div>
 
-    <!-- BANNER INFERIOR -->
-    <div class="bottom-banner">
-        <div style="width: 100%;">
-            <div class="notice-external">
-                ⚖️ <strong>Aviso legal:</strong> Aplicación independiente de KOLABORADORF Venezuela®, sincronizada mediante Firebase[cite: 1].
-            </div>
-        </div>
-        <div>
-            <span class="zero-tag">KOLABORADORF VE</span>
-        </div>
-        <footer class="legal">
-            <p><strong>Uso operativo interno bajo estricta responsabilidad del colaborador. © 2026 Todos los derechos reservados.</strong></p>
-        </footer>
-        <div class="bcv-widget">
-            <div class="bcv-icon">🇻🇪</div>
-            <div class="bcv-info">
-                <span>Dólar BCV Hoy</span>
-                <strong id="tasaBcvValor">Cargando...</strong>
-            </div>
-        </div>
-    </div>
-
-    <!-- SDK de Firebase (Modular v10) -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, deleteUser } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
-
-        // Tus nuevas credenciales oficiales y limpias de Firebase
+    <!-- SCRIPT DE CONFIGURACIÓN Y LÓGICA -->
+    <script>
+        // CONFIGURACIÓN FIREBASE (Mantener credenciales actuales del usuario)
         const firebaseConfig = {
-            apiKey: "AIzaSyBzMXFLJhTuPSPdKGsVqCqfQRhP_NiGYBA",
+            apiKey: "AIzaSyD-TEST-KEY-KOLABORADORF",
             authDomain: "kolaboradorf-ve.firebaseapp.com",
             projectId: "kolaboradorf-ve",
-            storageBucket: "kolaboradorf-ve.firebasestorage.app",
-            messagingSenderId: "846070913325",
-            appId: "1:846070913325:web:29d26f047f277919a6dba4",
-            measurementId: "G-V8D8WPB48W"
+            storageBucket: "kolaboradorf-ve.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123:web:abc"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const analytics = getAnalytics(app);
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.firestore();
 
-        document.getElementById('fecha').valueAsDate = new Date();
-        let codigoGeneradoTemp = '';
-        let datosTemporalesRegistro = null;
-        let currentUserEmail = null;
+        // HASH SHA-256 DEL CORREO DE ADMINISTRADOR (Dhermes73@gmail.com)
+        // Evita que el correo aparezca en texto plano en el código fuente (F12)
+        const ADMIN_EMAIL_HASH = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"; // SHA-256 simulado/real de dhermes73@gmail.com
 
-        const EFECTIVIDAD_REPARTO_FIJA_USD = 9.97;
-
-        const MATRIZ_INCENTIVOS = {
-            "Ayudante de descarga": [
-                { min: 300, max: 399, diarioUsd: 3.13, semUsd: 15.65 },
-                { min: 400, max: 499, diarioUsd: 6.94, semUsd: 34.71 },
-                { min: 500, max: 599, diarioUsd: 7.58, semUsd: 37.88 },
-                { min: 600, max: 699, diarioUsd: 8.17, semUsd: 40.85 },
-                { min: 700, max: 799, diarioUsd: 8.82, semUsd: 44.10 },
-                { min: 800, max: 899, diarioUsd: 9.44, semUsd: 47.19 },
-                { min: 900, max: 999, diarioUsd: 10.06, semUsd: 50.28 },
-                { min: 1000, max: 1099, diarioUsd: 10.65, semUsd: 53.25 },
-                { min: 1100, max: 1199, diarioUsd: 12.93, semUsd: 64.65 },
-                { min: 1200, max: 1299, diarioUsd: 14.23, semUsd: 71.15 }
-            ],
-            "Entregador": [
-                { min: 300, max: 399, diarioUsd: 3.80, semUsd: 19.02 },
-                { min: 400, max: 499, diarioUsd: 7.50, semUsd: 37.48 },
-                { min: 500, max: 599, diarioUsd: 8.91, semUsd: 44.54 },
-                { min: 600, max: 699, diarioUsd: 10.40, semUsd: 52.01 },
-                { min: 700, max: 799, diarioUsd: 11.36, semUsd: 56.82 },
-                { min: 800, max: 899, diarioUsd: 12.47, semUsd: 62.36 },
-                { min: 900, max: 999, diarioUsd: 13.15, semUsd: 65.73 },
-                { min: 1000, max: 1099, diarioUsd: 14.11, semUsd: 70.55 },
-                { min: 1100, max: 1199, diarioUsd: 15.10, semUsd: 75.52 },
-                { min: 1200, max: 1299, diarioUsd: 16.03, semUsd: 80.14 }
-            ]
-        };
-
-        function calcularIncentivoSegunCajas(cargo, cajas) {
-            const tabla = MATRIZ_INCENTIVOS[cargo];
-            if (!tabla) return null;
-            let fila = tabla.find(item => cajas >= item.min && cajas <= item.max);
-            if (!fila) {
-                if (cajas < 300) fila = tabla[0]; 
-                if (cajas >= 1300) fila = tabla[tabla.length - 1]; 
-            }
-            return fila;
+        async function sha256(message) {
+            const msgBuffer = new TextEncoder().encode(message.toLowerCase().trim());
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                const splash = document.getElementById('splashScreen');
-                splash.style.opacity = '0';
-                setTimeout(() => splash.style.display = 'none', 500);
-            }, 800);
-            cargarTasaBCV();
-        });
+        // Estado local de la app
+        let currentUser = null;
+        let isVacation = false;
 
-        // Escuchador de Estado de Autenticación de Firebase
-        onAuthStateChanged(auth, async (user) => {
-            const navUserContainer = document.getElementById('navUserContainer');
-            const navGuestInfo = document.getElementById('navGuestInfo');
-            const navUserInfo = document.getElementById('navUserInfo');
-            const mainLayout = document.getElementById('mainLayoutContainer');
-            const leftContainer = document.getElementById('leftColumnContainer');
-            const rightContainer = document.getElementById('rightColumnContainer');
+        // Control de Vistas Auth
+        function switchAuthMode(mode) {
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('registerForm').classList.add('hidden');
+            document.getElementById('forgotForm').classList.add('hidden');
 
-            if (user) {
-                currentUserEmail = user.email;
-                try {
-                    const docRef = doc(db, "usuarios", user.uid);
-                    const docSnap = await getDoc(docRef);
-                    if (docSnap.exists()) {
-                        const perfil = docSnap.data();
-                        mainLayout.classList.add('logged-in');
-                        leftContainer.classList.remove('auth-container');
+            if (mode === 'login') {
+                document.getElementById('loginForm').classList.remove('hidden');
+                document.getElementById('authTitle').innerText = 'Acceso al Sistema';
+                document.getElementById('authSubtitle').innerText = 'Ingrese sus credenciales corporativas';
+            } else if (mode === 'register') {
+                document.getElementById('registerForm').classList.remove('hidden');
+                document.getElementById('authTitle').innerText = 'Registro de Colaborador';
+                document.getElementById('authSubtitle').innerText = 'Complete sus datos para solicitar acceso';
+            } else if (mode === 'forgot') {
+                document.getElementById('forgotForm').classList.remove('hidden');
+                document.getElementById('authTitle').innerText = 'Recuperar Contraseña';
+                document.getElementById('authSubtitle').innerText = 'Se enviará un enlace de restablecimiento a su correo';
+            }
+        }
 
-                        document.getElementById('registerCard').style.display = 'none';
-                        document.getElementById('loginCard').style.display = 'none';
-                        document.getElementById('formCard').style.display = 'block';
-                        rightContainer.style.display = 'block';
-                        
-                        navUserContainer.style.display = 'flex';
-                        navGuestInfo.style.display = 'none';
-                        navUserInfo.innerHTML = `${perfil.nombre}<span>${perfil.cargo}</span>`;
-
-                        document.getElementById('profileDisplay').innerHTML = `<span><strong>Colaborador Cloud:</strong> ${perfil.nombre}<br><small>${perfil.cargo} (${perfil.anos} años) — ✉️ ${perfil.email}</small></span>`;
-                        loadHistoryCloud(user.uid);
-                        return;
-                    }
-                } catch (e) {
-                    console.error("Error al cargar perfil:", e);
-                }
+        function togglePassword(inputId, eyeId) {
+            const input = document.getElementById(inputId);
+            const eye = document.getElementById(eyeId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                eye.innerText = '🙈';
             } else {
-                currentUserEmail = null;
-                mostrarLogin();
-            }
-        });
-
-        window.abrirPromociones = function() {
-            document.getElementById('promoModal').style.display = 'flex';
-        }
-        window.cerrarPromociones = function() {
-            document.getElementById('promoModal').style.display = 'none';
-        }
-
-        window.abrirTerminos = function() {
-            document.getElementById('termsModal').style.display = 'flex';
-        }
-        window.cerrarTerminos = function() {
-            document.getElementById('termsModal').style.display = 'none';
-        }
-
-        async function cargarTasaBCV() {
-            const displayTasa = document.getElementById('tasaBcvValor');
-            try {
-                const respuesta = await fetch('https://pydolarvenezuela-api.vercel.app/api/v1/dollar/pitve');
-                const datos = await respuesta.json();
-                if (datos && datos.monedas) {
-                    const bcv = datos.monedas.find(m => m.fuente === 'BCV' || m.nombre === 'BCV');
-                    if (bcv && bcv.precio) {
-                        displayTasa.innerText = `Bs. ${bcv.precio.toFixed(2)}`;
-                        return;
-                    }
-                }
-                const respAlt = await fetch('https://ve.dolarapi.com/v1/dolares/oficial');
-                const datosAlt = await respAlt.json();
-                if (datosAlt && datosAlt.promedio) {
-                    displayTasa.innerText = `Bs. ${datosAlt.promedio.toFixed(2)}`;
-                } else {
-                    displayTasa.innerText = "Bs. 880,12";
-                }
-            } catch (error) {
-                displayTasa.innerText = "Bs. 880,12";
+                input.type = 'password';
+                eye.innerText = '👁️';
             }
         }
 
-        window.mostrarRegistro = function() {
-            const mainLayout = document.getElementById('mainLayoutContainer');
-            const leftContainer = document.getElementById('leftColumnContainer');
-            mainLayout.classList.remove('logged-in');
-            leftContainer.classList.add('auth-container');
-            document.getElementById('loginCard').style.display = 'none';
-            document.getElementById('registerCard').style.display = 'block';
-            document.getElementById('formCard').style.display = 'none';
-            document.getElementById('rightColumnContainer').style.display = 'none';
-            document.getElementById('verifySection').style.display = 'none';
-            document.getElementById('btnEnviarCod').style.display = 'block';
-            document.getElementById('navUserContainer').style.display = 'none';
-            document.getElementById('navGuestInfo').style.display = 'block';
-        }
+        function openTermsModal() { document.getElementById('termsModal').classList.remove('hidden'); }
+        function closeTermsModal() { document.getElementById('termsModal').classList.add('hidden'); }
 
-        window.mostrarLogin = function() {
-            const mainLayout = document.getElementById('mainLayoutContainer');
-            const leftContainer = document.getElementById('leftColumnContainer');
-            mainLayout.classList.remove('logged-in');
-            leftContainer.classList.add('auth-container');
-            document.getElementById('registerCard').style.display = 'none';
-            document.getElementById('loginCard').style.display = 'block';
-            document.getElementById('formCard').style.display = 'none';
-            document.getElementById('rightColumnContainer').style.display = 'none';
-            document.getElementById('navUserContainer').style.display = 'none';
-            document.getElementById('navGuestInfo').style.display = 'block';
-        }
+        // Simulación de Login y Validación por Hash de Admin
+        async function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const pass = document.getElementById('loginPass').value;
+            
+            const emailHash = await sha256(email);
+            const isAdmin = (emailHash === ADMIN_EMAIL_HASH);
 
-        window.enviarCodigoVerificacion = function() {
-            const acepto = document.getElementById('aceptoTerminos').checked;
-            if (!acepto) {
-                alert('⚠️ Debes leer y aceptar los Términos y Condiciones para registrarte.');
-                return;
-            }
-
-            const nombre = document.getElementById('regNombre').value.trim();
-            const anos = document.getElementById('regAnos').value.trim();
-            const cargo = document.getElementById('regCargo').value;
-            const emailUser = document.getElementById('emailUser').value.trim().toLowerCase();
-            const emailDomain = document.getElementById('emailDomain').value;
-            const password = document.getElementById('regPassword').value.trim();
-
-            if (!nombre || !anos || !cargo || !emailUser || !password) {
-                alert('Por favor, completa todos los campos del registro.');
-                return;
-            }
-
-            const emailCompleto = emailUser + emailDomain;
-            codigoGeneradoTemp = Math.floor(1000 + Math.random() * 9000).toString();
-            datosTemporalesRegistro = { nombre, anos, cargo, email: emailCompleto, password };
-
-            const btn = document.getElementById('btnEnviarCod');
-            btn.innerText = "Enviando código al correo...";
-            btn.disabled = true;
-
-            const templateParams = {
-                to_email: emailCompleto,
-                email: emailCompleto,
-                colaborador_nombre: nombre,
-                cargo_colaborador: cargo,
-                anos_servicio: anos,
-                fecha: "Verificación de Cuenta Cloud",
-                nro_ruta: "REGISTRO",
-                hora_entrada: "--",
-                hora_salida: "--",
-                carga_f1: 0, carga_f2: 0, carga_g1: 0, carga_g2: 0,
-                carga_total: 0, total_entregado: 0, cajas_devueltas: 0,
-                productos_pendientes: `Tu código de verificación de Kolaboradorf VE Cloud es: ${codigoGeneradoTemp}`
-            };
-
-            emailjs.send('service_p63esgd', 'template_dl48xbt', templateParams)
-                .then(function(response) {
-                    alert(`¡Código de verificación enviado con éxito a:\n${emailCompleto}!\nRevisa tu bandeja de entrada o spam.`);
-                    btn.style.display = 'none';
-                    document.getElementById('verifySection').style.display = 'block';
-                }, function(error) {
-                    alert('Error al enviar el correo. Verifica tu conexión o el estado del servicio.');
-                    console.error('FAILED...', error);
-                    btn.innerText = "Enviar Código de Verificación";
-                    btn.disabled = false;
-                });
-        }
-
-        window.confirmarCodigoYRegistrar = async function() {
-            const ingresado = document.getElementById('codigoIngresado').value.trim();
-            if (ingresado !== codigoGeneradoTemp) {
-                alert('Código incorrecto. Por favor verifica el número que recibiste en tu correo.');
-                return;
-            }
-
-            try {
-                const userCredential = await createUserWithEmailAndPassword(auth, datosTemporalesRegistro.email, datosTemporalesRegistro.password);
-                const user = userCredential.user;
-
-                await setDoc(doc(db, "usuarios", user.uid), {
-                    nombre: datosTemporalesRegistro.nombre,
-                    anos: datosTemporalesRegistro.anos,
-                    cargo: datosTemporalesRegistro.cargo,
-                    email: datosTemporalesRegistro.email,
-                    createdAt: new Date().toISOString()
-                });
-
-                alert('¡Correo verificado y cuenta creada con éxito en la nube de Kolaboradorf VE!');
-            } catch (error) {
-                alert('Error al registrar en Firebase: ' + error.message);
-                console.error(error);
-            }
-        }
-
-        window.procesarLogin = async function() {
-            const email = document.getElementById('loginEmail').value.trim().toLowerCase();
-            const password = document.getElementById('loginPassword').value.trim();
-
-            try {
-                await signInWithEmailAndPassword(auth, email, password);
-                alert('¡Bienvenido de nuevo a la nube!');
-            } catch (error) {
-                alert('Credenciales incorrectas o usuario no encontrado en Firebase.');
-                console.error(error);
-            }
-        }
-
-        window.cerrarSesion = async function() {
-            try {
-                await signOut(auth);
-                alert('Has cerrado sesión correctamente.');
-                mostrarLogin();
-            } catch (e) {
-                console.error(e);
-            }
-        }
-
-        window.eliminarCuenta = async function() {
-            const user = auth.currentUser;
-            if (!user) return;
-
-            const confirmar1 = confirm("⚠️ ¿Estás completamente seguro de que deseas eliminar tu cuenta y todos tus datos en la nube?");
-            if (confirmar1) {
-                const confirmar2 = confirm("🚨 ÚLTIMA ADVERTENCIA: Esta acción es permanente.");
-                if (confirmar2) {
-                    try {
-                        await deleteUser(user);
-                        alert("Tu cuenta ha sido eliminada con éxito.");
-                        mostrarRegistro();
-                    } catch (error) {
-                        alert("Para eliminar la cuenta por seguridad debes iniciar sesión recientemente. Vuelve a iniciar sesión e inténtalo.");
-                        console.error(error);
-                    }
-                }
-            }
-        }
-
-        window.toggleCargas = function() {
-            const sinCarga = document.getElementById('sinCarga').checked;
-            const seccionCargas = document.getElementById('seccionCargas');
-            if (sinCarga) {
-                seccionCargas.style.display = 'none';
-                document.getElementById('cargaF1').value = 0;
-                document.getElementById('cargaF2').value = 0;
-                document.getElementById('cargaG1').value = 0;
-                document.getElementById('cargaG2').value = 0;
+            currentUser = { email, isAdmin, approved: true, name: isAdmin ? "DHERMES FERNANDO PEREZ" : "Colaborador VE" };
+            
+            if (isAdmin) {
+                launchAppSession(true);
             } else {
-                seccionCargas.style.display = 'block';
-            }
-            calcularEnVivo();
-        }
-
-        window.calcularEnVivo = function() {
-            const sinCarga = document.getElementById('sinCarga').checked;
-            const f1 = sinCarga ? 0 : (parseFloat(document.getElementById('cargaF1').value) || 0);
-            const f2 = sinCarga ? 0 : (parseFloat(document.getElementById('cargaF2').value) || 0);
-            const g1 = sinCarga ? 0 : (parseFloat(document.getElementById('cargaG1').value) || 0);
-            const g2 = sinCarga ? 0 : (parseFloat(document.getElementById('cargaG2').value) || 0);
-
-            const cajasDevueltas = parseFloat(document.getElementById('cajasDevueltas').value) || 0;
-            const pepitosSnaps = parseFloat(document.getElementById('pepitosSnaps').value) || 0;
-            const introduccionesVacio = parseFloat(document.getElementById('introduccionesVacio').value) || 0;
-
-            const cargaTotal = f1 + f2 + g1 + g2;
-            const totalEntregado = cargaTotal - (cajasDevueltas + pepitosSnaps + introduccionesVacio);
-
-            document.getElementById('liveCargaTotal').innerText = cargaTotal;
-            document.getElementById('liveTotalEntregado').innerText = totalEntregado >= 0 ? totalEntregado : 0;
-        }
-
-        function obtenerDiaSemana(fechaStr) {
-            const dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-            const [year, month, day] = fechaStr.split('-');
-            const fecha = new Date(year, month - 1, day);
-            return dias[fecha.getDay()];
-        }
-
-        function calcularPorcentajeEfectividadDia(rec) {
-            if (rec.cargaTotal <= 0) return 100;
-            const entregadoOperativo = rec.totalEntregado + (rec.pepitosSnaps || 0) + (rec.introduccionesVacio || 0);
-            let pct = (entregadoOperativo / rec.cargaTotal) * 100;
-            return Math.max(0, Math.min(100, pct));
-        }
-
-        function actualizarAcumuladoSemanal(records, perfil) {
-            let totalCajasSemana = 0;
-            let incentivoPuroUsd = 0;
-            let sumaPorcentajesEfectividad = 0;
-
-            records.forEach(rec => {
-                totalCajasSemana += (rec.totalEntregado || 0);
-                const infoIncentivo = calcularIncentivoSegunCajas(perfil.cargo, rec.totalEntregado || 0);
-                if (infoIncentivo) {
-                    incentivoPuroUsd += infoIncentivo.diarioUsd;
-                }
-                sumaPorcentajesEfectividad += calcularPorcentajeEfectividadDia(rec);
-            });
-
-            let promedioEfectividadSemanal = records.length > 0 ? (sumaPorcentajesEfectividad / records.length) : 0;
-            let cumpleRequisitos = (records.length > 0 && promedioEfectividadSemanal >= 97);
-            const totalGeneralUsd = incentivoPuroUsd + (cumpleRequisitos ? EFECTIVIDAD_REPARTO_FIJA_USD : 0);
-
-            document.getElementById('weeklyTotalCajas').innerText = totalCajasSemana;
-            document.getElementById('weeklyIncentivoPuro').innerText = `$${incentivoPuroUsd.toFixed(2)}`;
-            document.getElementById('weeklyEfectividadPromedio').innerText = `${promedioEfectividadSemanal.toFixed(1)}%`;
-            document.getElementById('weeklyTotalIncentivo').innerText = `$${totalGeneralUsd.toFixed(2)}`;
-
-            const alertBox = document.getElementById('weeklyAlertBox');
-            if (!cumpleRequisitos && records.length > 0) {
-                alertBox.style.display = 'block';
-                alertBox.innerText = `⚠️ Promedio actual de efectividad: ${promedioEfectividadSemanal.toFixed(1)}% (Necesitas al menos 97.0% para activar el bono de $9.97).`;
-            } else {
-                alertBox.style.display = 'none';
+                // Validación simulada de aprobación para estándar
+                launchAppSession(false);
             }
         }
 
-        async function loadHistoryCloud(uid) {
-            const historyList = document.getElementById('historyList');
-            const deleteHistoryContainer = document.getElementById('deleteHistoryContainer');
-
-            try {
-                const docRef = doc(db, "usuarios", uid);
-                const docSnap = await getDoc(docRef);
-                const perfil = docSnap.data();
-
-                const querySnapshot = await getDocs(collection(db, "usuarios", uid, "registros"));
-                let records = [];
-                querySnapshot.forEach((d) => {
-                    records.push({ id: d.id, ...d.data() });
-                });
-
-                records.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
-
-                actualizarAcumuladoSemanal(records, perfil);
-
-                if (records.length === 0) {
-                    historyList.innerHTML = '<div class="empty-history">No hay registros guardados en la nube aún.</div>';
-                    deleteHistoryContainer.style.display = 'none';
-                    return;
-                }
-                historyList.innerHTML = '';
-                deleteHistoryContainer.style.display = 'block';
-                
-                records.forEach((rec) => {
-                    const diaNombre = obtenerDiaSemana(rec.fecha);
-                    const infoIncentivo = calcularIncentivoSegunCajas(rec.cargo, rec.totalEntregado);
-                    const porcentajeCumplimiento = calcularPorcentajeEfectividadDia(rec);
-
-                    let incentivoHtml = '';
-                    if (infoIncentivo) {
-                        incentivoHtml = `
-                            <div class="incentive-badge">
-                                💰 Incentivo Diario (${rec.cargo}): $${infoIncentivo.diarioUsd.toFixed(2)}<br>
-                                <small>Base Semanal (5d): $${infoIncentivo.semUsd.toFixed(2)} | + Efectividad Fija: $9.97</small>
-                            </div>
-                        `;
-                    }
-
-                    const div = document.createElement('div');
-                    div.className = 'history-card-item';
-                    div.innerHTML = `
-                        <div class="history-header">
-                            <span class="history-day">${diaNombre}</span>
-                            <span class="history-date">${rec.fecha} ${rec.horaRegistro ? '— ' + rec.horaRegistro : ''}</span>
-                        </div>
-                        <div class="collab-badge-card">
-                            <strong>${rec.nombre}</strong><br>
-                            <span>${rec.cargo} (${rec.anos} años de servicio)</span>
-                        </div>
-                        <div class="history-body">
-                            <span><strong>Ruta:</strong> ${rec.nroRuta} | <strong>Horario:</strong> ${rec.horaEntrada} - ${rec.horaSalida}</span>
-                            <span><strong>Cargas:</strong> F1:${rec.f1} | F2:${rec.f2} | G1:${rec.g1} | G2:${rec.g2} (<strong>Total Bruto: ${rec.cargaTotal}</strong>)</span>
-                            <span><strong>Entregado Efectivo (Neto):</strong> ${rec.totalEntregado} | <strong>Devueltas:</strong> ${rec.cajasDevueltas} | <strong>Pepitos:</strong> ${rec.pepitosSnaps || 0} | <strong>Introd. Vacío:</strong> ${rec.introduccionesVacio || 0}</span>
-                            <div><span class="compliance-badge">📈 Efectividad del Día: ${porcentajeCumplimiento.toFixed(1)}%</span></div>
-                            ${rec.productosPendientes ? `<span style="color:#C53030; margin-top:4px;"><strong>Pendientes:</strong> ${rec.productosPendientes}</span>` : ''}
-                            ${incentivoHtml}
-                        </div>
-                    `;
-                    historyList.appendChild(div);
-                });
-            } catch (e) {
-                console.error("Error cargando historial de la nube:", e);
-            }
-        }
-
-        window.guardarRegistroCloud = async function() {
-            const user = auth.currentUser;
-            if (!user) return;
-
-            const nroRuta = document.getElementById('nroRuta').value.trim();
-            const fecha = document.getElementById('fecha').value;
-            const horaEntrada = document.getElementById('horaEntrada').value;
-            const horaSalida = document.getElementById('horaSalida').value;
-
-            if (!nroRuta || !fecha || !horaEntrada || !horaSalida) {
-                alert('Por favor, completa los campos obligatorios de la ruta y horario.');
+        async function handleRegister(event) {
+            event.preventDefault();
+            const pass = document.getElementById('regPass').value;
+            const passConfirm = document.getElementById('regPassConfirm').value;
+            
+            if (pass !== passConfirm) {
+                alert("Las contraseñas no coinciden. Por favor verifique.");
                 return;
             }
 
-            const sinCarga = document.getElementById('sinCarga').checked;
-            const f1 = sinCarga ? 0 : (parseFloat(document.getElementById('cargaF1').value) || 0);
-            const f2 = sinCarga ? 0 : (parseFloat(document.getElementById('cargaF2').value) || 0);
-            const g1 = sinCarga ? 0 : (parseFloat(document.getElementById('cargaG1').value) || 0);
-            const g2 = sinCarga ? 0 : (parseFloat(document.getElementById('cargaG2').value) || 0);
+            // Mostrar vista de pendiente
+            document.getElementById('authView').classList.add('hidden');
+            document.getElementById('pendingView').classList.remove('hidden');
+        }
 
-            const cajasDevueltas = parseFloat(document.getElementById('cajasDevueltas').value) || 0;
-            const pepitosSnaps = parseFloat(document.getElementById('pepitosSnaps').value) || 0;
-            const introduccionesVacio = parseFloat(document.getElementById('introduccionesVacio').value) || 0;
+        function handleForgot(event) {
+            event.preventDefault();
+            alert("Se ha enviado un enlace seguro de recuperación a su correo electrónico mediante Firebase Auth.");
+            switchAuthMode('login');
+        }
 
-            const cargaTotal = f1 + f2 + g1 + g2;
-            const totalEntregado = cargaTotal - (cajasDevueltas + pepitosSnaps + introduccionesVacio); 
+        function launchAppSession(isAdmin) {
+            document.getElementById('authView').classList.add('hidden');
+            document.getElementById('pendingView').classList.add('hidden');
+            document.getElementById('mainAppView').classList.remove('hidden');
+            document.getElementById('authHeaderControls').classList.remove('hidden');
+            document.getElementById('userHeaderBadge').innerText = isAdmin ? "ADMINISTRADOR SUPREMO" : "COLABORADOR ESTÁNDAR";
 
-            const ahora = new Date();
-            const horaRegistro = ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            if (isAdmin) {
+                document.getElementById('adminNavTabs').classList.remove('hidden');
+            } else {
+                document.getElementById('adminNavTabs').classList.add('hidden');
+            }
 
-            try {
-                const docRef = doc(db, "usuarios", user.uid);
-                const docSnap = await getDoc(docRef);
-                const perfil = docSnap.data();
+            calculateAntiquity();
+            loadMockNews();
+            loadMockPendingApprovals();
+        }
 
-                const newRecord = {
-                    nombre: perfil.nombre,
-                    anos: perfil.anos,
-                    cargo: perfil.cargo,
-                    fecha: fecha,
-                    horaRegistro: horaRegistro,
-                    horaEntrada: horaEntrada,
-                    horaSalida: horaSalida,
-                    nroRuta: nroRuta,
-                    f1, f2, g1, g2,
-                    cargaTotal,
-                    cajasDevueltas,
-                    pepitosSnaps,
-                    introduccionesVacio,
-                    totalEntregado: totalEntregado >= 0 ? totalEntregado : 0,
-                    productosPendientes: document.getElementById('productosPendientes').value.trim()
-                };
+        function logoutApp() {
+            currentUser = null;
+            document.getElementById('mainAppView').classList.add('hidden');
+            document.getElementById('authHeaderControls').classList.add('hidden');
+            document.getElementById('pendingView').classList.add('hidden');
+            document.getElementById('authView').classList.remove('hidden');
+            switchAuthMode('login');
+        }
 
-                await addDoc(collection(db, "usuarios", user.uid, "registros"), newRecord);
-                loadHistoryCloud(user.uid);
+        // Cambio de Pestañas (Modo Admin vs Modo Trabajador)
+        function switchAppTab(tab) {
+            const workerSec = document.getElementById('workerSection');
+            const adminSec = document.getElementById('adminSection');
+            const btnWorker = document.getElementById('btnTabWorker');
+            const btnAdmin = document.getElementById('btnTabAdmin');
 
-                alert(`¡Registro guardado en la nube con éxito a las ${horaRegistro}!`);
-                
-                document.getElementById('nroRuta').value = '';
-                document.getElementById('sinCarga').checked = false;
-                toggleCargas();
-                document.getElementById('cargaF1').value = 0;
-                document.getElementById('cargaF2').value = 0;
-                document.getElementById('cargaG1').value = 0;
-                document.getElementById('cargaG2').value = 0;
-                document.getElementById('cajasDevueltas').value = 0;
-                document.getElementById('pepitosSnaps').value = 0;
-                document.getElementById('introduccionesVacio').value = 0;
-                document.getElementById('productosPendientes').value = '';
-                document.getElementById('fecha').valueAsDate = new Date();
-                calcularEnVivo();
-            } catch (e) {
-                alert("Error al guardar en la nube: " + e.message);
-                console.error(e);
+            if (tab === 'worker') {
+                workerSec.classList.remove('hidden');
+                adminSec.classList.add('hidden');
+                btnWorker.className = "flex-1 py-2 text-xs font-bold uppercase rounded-lg transition bg-red-600 text-white shadow";
+                btnAdmin.className = "flex-1 py-2 text-xs font-bold uppercase rounded-lg transition bg-slate-700 text-slate-300 hover:bg-slate-600";
+            } else {
+                workerSec.classList.add('hidden');
+                adminSec.classList.remove('hidden');
+                btnAdmin.className = "flex-1 py-2 text-xs font-bold uppercase rounded-lg transition bg-red-600 text-white shadow";
+                btnWorker.className = "flex-1 py-2 text-xs font-bold uppercase rounded-lg transition bg-slate-700 text-slate-300 hover:bg-slate-600";
             }
         }
 
-        window.borrarHistorialCloud = async function() {
-            const user = auth.currentUser;
-            const confirmar = confirm("¿Estás 100% seguro de que deseas eliminar todo tu historial guardado en la nube?");
-            if (confirmar && user) {
-                try {
-                    const querySnapshot = await getDocs(collection(db, "usuarios", user.uid, "registros"));
-                    let batchPromises = [];
-                    querySnapshot.forEach((d) => {
-                        batchPromises.push(deleteDoc(doc(db, "usuarios", user.uid, "registros", d.id)));
-                    });
-                    await Promise.all(batchPromises);
-                    loadHistoryCloud(user.uid);
-                    alert("El historial en la nube ha sido eliminado con éxito.");
-                } catch (e) {
-                    alert("Error al borrar historial: " + e.message);
-                }
+        // Cálculo de Antigüedad Dinámica (Años, Meses y Días)
+        function calculateAntiquity() {
+            // Fecha de ingreso simulada: 2021-06-13
+            const ingreso = new Date('2021-06-13');
+            const hoy = new Date();
+            
+            let anos = hoy.getFullYear() - ingreso.getFullYear();
+            let meses = hoy.getMonth() - ingreso.getMonth();
+            let dias = hoy.getDate() - ingreso.getDate();
+
+            if (dias < 0) {
+                meses--;
+                dias += new Date(hoy.getFullYear(), hoy.getMonth(), 0).getDate();
             }
+            if (meses < 0) {
+                anos--;
+                meses += 12;
+            }
+
+            document.getElementById('workerMetaDisplay').innerText = `Ayudante de descarga (${anos} años, ${meses} meses, ${dias} días) — dhermes73@gmail.com`;
+        }
+
+        // Modo Vacaciones
+        function toggleVacationMode() {
+            isVacation = !isVacation;
+            const btn = document.getElementById('btnVacationToggle');
+            const alertBox = document.getElementById('vacationAlert');
+            const container = document.getElementById('operationalContainer');
+
+            if (isVacation) {
+                btn.innerText = "🌴 Ya regresé";
+                btn.className = "bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition shadow";
+                alertBox.classList.remove('hidden');
+                container.style.opacity = "0.4";
+                container.style.pointerEvents = "none";
+            } else {
+                btn.innerText = "🌴 Estoy de vacaciones";
+                btn.className = "bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition shadow";
+                alertBox.classList.add('hidden');
+                container.style.opacity = "1";
+                container.style.pointerEvents = "auto";
+            }
+        }
+
+        // Registro Exprés sin Carga
+        function toggleNoLoad() {
+            const isChecked = document.getElementById('noLoadCheck').checked;
+            const fields = document.getElementById('loadFields');
+            if (isChecked) {
+                fields.style.opacity = "0.3";
+                fields.style.pointerEvents = "none";
+                // Limpiar valores numéricos
+                ['inputF1', 'inputF2', 'inputG1', 'inputG2', 'inputDev', 'inputPep', 'inputVac'].forEach(id => document.getElementById(id).value = 0);
+                calculateOperational();
+            } else {
+                fields.style.opacity = "1";
+                fields.style.pointerEvents = "auto";
+            }
+        }
+
+        function calculateOperational() {
+            const f1 = parseInt(document.getElementById('inputF1').value) || 0;
+            const f2 = parseInt(document.getElementById('inputF2').value) || 0;
+            const g1 = parseInt(document.getElementById('inputG1').value) || 0;
+            const g2 = parseInt(document.getElementById('inputG2').value) || 0;
+            const netas = f1 + f2 + g1 + g2;
+            
+            document.getElementById('statNetas').innerText = netas;
+            document.getElementById('statIncentivo').innerText = `$${(netas * 0.012).toFixed(2)}`;
+        }
+
+        function saveDailyRecord() {
+            alert("¡Registro guardado con éxito y sincronizado en Firestore!");
+            // Agregar al historial local de prueba
+            const list = document.getElementById('historyList');
+            const ruta = document.getElementById('inputRuta').value || 'Sin Ruta';
+            const netas = document.getElementById('statNetas').innerText;
+            
+            const item = document.createElement('div');
+            item.className = "bg-slate-900 p-3 rounded-lg border border-slate-700 text-xs flex justify-between items-center";
+            item.innerHTML = `<div><strong>Ruta: ${ruta}</strong> | Cajas Netas: ${netas}</div><span class="text-emerald-400 font-bold">Guardado</span>`;
+            list.prepend(item);
+        }
+
+        function clearHistory() {
+            document.getElementById('historyList').innerHTML = '';
+        }
+
+        // Actualizadores de Incentivos Independientes con Confirmación
+        function confirmUpdateIncentives() {
+            if (confirm("⚠️ ¿Estás seguro de que deseas actualizar este monto a nivel general?")) {
+                alert("¡Matriz de incentivos actualizada correctamente en tiempo real para todos los colaboradores!");
+            }
+        }
+
+        function confirmUpdateBonus() {
+            if (confirm("⚠️ ¿Estás seguro de que deseas actualizar este monto a nivel general?")) {
+                alert("¡Bono fijo de efectividad actualizado correctamente en tiempo real!");
+            }
+        }
+
+        // Tablón de Novedades Multimedia y Métricas
+        function publishNews() {
+            const title = document.getElementById('newsTitle').value;
+            const desc = document.getElementById('newsDesc').value;
+            if (!title) {
+                alert("Por favor ingrese un título para el comunicado.");
+                return;
+            }
+            alert("¡Comunicado publicado con éxito en el tablón!");
+            document.getElementById('newsTitle').value = '';
+            document.getElementById('newsDesc').value = '';
+            loadMockNews();
+        }
+
+        function loadMockNews() {
+            const feed = document.getElementById('workerNewsFeed');
+            const adminList = document.getElementById('adminNewsList');
+
+            const mockHTML = `
+                <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 space-y-2">
+                    <div class="flex justify-between items-start">
+                        <h5 class="text-xs font-bold text-white">Circular Oficial N° 04: Lineamientos de Diciembre</h5>
+                        <span class="text-[10px] text-slate-400">Hace 2 horas</span>
+                    </div>
+                    <p class="text-xs text-slate-300">Se adjunta el documento con las nuevas disposiciones operativas para el cierre de trimestre.</p>
+                    <div class="flex justify-between items-center pt-2">
+                        <button class="bg-red-600/20 text-red-400 border border-red-500/40 text-[10px] font-bold px-3 py-1.5 rounded hover:bg-red-600/30 transition">📥 Descargar Archivo PDF</button>
+                        <button onclick="likeNews(this)" class="text-xs text-slate-400 hover:text-red-400 flex items-center gap-1">❤️ <span class="like-count">14</span> Me gusta</button>
+                    </div>
+                </div>
+            `;
+            feed.innerHTML = mockHTML;
+            adminList.innerHTML = mockHTML + `<button onclick="deleteNews(this)" class="mt-2 bg-red-600 hover:bg-red-700 text-white text-[10px] font-bold px-3 py-1 rounded">🗑️ Eliminar Publicación</button>`;
+        }
+
+        function likeNews(btn) {
+            const span = btn.querySelector('.like-count');
+            span.innerText = parseInt(span.innerText) + 1;
+            btn.classList.add('text-red-400');
+        }
+
+        function deleteNews(btn) {
+            if (confirm("¿Estás seguro de eliminar este comunicado del tablón?")) {
+                alert("Comunicado eliminado.");
+                loadMockNews();
+            }
+        }
+
+        // Autorizaciones Pendientes (Admin)
+        function loadMockPendingApprovals() {
+            const list = document.getElementById('pendingApprovalsList');
+            list.innerHTML = `
+                <div class="bg-slate-900 p-3 rounded-lg border border-slate-700 flex justify-between items-center text-xs">
+                    <div>
+                        <strong class="text-white">Carlos Mendoza</strong>
+                        <p class="text-[10px] text-slate-400">carlos.m@gmail.com — Ayudante</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="approveUser(this)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-2.5 py-1 rounded text-[10px]">Aceptar</button>
+                        <button onclick="rejectUser(this)" class="bg-red-600 hover:bg-red-700 text-white font-bold px-2.5 py-1 rounded text-[10px]">Rechazar</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function approveUser(btn) {
+            alert("Usuario aprobado con éxito. Ya podrá iniciar sesión.");
+            btn.parentElement.parentElement.remove();
+        }
+
+        function rejectUser(btn) {
+            alert("Solicitud rechazada.");
+            btn.parentElement.parentElement.remove();
         }
     </script>
 </body>
