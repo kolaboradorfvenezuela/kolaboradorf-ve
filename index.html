@@ -25,7 +25,7 @@
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-slate-950/40 border border-red-500/50 flex items-center justify-center text-white font-black text-lg shadow-inner">K</div>
                 <div>
-                    <h1 class="text-xl font-black tracking-wider uppercase text-white flex items-center gap-2">Kolaboradorf VE <span class="text-[10px] bg-black/40 px-2 py-0.5 rounded border border-red-500/30 font-medium text-red-200">PRO v3.4</span></h1>
+                    <h1 class="text-xl font-black tracking-wider uppercase text-white flex items-center gap-2">Kolaboradorf VE <span class="text-[10px] bg-black/40 px-2 py-0.5 rounded border border-red-500/30 font-medium text-red-200">PRO v3.5</span></h1>
                     <p class="text-[11px] text-red-200 font-medium">Gestión Inteligente Sincronizada en la Nube</p>
                 </div>
             </div>
@@ -131,7 +131,7 @@
                 </div>
             </form>
 
-            <!-- Paso 1 Recuperación: Solicitar correo -->
+            <!-- Paso 1 Recuperación -->
             <form id="forgotForm" onsubmit="handleForgotRequest(event)" class="space-y-5 hidden">
                 <div class="text-center bg-slate-950 p-5 rounded-2xl border border-slate-800 shadow-inner">
                     <h3 class="text-sm font-bold text-white">Recuperar Contraseña</h3>
@@ -147,7 +147,7 @@
                 <button type="submit" class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-xl transition text-sm shadow-lg shadow-red-600/30 uppercase tracking-wider">Enviar Código por EmailJS</button>
             </form>
 
-            <!-- Paso 2 Recuperación: Ingresar Código y Nueva Clave -->
+            <!-- Paso 2 Recuperación -->
             <form id="resetPassForm" onsubmit="handleResetPassword(event)" class="space-y-5 hidden">
                 <div class="text-center bg-slate-950 p-5 rounded-2xl border border-slate-800 shadow-inner">
                     <span class="text-3xl">🔑</span>
@@ -275,11 +275,11 @@
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- Solicitudes Pendientes -->
+                    <!-- Solicitudes Pendientes (Conectadas a Firestore) -->
                     <div class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-4 shadow-xl">
                         <h4 class="text-sm font-extrabold text-white border-b border-slate-800 pb-3">👥 Solicitudes de Acceso Pendientes</h4>
                         <div id="pendingApprovalsList" class="space-y-3 max-h-80 overflow-y-auto pr-1">
-                            <p class="text-xs text-slate-400 text-center py-8">No hay solicitudes de acceso pendientes.</p>
+                            <p class="text-xs text-slate-400 text-center py-8">Cargando solicitudes desde la nube...</p>
                         </div>
                     </div>
 
@@ -332,7 +332,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT PROFESIONAL INTEGRAL BLINDADO -->
+    <!-- SCRIPT PROFESIONAL INTEGRAL CON FIRESTORE SYNC -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBzMXFLJhTuPSPdKGsVqCqQRhP_NiGYBA",
@@ -465,11 +465,16 @@
             }
 
             try {
+                const doc = await db.collection("usuarios").doc(email).get();
+                if (doc.exists && doc.data().approved === false) {
+                    alert("Su cuenta aún está pendiente de aprobación por el Administrador.");
+                    return;
+                }
                 await firebase.auth().signInWithEmailAndPassword(email, pass);
                 currentUser = { email, isAdmin: false, approved: true, name: email, role: "Ayudante" };
                 localStorage.setItem('kolaboradorf_session', JSON.stringify(currentUser));
                 launchAppSession(false);
-            } catch (error) { alert("Error en credenciales: " + error.message); }
+            } catch (error) { alert("Error en credenciales o cuenta no aprobada: " + error.message); }
         }
 
         async function handleRegister(event) {
@@ -485,7 +490,7 @@
             if (pass !== passConfirm) { alert("Las contraseñas no coinciden."); return; }
 
             generatedVerificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-            pendingVerificationData = { email, pass, name, role: selectedRole };
+            pendingVerificationData = { email, pass, name, role: selectedRole, fechaIngreso: document.getElementById('regFechaIngreso').value };
 
             const templateParams = {
                 email: email,
@@ -516,16 +521,76 @@
             if (enteredCode !== generatedVerificationCode) { alert("Código incorrecto."); return; }
 
             try {
-                // Intento de creación en Firebase Auth (blindado ante restricciones de consola)
+                // Guarda la solicitud pendiente en Firestore para que el Admin la vea inmediatamente
+                await db.collection("usuarios").doc(pendingVerificationData.email).set({
+                    name: pendingVerificationData.name,
+                    email: pendingVerificationData.email,
+                    role: pendingVerificationData.role,
+                    fechaIngreso: pendingVerificationData.fechaIngreso,
+                    approved: false,
+                    createdAt: new Date().toISOString()
+                });
+
                 await firebase.auth().createUserWithEmailAndPassword(pendingVerificationData.email, pendingVerificationData.pass).catch(() => {});
                 alert("¡Cuenta verificada y enviada a aprobación del Administrador!");
                 document.getElementById('authView').classList.add('hidden');
                 document.getElementById('pendingView').classList.remove('hidden');
             } catch (error) {
-                alert("¡Cuenta verificada con éxito! (Modo Local Seguro)");
+                alert("¡Cuenta verificada y enviada a aprobación!");
                 document.getElementById('authView').classList.add('hidden');
                 document.getElementById('pendingView').classList.remove('hidden');
             }
+        }
+
+        // CARGAR SOLICITUDES PENDIENTES EN EL CENTRO DE MANDO
+        async function loadPendingApprovals() {
+            const container = document.getElementById('pendingApprovalsList');
+            container.innerHTML = '<p class="text-xs text-slate-400 text-center py-6">Cargando solicitudes...</p>';
+
+            try {
+                const snapshot = await db.collection("usuarios").where("approved", "==", false).get();
+                if (snapshot.empty) {
+                    container.innerHTML = '<p class="text-xs text-slate-400 text-center py-8">No hay solicitudes de acceso pendientes.</p>';
+                    return;
+                }
+
+                container.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const user = doc.data();
+                    const card = document.createElement('div');
+                    card.className = "bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 shadow-inner";
+                    card.innerHTML = `
+                        <div>
+                            <strong class="text-white text-sm font-extrabold">${user.name}</strong>
+                            <p class="text-[11px] text-slate-400">${user.email} — <span class="text-red-400 uppercase font-bold">${user.role}</span></p>
+                        </div>
+                        <div class="flex gap-2 w-full sm:w-auto">
+                            <button onclick="approveUser('${user.email}')" class="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg transition shadow">Dar Acceso</button>
+                            <button onclick="rejectUser('${user.email}')" class="flex-1 sm:flex-none bg-red-600 hover:bg-red-500 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg transition shadow">Rechazar</button>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            } catch (e) {
+                container.innerHTML = '<p class="text-xs text-red-400 text-center py-6">Error al cargar solicitudes de la nube.</p>';
+            }
+        }
+
+        async function approveUser(email) {
+            try {
+                await db.collection("usuarios").doc(email).update({ approved: true });
+                alert("¡Acceso concedido exitosamente a " + email + "!");
+                loadPendingApprovals();
+            } catch (e) { alert("Error al aprobar: " + e.message); }
+        }
+
+        async function rejectUser(email) {
+            if (!confirm("¿Deseas rechazar y eliminar esta solicitud?")) return;
+            try {
+                await db.collection("usuarios").doc(email).delete();
+                alert("Solicitud rechazada.");
+                loadPendingApprovals();
+            } catch (e) { alert("Error al rechazar: " + e.message); }
         }
 
         async function handleForgotRequest(event) {
@@ -586,7 +651,10 @@
             document.getElementById('mainAppView').classList.remove('hidden');
             document.getElementById('authHeaderControls').classList.remove('hidden');
             document.getElementById('userHeaderBadge').innerText = isAdmin ? "ADMINISTRADOR SUPREMO" : `COLABORADOR (${currentUser.role.toUpperCase()})`;
-            if (isAdmin) document.getElementById('adminNavTabs').classList.remove('hidden');
+            if (isAdmin) {
+                document.getElementById('adminNavTabs').classList.remove('hidden');
+                loadPendingApprovals();
+            }
             await loadIncentiveConfig();
             calculateAntiquity();
             calculateRealTime();
@@ -623,6 +691,7 @@
                 adminSec.classList.remove('hidden');
                 btnAdmin.className = "flex-1 sm:flex-none px-5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-xl transition bg-red-600 text-white shadow-lg shadow-red-600/20";
                 btnWorker.className = "flex-1 sm:flex-none px-5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-xl transition bg-slate-800 text-slate-300 hover:bg-slate-700";
+                loadPendingApprovals();
             }
         }
 
