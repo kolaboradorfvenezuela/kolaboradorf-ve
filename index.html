@@ -262,11 +262,11 @@
                 </div>
             </div>
 
-            <!-- CENTRO DE MANDO ADMINISTRADOR SUPREMO (RESTAURADO) -->
+            <!-- CENTRO DE MANDO ADMINISTRADOR SUPREMO (CON CONFIGURACIÓN SEPARADA PARA AYUDANTE Y ENTREGADOR) -->
             <div id="adminSection" class="hidden space-y-6">
                 <div class="bg-red-950/40 border border-red-800/60 rounded-xl p-5">
                     <h3 class="text-base font-bold text-white">⚙️ Centro de Mando Supremo (Administrador)</h3>
-                    <p class="text-xs text-red-200/80 mt-1">Panel exclusivo de supervisión, aprobación de cuentas y configuración independiente de montos en dólares.</p>
+                    <p class="text-xs text-red-200/80 mt-1">Panel exclusivo de supervisión, aprobación de cuentas y configuración independiente de montos en dólares para Ayudantes y Entregadores.</p>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -278,20 +278,20 @@
                         </div>
                     </div>
 
-                    <!-- Configuración Montos Entregadores -->
+                    <!-- Configuración Montos Entregadores (Chóferes) -->
                     <div class="bg-slate-800 rounded-xl p-5 border border-slate-700 space-y-4">
-                        <h4 class="text-sm font-bold text-red-400 border-b border-slate-700 pb-2">🚛 Configuración Dólares: Entregadores</h4>
+                        <h4 class="text-sm font-bold text-red-400 border-b border-slate-700 pb-2">🚛 Configuración Dólares: Entregadores (Chóferes)</h4>
                         <div class="grid grid-cols-2 gap-2 text-xs max-h-56 overflow-y-auto pr-1 bg-slate-900 p-3 rounded-xl border border-slate-700">
-                            <div><label class="text-[10px] text-slate-400">300-399 ($):</label><input type="number" step="0.01" id="ent_300" value="3.80" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
-                            <div><label class="text-[10px] text-slate-400">400-499 ($):</label><input type="number" step="0.01" id="ent_400" value="7.50" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
-                            <div><label class="text-[10px] text-slate-400">500-599 ($):</label><input type="number" step="0.01" id="ent_500" value="8.91" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
-                            <div><label class="text-[10px] text-slate-400">600-699 ($):</label><input type="number" step="0.01" id="ent_600" value="10.40" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
-                            <div><label class="text-[10px] text-slate-400">700-799 ($):</label><input type="number" step="0.01" id="ent_700" value="11.36" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
-                            <div><label class="text-[10px] text-slate-400">800-899 ($):</label><input type="number" step="0.01" id="ent_800" value="12.47" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
-                            <div><label class="text-[10px] text-slate-400">900-999 ($):</label><input type="number" step="0.01" id="ent_900" value="13.15" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
-                            <div><label class="text-[10px] text-slate-400">1000-1099 ($):</label><input type="number" step="0.01" id="ent_1000" value="14.11" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
-                            <div><label class="text-[10px] text-slate-400">1100-1199 ($):</label><input type="number" step="0.01" id="ent_1100" value="15.10" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
-                            <div><label class="text-[10px] text-slate-400">1200-1299 ($):</label><input type="number" step="0.01" id="ent_1200" value="16.03" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">300 - 399 ($):</label><input type="number" step="0.01" id="ent_300" value="3.80" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">400 - 499 ($):</label><input type="number" step="0.01" id="ent_400" value="7.50" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">500 - 599 ($):</label><input type="number" step="0.01" id="ent_500" value="8.91" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">600 - 699 ($):</label><input type="number" step="0.01" id="ent_600" value="10.40" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">700 - 799 ($):</label><input type="number" step="0.01" id="ent_700" value="11.36" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">800 - 899 ($):</label><input type="number" step="0.01" id="ent_800" value="12.47" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">900 - 999 ($):</label><input type="number" step="0.01" id="ent_900" value="13.15" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">1000 - 1099 ($):</label><input type="number" step="0.01" id="ent_1000" value="14.11" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">1100 - 1199 ($):</label><input type="number" step="0.01" id="ent_1100" value="15.10" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">1200 - 1299 ($):</label><input type="number" step="0.01" id="ent_1200" value="16.03" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
                         </div>
                         <button onclick="saveEntregadorConfig()" class="w-full bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-2 rounded-lg transition shadow">💾 Guardar Montos Entregadores</button>
                     </div>
@@ -300,16 +300,16 @@
                     <div class="bg-slate-800 rounded-xl p-5 border border-slate-700 space-y-4 lg:col-span-2">
                         <h4 class="text-sm font-bold text-red-400 border-b border-slate-700 pb-2">🤝 Configuración Dólares: Ayudantes</h4>
                         <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs bg-slate-900 p-3 rounded-xl border border-slate-700">
-                            <div><label class="text-[10px] text-slate-400">300-399 ($):</label><input type="number" step="0.01" id="ayu_300" value="3.13" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
-                            <div><label class="text-[10px] text-slate-400">400-499 ($):</label><input type="number" step="0.01" id="ayu_400" value="6.94" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
-                            <div><label class="text-[10px] text-slate-400">500-599 ($):</label><input type="number" step="0.01" id="ayu_500" value="7.58" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
-                            <div><label class="text-[10px] text-slate-400">600-699 ($):</label><input type="number" step="0.01" id="ayu_600" value="8.17" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
-                            <div><label class="text-[10px] text-slate-400">700-799 ($):</label><input type="number" step="0.01" id="ayu_700" value="8.82" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
-                            <div><label class="text-[10px] text-slate-400">800-899 ($):</label><input type="number" step="0.01" id="ayu_800" value="9.44" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
-                            <div><label class="text-[10px] text-slate-400">900-999 ($):</label><input type="number" step="0.01" id="ayu_900" value="10.06" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
-                            <div><label class="text-[10px] text-slate-400">1000-1099 ($):</label><input type="number" step="0.01" id="ayu_1000" value="10.65" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
-                            <div><label class="text-[10px] text-slate-400">1100-1199 ($):</label><input type="number" step="0.01" id="ayu_1100" value="12.93" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
-                            <div><label class="text-[10px] text-slate-400">1200-1299 ($):</label><input type="number" step="0.01" id="ayu_1200" value="14.23" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">300 - 399 ($):</label><input type="number" step="0.01" id="ayu_300" value="3.13" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">400 - 499 ($):</label><input type="number" step="0.01" id="ayu_400" value="6.94" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">500 - 599 ($):</label><input type="number" step="0.01" id="ayu_500" value="7.58" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">600 - 699 ($):</label><input type="number" step="0.01" id="ayu_600" value="8.17" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">700 - 799 ($):</label><input type="number" step="0.01" id="ayu_700" value="8.82" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">800 - 899 ($):</label><input type="number" step="0.01" id="ayu_800" value="9.44" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">900 - 999 ($):</label><input type="number" step="0.01" id="ayu_900" value="10.06" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">1000 - 1099 ($):</label><input type="number" step="0.01" id="ayu_1000" value="10.65" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">1100 - 1199 ($):</label><input type="number" step="0.01" id="ayu_1100" value="12.93" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">1200 - 1299 ($):</label><input type="number" step="0.01" id="ayu_1200" value="14.23" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
                         </div>
                         <button onclick="saveAyudanteConfig()" class="w-full bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-2.5 rounded-lg transition shadow">💾 Guardar Montos Ayudantes</button>
                     </div>
@@ -327,7 +327,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT COMPLETO CON FÓRMULAS Y CENTRO DE MANDO -->
+    <!-- SCRIPT COMPLETO CON FÓRMULAS Y CONFIGURACIÓN INDEPENDIENTE -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBzMXFLJhTuPSPdKGsVqCqQRhP_NiGYBA",
