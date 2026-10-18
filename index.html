@@ -465,8 +465,14 @@
         }
         const db = firebase.firestore();
 
+        // ESTABLECER PERSISTENCIA LOCAL ESTRICTA ANTES DE CUALQUIER OTRA ACCIÓN
         firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-            .catch((error) => { console.error("Error de persistencia:", error); });
+            .then(() => {
+                console.log("Persistencia local configurada correctamente.");
+            })
+            .catch((error) => {
+                console.error("Error al configurar persistencia:", error);
+            });
 
         let currentUser = null;
         let isVacation = false;
@@ -475,6 +481,7 @@
         ];
         let pendingUsersArray = [];
 
+        // OBSERVADOR DE SESIÓN BLINDADO PARA EVITAR CIERRES AL RECARGAR
         firebase.auth().onAuthStateChanged(async (user) => {
             if (user) {
                 const email = user.email.toLowerCase();
@@ -485,6 +492,9 @@
                     currentUser = { email, isAdmin: false, approved: true, role: "Ayudante", firebaseUser: user };
                     launchAppSession(false);
                 }
+            } else {
+                // Si realmente no hay usuario autenticado, aseguramos la vista de login
+                logoutAppSessionUI();
             }
         });
 
@@ -616,9 +626,7 @@
                 document.getElementById('adminNavTabs').classList.add('hidden');
             }
 
-            // Muestra siempre el botón de eliminar cuenta en el panel de trabajador para pruebas del usuario
             document.getElementById('standardAccountDeleteSection').classList.remove('hidden');
-
             document.getElementById('activeRoleBadge').innerText = currentUser.role;
 
             await loadIncentiveConfig();
@@ -631,6 +639,10 @@
             try {
                 await firebase.auth().signOut();
             } catch(e) {}
+            logoutAppSessionUI();
+        }
+
+        function logoutAppSessionUI() {
             currentUser = null;
             document.getElementById('mainAppView').classList.add('hidden');
             document.getElementById('authHeaderControls').classList.add('hidden');
@@ -821,7 +833,7 @@
                         alert("Su cuenta ha sido eliminada por completo del sistema.");
                         logoutApp();
                     } else {
-                        alert("No se encontró una sesión activa de Firebase para eliminar (modo administrador local).");
+                        alert("No se encontró una sesión activa de Firebase para eliminar.");
                         logoutApp();
                     }
                 } catch (error) {
