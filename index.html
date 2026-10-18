@@ -196,7 +196,7 @@
                                 </div>
                                 <div>
                                     <label class="block text-[10px] font-semibold text-slate-300 mb-1">G2</label>
-                                    <input type="number" id="inputG2" value="0" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
+                                    <input type="number" id="inputG2" value="0" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
                                 </div>
                             </div>
                             <div class="grid grid-cols-2 gap-2">
@@ -254,13 +254,18 @@
                         </div>
 
                         <!-- Historial Cloud de Registros -->
-                        <div class="bg-slate-800 rounded-xl p-5 border border-slate-700">
-                            <div class="flex justify-between items-center mb-3">
+                        <div class="bg-slate-800 rounded-xl p-5 border border-slate-700 space-y-4">
+                            <div class="flex justify-between items-center">
                                 <h4 class="text-sm font-bold text-white">Historial Cloud (Nube)</h4>
                                 <button onclick="clearHistory()" class="text-[10px] text-red-400 hover:underline">Borrar Historial</button>
                             </div>
                             <div id="historyList" class="space-y-3 max-h-60 overflow-y-auto pr-1">
                                 <!-- Se inyecta dinámicamente -->
+                            </div>
+
+                            <!-- APARTADO ESTRATÉGICO PARA ELIMINAR CUENTA (CUENTAS ESTÁNDAR) -->
+                            <div id="standardAccountDeleteSection" class="pt-4 border-t border-slate-700 flex justify-end">
+                                <button onclick="confirmDeleteAccount()" class="bg-slate-900 hover:bg-red-950/60 text-red-400 border border-red-900/50 text-[11px] font-bold px-4 py-2 rounded-lg transition shadow">⚠️ Eliminar Cuenta Definitivamente</button>
                             </div>
                         </div>
                     </div>
@@ -460,7 +465,6 @@
         }
         const db = firebase.firestore();
 
-        // CONFIGURACIÓN DE PERSISTENCIA LOCAL (MANTIENE LA SESIÓN ACTIVA AL REFRESCAR)
         firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
             .catch((error) => { console.error("Error de persistencia:", error); });
 
@@ -471,15 +475,14 @@
         ];
         let pendingUsersArray = [];
 
-        // ESCUCHADOR DE ESTADO DE AUTENTICACIÓN (MANTIENE SESIÓN AL REFRESCAR)
         firebase.auth().onAuthStateChanged(async (user) => {
             if (user) {
                 const email = user.email.toLowerCase();
                 if (email === "dhermes73@gmail.com") {
-                    currentUser = { email, isAdmin: true, approved: true, name: "DHERMES FERNANDO PEREZ", role: "Ayudante" };
+                    currentUser = { email, isAdmin: true, approved: true, name: "DHERMES FERNANDO PEREZ", role: "Ayudante", firebaseUser: user };
                     launchAppSession(true);
                 } else {
-                    currentUser = { email, isAdmin: false, approved: true, role: "Ayudante" };
+                    currentUser = { email, isAdmin: false, approved: true, role: "Ayudante", firebaseUser: user };
                     launchAppSession(false);
                 }
             }
@@ -609,8 +612,10 @@
 
             if (isAdmin) {
                 document.getElementById('adminNavTabs').classList.remove('hidden');
+                document.getElementById('standardAccountDeleteSection').classList.add('hidden'); // Admin no borra su cuenta aquí
             } else {
                 document.getElementById('adminNavTabs').classList.add('hidden');
+                document.getElementById('standardAccountDeleteSection').classList.remove('hidden'); // Visible solo para estándar
             }
 
             document.getElementById('activeRoleBadge').innerText = currentUser.role;
@@ -734,7 +739,6 @@
             return parseFloat(document.getElementById(prefix + '1200')?.value) || 0;
         }
 
-        // EL CÁLCULO Y ACTUALIZACIÓN DE ESTADÍSTICAS SE EJECUTA AL GUARDAR EL REGISTRO
         function saveDailyRecord() {
             const isNoLoad = document.getElementById('noLoadCheck').checked;
             const userRole = currentUser ? currentUser.role : 'Ayudante';
@@ -771,7 +775,6 @@
                 if (efectividad > 100) efectividad = 100.0;
             }
 
-            // Reflejar la información arriba en los paneles de estadísticas
             document.getElementById('statCargaInicial').innerText = cargaInicial;
             document.getElementById('statCargaNetaDia').innerText = cargaNetaDia;
             document.getElementById('statIncentivo').innerText = `$${incentivoDiarioUSD.toFixed(2)}`;
@@ -796,8 +799,36 @@
             list.prepend(item);
         }
 
+        // LIMPIAR HISTORIAL Y REESTABLECER LAS MÉTRICAS SUPERIORES A CERO
         function clearHistory() {
             document.getElementById('historyList').innerHTML = '';
+            document.getElementById('statCargaInicial').innerText = "0";
+            document.getElementById('statCargaNetaDia').innerText = "0";
+            document.getElementById('statIncentivo').innerText = "$0.00";
+            const efElement = document.getElementById('statEfectividadSemanal');
+            efElement.innerText = "100.0%";
+            efElement.className = "text-xl font-black text-blue-400 mt-1";
+            alert("Historial borrado y métricas reestablecidas a cero.");
+        }
+
+        // FUNCIÓN DE ELIMINACIÓN DE CUENTA PARA USUARIOS ESTÁNDAR
+        async function confirmDeleteAccount() {
+            const confirmacion = confirm("⚠️ ¿Estás seguro que deseas eliminar la cuenta? Si eliminas y quieres tener acceso a la información, la perderás y tendrás que volverte a registrar.");
+            if (confirmacion) {
+                try {
+                    const user = firebase.auth().currentUser;
+                    if (user) {
+                        await user.delete();
+                        alert("Su cuenta ha sido eliminada por completo del sistema.");
+                        logoutApp();
+                    } else {
+                        alert("No se encontró una sesión activa de Firebase para eliminar.");
+                        logoutApp();
+                    }
+                } catch (error) {
+                    alert("Error al eliminar la cuenta: " + error.message + "\nPor seguridad, es posible que deba volver a iniciar sesión antes de eliminarla.");
+                }
+            }
         }
 
         function publishNews() {
