@@ -477,7 +477,7 @@
         let pendingVerificationData = null;
         let generatedVerificationCode = "";
 
-        // VERIFICACIÓN INMEDIATA CON LOCALSTORAGE
+        // VERIFICACIÓN INMEDIATA CON LOCALSTORAGE Y SALTO DE SEGURIDAD
         window.addEventListener('DOMContentLoaded', () => {
             const todayStr = new Date().toISOString().split('T')[0];
             const dateInput = document.getElementById('inputFechaJornada');
@@ -495,35 +495,10 @@
                 }
             }
 
-            firebase.auth().onAuthStateChanged(async (user) => {
-                document.getElementById('loadingSessionView').classList.add('hidden');
-                if (user) {
-                    const email = user.email.toLowerCase();
-                    const isAdmin = (email === "dhermes73@gmail.com");
-                    currentUser = { email, isAdmin, approved: true, name: isAdmin ? "DHERMES FERNANDO PEREZ" : email, role: "Ayudante", firebaseUser: user };
-                    localStorage.setItem('kolaboradorf_session', JSON.stringify(currentUser));
-                    launchAppSession(isAdmin);
-                } else {
-                    logoutAppSessionUI();
-                }
-            });
-
-            setTimeout(() => {
-                const currentView = document.getElementById('loadingSessionView');
-                if (currentView && !currentView.classList.contains('hidden')) {
-                    currentView.classList.add('hidden');
-                    const fbUser = firebase.auth().currentUser;
-                    if (fbUser) {
-                        const email = fbUser.email.toLowerCase();
-                        const isAdmin = (email === "dhermes73@gmail.com");
-                        currentUser = { email, isAdmin, approved: true, name: isAdmin ? "DHERMES FERNANDO PEREZ" : email, role: "Ayudante", firebaseUser: fbUser };
-                        localStorage.setItem('kolaboradorf_session', JSON.stringify(currentUser));
-                        launchAppSession(isAdmin);
-                    } else {
-                        logoutAppSessionUI();
-                    }
-                }
-            }, 1000);
+            // Si no hay sesión guardada localmente, rompemos el bucle de carga y mostramos el login de inmediato
+            document.getElementById('loadingSessionView').classList.add('hidden');
+            document.getElementById('authView').classList.remove('hidden');
+            switchAuthMode('login');
         });
 
         function switchAuthMode(mode) {
@@ -1002,7 +977,7 @@
 
         function publishNews() {
             const title = document.getElementById('newsTitle').value;
-            const desc = document.getElementById('newsDesc'].value;
+            const desc = document.getElementById('newsDesc').value;
             if (!title) { alert("Ingrese un título."); return; }
             publishedNewsArray.unshift({ id: Date.now(), title, date: "Hace un momento", desc: desc || "Sin desc.", likes: 0 });
             document.getElementById('newsTitle').value = '';
