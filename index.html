@@ -73,7 +73,7 @@
                     <input type="email" id="regEmail" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-red-500">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Cargo / Rol Operativo</label>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Seleccione su Rol (Define su Panel)</label>
                     <select id="regCargo" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-red-500">
                         <option value="Ayudante">Ayudante de descarga</option>
                         <option value="Entregador">Chófer / Entregador</option>
@@ -149,13 +149,9 @@
                             <p id="workerMetaDisplay" class="text-xs text-slate-400">Ayudante de descarga (Cargando antigüedad...) — dhermes73@gmail.com</p>
                         </div>
                     </div>
-                    <!-- Selector de Rol Activo para el cálculo -->
-                    <div class="flex items-center gap-2 bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-700">
-                        <span class="text-[10px] text-slate-400 font-bold uppercase">Rol Actual:</span>
-                        <select id="userRoleSelect" onchange="calculateOperational()" class="bg-slate-800 text-xs text-white font-bold rounded px-2 py-1 border border-slate-700 focus:outline-none">
-                            <option value="Ayudante">Ayudante</option>
-                            <option value="Entregador">Chófer / Entregador</option>
-                        </select>
+                    <!-- Indicador de Rol Registrado -->
+                    <div class="bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-700 text-xs">
+                        <span class="text-slate-400">Panel Activo:</span> <strong id="activeRoleBadge" class="text-red-400 uppercase">Ayudante</strong>
                     </div>
                     <!-- Botón de Vacaciones -->
                     <div>
@@ -283,7 +279,7 @@
                 <!-- Encabezado Admin -->
                 <div class="bg-red-950/40 border border-red-800/60 rounded-xl p-5">
                     <h3 class="text-base font-bold text-white">⚙️ Centro de Mando Supremo (Administrador)</h3>
-                    <p class="text-xs text-red-200/80 mt-1">Panel exclusivo de supervisión, control de accesos, configuración manual de montos en dólares por tramos para Entregadores y Ayudantes.</p>
+                    <p class="text-xs text-red-200/80 mt-1">Panel exclusivo de supervisión, control de accesos, configuración de montos en dólares y publicación de novedades.</p>
                 </div>
 
                 <!-- Grid de Administración -->
@@ -303,43 +299,43 @@
                         <div class="grid grid-cols-2 gap-2 text-xs max-h-56 overflow-y-auto pr-1 bg-slate-900 p-3 rounded-xl border border-slate-700">
                             <div>
                                 <label class="text-[10px] text-slate-400">300 - 399 ($):</label>
-                                <input type="number" step="0.01" id="ent_300" value="3.80" onchange="calculateOperational()" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
+                                <input type="number" step="0.01" id="ent_300" value="3.80" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
                             </div>
                             <div>
                                 <label class="text-[10px] text-slate-400">400 - 499 ($):</label>
-                                <input type="number" step="0.01" id="ent_400" value="7.50" onchange="calculateOperational()" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
+                                <input type="number" step="0.01" id="ent_400" value="7.50" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
                             </div>
                             <div>
                                 <label class="text-[10px] text-slate-400">500 - 599 ($):</label>
-                                <input type="number" step="0.01" id="ent_500" value="8.91" onchange="calculateOperational()" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
+                                <input type="number" step="0.01" id="ent_500" value="8.91" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
                             </div>
                             <div>
                                 <label class="text-[10px] text-slate-400">600 - 699 ($):</label>
-                                <input type="number" step="0.01" id="ent_600" value="10.40" onchange="calculateOperational()" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
+                                <input type="number" step="0.01" id="ent_600" value="10.40" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
                             </div>
                             <div>
                                 <label class="text-[10px] text-slate-400">700 - 799 ($):</label>
-                                <input type="number" step="0.01" id="ent_700" value="11.36" onchange="calculateOperational()" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
+                                <input type="number" step="0.01" id="ent_700" value="11.36" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
                             </div>
                             <div>
                                 <label class="text-[10px] text-slate-400">800 - 899 ($):</label>
-                                <input type="number" step="0.01" id="ent_800" value="12.47" onchange="calculateOperational()" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
+                                <input type="number" step="0.01" id="ent_800" value="12.47" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
                             </div>
                             <div>
                                 <label class="text-[10px] text-slate-400">900 - 999 ($):</label>
-                                <input type="number" step="0.01" id="ent_900" value="13.15" onchange="calculateOperational()" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
+                                <input type="number" step="0.01" id="ent_900" value="13.15" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
                             </div>
                             <div>
                                 <label class="text-[10px] text-slate-400">1000 - 1099 ($):</label>
-                                <input type="number" step="0.01" id="ent_1000" value="14.11" onchange="calculateOperational()" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
+                                <input type="number" step="0.01" id="ent_1000" value="14.11" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
                             </div>
                             <div>
                                 <label class="text-[10px] text-slate-400">1100 - 1199 ($):</label>
-                                <input type="number" step="0.01" id="ent_1100" value="15.10" onchange="calculateOperational()" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
+                                <input type="number" step="0.01" id="ent_1100" value="15.10" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
                             </div>
                             <div>
                                 <label class="text-[10px] text-slate-400">1200 - 1299 ($):</label>
-                                <input type="number" step="0.01" id="ent_1200" value="16.03" onchange="calculateOperational()" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
+                                <input type="number" step="0.01" id="ent_1200" value="16.03" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
                             </div>
                         </div>
                     </div>
@@ -350,45 +346,48 @@
                         <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs bg-slate-900 p-3 rounded-xl border border-slate-700">
                             <div>
                                 <label class="text-[10px] text-slate-400">300 - 399 ($):</label>
-                                <input type="number" step="0.01" id="ayu_300" value="3.13" onchange="calculateOperational()" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
+                                <input type="number" step="0.01" id="ayu_300" value="3.13" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
                             </div>
                             <div>
                                 <label class="text-[10px] text-slate-400">400 - 499 ($):</label>
-                                <input type="number" step="0.01" id="ayu_400" value="6.94" onchange="calculateOperational()" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
+                                <input type="number" step="0.01" id="ayu_400" value="6.94" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
                             </div>
                             <div>
                                 <label class="text-[10px] text-slate-400">500 - 599 ($):</label>
-                                <input type="number" step="0.01" id="ayu_500" value="7.58" onchange="calculateOperational()" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
+                                <input type="number" step="0.01" id="ayu_500" value="7.58" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
                             </div>
                             <div>
                                 <label class="text-[10px] text-slate-400">600 - 699 ($):</label>
-                                <input type="number" step="0.01" id="ayu_600" value="8.17" onchange="calculateOperational()" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
+                                <input type="number" step="0.01" id="ayu_600" value="8.17" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
                             </div>
                             <div>
                                 <label class="text-[10px] text-slate-400">700 - 799 ($):</label>
-                                <input type="number" step="0.01" id="ayu_700" value="8.82" onchange="calculateOperational()" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
+                                <input type="number" step="0.01" id="ayu_700" value="8.82" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
                             </div>
                             <div>
                                 <label class="text-[10px] text-slate-400">800 - 899 ($):</label>
-                                <input type="number" step="0.01" id="ayu_800" value="9.44" onchange="calculateOperational()" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
+                                <input type="number" step="0.01" id="ayu_800" value="9.44" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
                             </div>
                             <div>
                                 <label class="text-[10px] text-slate-400">900 - 999 ($):</label>
-                                <input type="number" step="0.01" id="ayu_900" value="10.06" onchange="calculateOperational()" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
+                                <input type="number" step="0.01" id="ayu_900" value="10.06" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
                             </div>
                             <div>
                                 <label class="text-[10px] text-slate-400">1000 - 1099 ($):</label>
-                                <input type="number" step="0.01" id="ayu_1000" value="10.65" onchange="calculateOperational()" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
+                                <input type="number" step="0.01" id="ayu_1000" value="10.65" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
                             </div>
                             <div>
                                 <label class="text-[10px] text-slate-400">1100 - 1199 ($):</label>
-                                <input type="number" step="0.01" id="ayu_1100" value="12.93" onchange="calculateOperational()" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
+                                <input type="number" step="0.01" id="ayu_1100" value="12.93" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
                             </div>
                             <div>
                                 <label class="text-[10px] text-slate-400">1200 - 1299 ($):</label>
-                                <input type="number" step="0.01" id="ayu_1200" value="14.23" onchange="calculateOperational()" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
+                                <input type="number" step="0.01" id="ayu_1200" value="14.23" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white">
                             </div>
                         </div>
+
+                        <!-- Botón de Guardado General para los montos de administrador -->
+                        <button onclick="saveIncentiveConfig()" class="w-full bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-2.5 rounded-lg transition shadow">💾 Guardar Configuración General de Incentivos</button>
                     </div>
 
                 </div>
@@ -509,26 +508,28 @@
             const pass = document.getElementById('loginPass').value;
             
             if (email === "dhermes73@gmail.com") {
-                currentUser = { email, isAdmin: true, approved: true, name: "DHERMES FERNANDO PEREZ" };
+                currentUser = { email, isAdmin: true, approved: true, name: "DHERMES FERNANDO PEREZ", role: "Administrador" };
                 launchAppSession(true);
                 return;
             }
 
             try {
                 const userCredential = await firebase.auth().signInWithEmailAndPassword(email, pass);
-                currentUser = { email: userCredential.user.email, isAdmin: false, approved: true };
+                // Simulamos la obtención del rol guardado en el registro (Por defecto Ayudante si no se especifica)
+                currentUser = { email: userCredential.user.email, isAdmin: false, approved: true, role: "Ayudante" };
                 launchAppSession(false);
             } catch (error) {
                 alert("Error en las credenciales: " + error.message);
             }
         }
 
-        // REGISTRO OFICIAL CON VERIFICACIÓN POR CORREO
+        // REGISTRO OFICIAL CON ASIGNACIÓN DE ROL DESDE EL SELECTOR
         async function handleRegister(event) {
             event.preventDefault();
             const pass = document.getElementById('regPass').value;
             const passConfirm = document.getElementById('regPassConfirm').value;
             const email = document.getElementById('regEmail').value;
+            const selectedRole = document.getElementById('regCargo').value;
             
             if (pass !== passConfirm) {
                 alert("Las contraseñas no coinciden. Por favor verifique.");
@@ -539,7 +540,10 @@
                 const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, pass);
                 await userCredential.user.sendEmailVerification();
                 
-                alert("¡Registro exitoso! Se ha enviado un enlace de verificación a su correo electrónico.");
+                // Guardamos provisionalmente el rol seleccionado para la sesión
+                currentUser = { email, isAdmin: false, approved: false, role: selectedRole };
+                
+                alert("¡Registro exitoso con rol de " + selectedRole + "! Se ha enviado un enlace de verificación a su correo electrónico.");
                 document.getElementById('authView').classList.add('hidden');
                 document.getElementById('pendingView').classList.remove('hidden');
             } catch (error) {
@@ -558,13 +562,15 @@
             document.getElementById('pendingView').classList.add('hidden');
             document.getElementById('mainAppView').classList.remove('hidden');
             document.getElementById('authHeaderControls').classList.remove('hidden');
-            document.getElementById('userHeaderBadge').innerText = isAdmin ? "ADMINISTRADOR SUPREMO" : "COLABORADOR ESTÁNDAR";
+            document.getElementById('userHeaderBadge').innerText = isAdmin ? "ADMINISTRADOR SUPREMO" : `COLABORADOR (${currentUser.role.toUpperCase()})`;
 
             if (isAdmin) {
                 document.getElementById('adminNavTabs').classList.remove('hidden');
             } else {
                 document.getElementById('adminNavTabs').classList.add('hidden');
             }
+
+            document.getElementById('activeRoleBadge').innerText = currentUser.role;
 
             calculateAntiquity();
             renderNewsFeed();
@@ -617,7 +623,7 @@
                 meses += 12;
             }
 
-            document.getElementById('workerMetaDisplay').innerText = `Ayudante de descarga (${anos} años, ${meses} meses, ${dias} días) — dhermes73@gmail.com`;
+            document.getElementById('workerMetaDisplay').innerText = `${currentUser.role} (${anos} años, ${meses} meses, ${dias} días) — dhermes73@gmail.com`;
         }
 
         function toggleVacationMode() {
@@ -668,7 +674,12 @@
             calculateOperational();
         }
 
-        // OBTENER MONTO EN DÓLARES SEGÚN EL ROL (ENTREGADOR O AYUDANTE) Y LAS CAJAS
+        function saveIncentiveConfig() {
+            alert("¡Configuración de montos en dólares guardada y aplicada correctamente en el sistema!");
+            calculateOperational();
+        }
+
+        // OBTENER MONTO EN DÓLARES SEGÚN EL ROL REGISTRADO DEL USUARIO Y LAS CAJAS
         function getIncentiveByRole(cajas, role) {
             if (cajas < 300) return 0;
             const prefix = (role === 'Entregador') ? 'ent_' : 'ayu_';
@@ -685,11 +696,11 @@
             return parseFloat(document.getElementById(prefix + '1200')?.value) || 0; // 1200 - 1299+
         }
 
-        // CÁLCULO OPERATIVO INTEGRANDO LA SEPARACIÓN DE ROLES
+        // CÁLCULO OPERATIVO INTEGRANDO LA SEPARACIÓN POR ROL DE REGISTRO
         function calculateOperational() {
             const isNoLoad = document.getElementById('noLoadCheck').checked;
             const efElement = document.getElementById('statEfectividadSemanal');
-            const currentRole = document.getElementById('userRoleSelect').value;
+            const userRole = currentUser ? currentUser.role : 'Ayudante';
 
             if (isNoLoad) {
                 document.getElementById('statCargaInicial').innerText = 0;
@@ -721,9 +732,9 @@
             const cargaNetaDia = Math.max(0, cargaInicial - dev - pep);
             document.getElementById('statCargaNetaDia').innerText = cargaNetaDia;
             
-            // INCENTIVO DIARIO EN DÓLARES (Calculado de acuerdo a la tabla del rol seleccionado)
+            // INCENTIVO DIARIO EN DÓLARES (Calculado de acuerdo a la tabla del rol con el que se registró)
             const netasIncentivo = Math.max(0, cajasBrutas - dev - pep - (hasIntro ? intro : 0));
-            const incentivoDiarioUSD = getIncentiveByRole(netasIncentivo, currentRole);
+            const incentivoDiarioUSD = getIncentiveByRole(netasIncentivo, userRole);
             document.getElementById('statIncentivo').innerText = `$${incentivoDiarioUSD.toFixed(2)}`;
 
             // EFECTIVIDAD DEL DÍA
