@@ -70,7 +70,7 @@
                 <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-lg transition text-sm shadow-md">Iniciar Sesión</button>
             </form>
 
-            <!-- Formulario de Registro -->
+            <!-- Formulario de Registro con Términos y Verificación EmailJS -->
             <form id="registerForm" onsubmit="handleRegister(event)" class="space-y-4 hidden">
                 <div>
                     <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Nombre Completo</label>
@@ -94,21 +94,16 @@
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Contraseña</label>
-                    <div class="relative">
-                        <input type="password" id="regPass" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white pr-10 focus:outline-none focus:border-red-500">
-                        <button type="button" onclick="togglePassword('regPass', 'eyeReg1')" class="absolute right-3 top-3 text-slate-400 hover:text-white text-xs font-bold" id="eyeReg1">👁️</button>
-                    </div>
+                    <input type="password" id="regPass" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-red-500">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Confirmar Contraseña</label>
-                    <div class="relative">
-                        <input type="password" id="regPassConfirm" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white pr-10 focus:outline-none focus:border-red-500">
-                        <button type="button" onclick="togglePassword('regPassConfirm', 'eyeReg2')" class="absolute right-3 top-3 text-slate-400 hover:text-white text-xs font-bold" id="eyeReg2">👁️</button>
-                    </div>
+                    <input type="password" id="regPassConfirm" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-red-500">
                 </div>
-                <div class="text-xs text-slate-400 flex items-center gap-2">
-                    <input type="checkbox" id="regTerms" required class="rounded bg-slate-900 border-slate-700 text-red-600 focus:ring-0">
-                    <span>Acepto los <button type="button" onclick="openTermsModal()" class="text-red-400 underline">Términos y Condiciones</button></span>
+                <!-- Aceptación obligatoria de términos -->
+                <div class="text-xs text-slate-300 flex items-center gap-2 bg-slate-900 p-2.5 rounded-lg border border-slate-700">
+                    <input type="checkbox" id="regTerms" required class="rounded bg-slate-800 border-slate-700 text-red-600 focus:ring-0 w-4 h-4">
+                    <span>Acepto obligatoriamente los <button type="button" onclick="openTermsModal()" class="text-red-400 underline font-bold">Términos y Políticas</button></span>
                 </div>
                 <div class="flex justify-between items-center text-xs">
                     <button type="button" onclick="switchAuthMode('login')" class="text-red-400 hover:underline">← Volver al Login</button>
@@ -116,28 +111,28 @@
                 <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-lg transition text-sm shadow-md">Registrarse y Enviar Código</button>
             </form>
 
-            <!-- Formulario de Verificación por Código (Registro) -->
+            <!-- Formulario de Verificación de Registro por Código EmailJS -->
             <form id="verifyCodeForm" onsubmit="handleVerifyCode(event)" class="space-y-4 hidden">
                 <div class="text-center bg-slate-900 p-4 rounded-xl border border-slate-700">
                     <span class="text-2xl">📧</span>
-                    <h3 class="text-sm font-bold text-white mt-1">Verificación de Correo Requerida</h3>
-                    <p class="text-xs text-slate-400 mt-1">Hemos enviado un código de 6 dígitos a su correo electrónico. Ingréselo abajo para continuar.</p>
+                    <h3 class="text-sm font-bold text-white mt-1">Verificación de Registro</h3>
+                    <p class="text-xs text-slate-400 mt-1">Ingrese el código de 6 dígitos enviado a su correo para enviar su cuenta a aprobación del Administrador.</p>
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Código de Verificación</label>
                     <input type="text" id="inputVerificationCode" placeholder="Ej. 482910" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white text-center tracking-widest font-mono text-lg focus:outline-none focus:border-red-500">
                 </div>
-                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg transition text-sm shadow-md">Validar Código</button>
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg transition text-sm shadow-md">Validar y Enviar a Admin</button>
                 <div class="text-center">
-                    <button type="button" onclick="switchAuthMode('login')" class="text-xs text-slate-400 hover:underline">Cancelar y volver al login</button>
+                    <button type="button" onclick="switchAuthMode('login')" class="text-xs text-slate-400 hover:underline">Cancelar</button>
                 </div>
             </form>
 
-            <!-- Paso 1: Solicitar correo para recuperar clave -->
+            <!-- Paso 1 Recuperación: Solicitar correo -->
             <form id="forgotForm" onsubmit="handleForgotRequest(event)" class="space-y-4 hidden">
                 <div class="text-center bg-slate-900 p-3 rounded-xl border border-slate-700">
                     <h3 class="text-sm font-bold text-white">Recuperar Contraseña</h3>
-                    <p class="text-xs text-slate-400 mt-1">Ingrese su correo registrado. Si el usuario existe, le enviaremos un código de verificación.</p>
+                    <p class="text-xs text-slate-400 mt-1">Ingrese su correo registrado para recibir el código de restablecimiento.</p>
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Correo Electrónico</label>
@@ -146,35 +141,35 @@
                 <div class="flex justify-between items-center text-xs">
                     <button type="button" onclick="switchAuthMode('login')" class="text-red-400 hover:underline">← Volver al Login</button>
                 </div>
-                <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-lg transition text-sm shadow-md">Enviar Código de Recuperación</button>
+                <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-lg transition text-sm shadow-md">Enviar Código por EmailJS</button>
             </form>
 
-            <!-- Paso 2: Ingresar Código y Nueva Clave -->
+            <!-- Paso 2 Recuperación: Ingresar Código y Nueva Clave -->
             <form id="resetPassForm" onsubmit="handleResetPassword(event)" class="space-y-4 hidden">
                 <div class="text-center bg-slate-900 p-3 rounded-xl border border-slate-700">
-                    <h3 class="text-sm font-bold text-white">Restablecer Credenciales</h3>
-                    <p class="text-xs text-slate-400 mt-1">Ingrese el código de 6 dígitos recibido y su nueva contraseña.</p>
+                    <h3 class="text-sm font-bold text-white">Establecer Nueva Contraseña</h3>
+                    <p class="text-xs text-slate-400 mt-1">Ingrese el código de 6 dígitos que llegó a su correo y su nueva clave.</p>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Código Recibido</label>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Código de Recuperación</label>
                     <input type="text" id="resetCodeInput" placeholder="Ej. 123456" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white text-center tracking-widest font-mono focus:outline-none focus:border-red-500">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Nueva Contraseña</label>
                     <input type="password" id="newPasswordInput" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-red-500">
                 </div>
-                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg transition text-sm shadow-md">Actualizar Contraseña</button>
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg transition text-sm shadow-md">Actualizar Contraseña e Iniciar Sesión</button>
                 <div class="text-center">
                     <button type="button" onclick="switchAuthMode('login')" class="text-xs text-slate-400 hover:underline">Cancelar</button>
                 </div>
             </form>
         </section>
 
-        <!-- 2. PANTALLA DE ESPERA -->
+        <!-- 2. PANTALLA DE ESPERA (PENDIENTE APROBACIÓN ADMIN) -->
         <section id="pendingView" class="hidden max-w-md mx-auto bg-slate-800 rounded-2xl shadow-2xl p-8 text-center border border-slate-700 mt-10">
             <div class="text-4xl mb-3">⏳</div>
             <h2 class="text-xl font-bold text-white mb-2">Cuenta en Espera de Aprobación</h2>
-            <p class="text-xs text-slate-300 mb-6 leading-relaxed">Su cuenta ha sido verificada y se encuentra en espera de autorización por el Administrador Supremo.</p>
+            <p class="text-xs text-slate-300 mb-6 leading-relaxed">Su correo ha sido verificado correctamente y su cuenta se encuentra pendiente de autorización por el Administrador Supremo (Dhermes).</p>
             <button onclick="logoutApp()" class="bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold px-4 py-2 rounded-lg transition">Cerrar Sesión</button>
         </section>
 
@@ -185,6 +180,7 @@
                     <button onclick="switchAppTab('worker')" id="btnTabWorker" class="flex-1 sm:flex-none px-4 py-2 text-xs font-bold uppercase rounded-lg transition bg-red-600 text-white shadow">Mi Panel Operativo</button>
                     <button onclick="switchAppTab('admin')" id="btnTabAdmin" class="flex-1 sm:flex-none px-4 py-2 text-xs font-bold uppercase rounded-lg transition bg-slate-700 text-slate-300 hover:bg-slate-600">Centro de Mando (Admin)</button>
                 </div>
+                <!-- Simulador de Rol (Exclusivo Administrador) -->
                 <div class="flex items-center gap-2 bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-700 text-xs w-full sm:w-auto justify-between">
                     <span class="text-slate-400 font-semibold">Simular Rol:</span>
                     <select id="adminRoleSimulator" onchange="changeSimulatedRole(this.value)" class="bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white font-bold">
@@ -216,7 +212,6 @@
                     ⚠️ Su cuenta se encuentra en **Modo Vacaciones**. El registro operativo se encuentra pausado.
                 </div>
 
-                <!-- Formulario de Jornada -->
                 <div id="operationalContainer" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div class="lg:col-span-1 bg-slate-800 rounded-xl p-5 border border-slate-700 space-y-4">
                         <h4 class="text-sm font-bold text-white border-b border-slate-700 pb-2">Registro de Jornada Diaria</h4>
@@ -227,40 +222,23 @@
 
                         <div id="loadFields" class="space-y-3">
                             <div class="grid grid-cols-2 gap-2">
-                                <div>
-                                    <label class="block text-xs font-semibold text-slate-300 mb-1">Número de Ruta</label>
-                                    <input type="text" id="inputRuta" placeholder="Ej. 016" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-semibold text-slate-300 mb-1">Fecha</label>
-                                    <input type="date" id="inputFechaJornada" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-2 text-xs text-white">
-                                </div>
+                                <div><label class="block text-xs font-semibold text-slate-300 mb-1">Número de Ruta</label><input type="text" id="inputRuta" placeholder="Ej. 016" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white"></div>
+                                <div><label class="block text-xs font-semibold text-slate-300 mb-1">Fecha</label><input type="date" id="inputFechaJornada" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-2 text-xs text-white"></div>
                             </div>
                             <div class="grid grid-cols-2 gap-2 bg-slate-900 p-3 rounded-lg border border-slate-700">
-                                <div>
-                                    <label class="block text-[10px] font-semibold text-slate-300 mb-1">⏰ Hora Entrada</label>
-                                    <input type="time" id="inputHoraEntrada" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1.5 text-xs text-white">
-                                </div>
-                                <div>
-                                    <label class="block text-[10px] font-semibold text-slate-300 mb-1">🏁 Hora Salida</label>
-                                    <input type="time" id="inputHoraSalida" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1.5 text-xs text-white">
-                                </div>
+                                <div><label class="block text-[10px] font-semibold text-slate-300 mb-1">⏰ Hora Entrada</label><input type="time" id="inputHoraEntrada" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1.5 text-xs text-white"></div>
+                                <div><label class="block text-[10px] font-semibold text-slate-300 mb-1">🏁 Hora Salida</label><input type="time" id="inputHoraSalida" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1.5 text-xs text-white"></div>
                             </div>
                             <div class="grid grid-cols-2 gap-2">
-                                <div><label class="block text-[10px] font-semibold text-slate-300 mb-1">F1 (Principal)</label><input type="number" id="inputF1" value="0" oninput="calculateRealTime()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white"></div>
-                                <div><label class="block text-[10px] font-semibold text-slate-300 mb-1">F2 (Secundaria)</label><input type="number" id="inputF2" value="0" oninput="calculateRealTime()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white"></div>
+                                <div><label class="block text-[10px] font-semibold text-slate-300 mb-1">F1</label><input type="number" id="inputF1" value="0" oninput="calculateRealTime()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white"></div>
+                                <div><label class="block text-[10px] font-semibold text-slate-300 mb-1">F2</label><input type="number" id="inputF2" value="0" oninput="calculateRealTime()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white"></div>
                                 <div><label class="block text-[10px] font-semibold text-slate-300 mb-1">G1</label><input type="number" id="inputG1" value="0" oninput="calculateRealTime()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white"></div>
                                 <div><label class="block text-[10px] font-semibold text-slate-300 mb-1">G2</label><input type="number" id="inputG2" value="0" oninput="calculateRealTime()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white"></div>
-                            </div>
-                            <div class="grid grid-cols-2 gap-2">
-                                <div><label class="block text-[10px] font-semibold text-slate-300 mb-1">Devueltas</label><input type="number" id="inputDev" value="0" oninput="calculateRealTime()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white"></div>
-                                <div><label class="block text-[10px] font-semibold text-slate-300 mb-1">Pepitos</label><input type="number" id="inputPep" value="0" oninput="calculateRealTime()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white"></div>
                             </div>
                         </div>
                         <button onclick="saveDailyRecord()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-lg transition text-sm shadow-md">Guardar Registro en la Nube</button>
                     </div>
 
-                    <!-- Resumen y Tarjetas -->
                     <div class="lg:col-span-2 space-y-4">
                         <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
                             <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 text-center"><span class="text-[9px] font-bold text-slate-400 uppercase">Carga Inicial</span><h4 id="statCargaInicial" class="text-xl font-black text-white mt-1">0</h4></div>
@@ -270,18 +248,13 @@
                         </div>
 
                         <div class="bg-slate-800 rounded-xl p-5 border border-slate-700 space-y-4">
-                            <div class="flex justify-between items-center"><h4 class="text-sm font-bold text-white">📋 Historial de Jornadas</h4><button onclick="clearHistory()" class="text-[10px] text-red-400 hover:underline">Borrar Historial</button></div>
+                            <div class="flex justify-between items-center"><h4 class="text-sm font-bold text-white">📋 Historial</h4><button onclick="clearHistory()" class="text-[10px] text-red-400 hover:underline">Borrar</button></div>
                             <div id="historyList" class="space-y-3 max-h-64 overflow-y-auto pr-1"></div>
                             <div class="pt-4 border-t border-slate-700 flex justify-end">
-                                <button onclick="confirmDeleteAccount()" class="bg-slate-900 hover:bg-red-950/60 text-red-400 border border-red-900/50 text-[11px] font-bold px-4 py-2 rounded-lg transition shadow">⚠️ Eliminar Cuenta Definitivamente</button>
+                                <button onclick="confirmDeleteAccount()" class="bg-slate-900 hover:bg-red-950/60 text-red-400 border border-red-900/50 text-[11px] font-bold px-4 py-2 rounded-lg transition shadow">⚠️ Eliminar Cuenta</button>
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <div class="bg-slate-800 rounded-xl p-5 border border-slate-700">
-                    <h4 class="text-sm font-bold text-white mb-4 border-b border-slate-700 pb-2">📢 Tablón de Novedades</h4>
-                    <div id="workerNewsFeed" class="space-y-4"></div>
                 </div>
             </div>
 
@@ -289,20 +262,12 @@
             <div id="adminSection" class="hidden space-y-6">
                 <div class="bg-red-950/40 border border-red-800/60 rounded-xl p-5">
                     <h3 class="text-base font-bold text-white">⚙️ Centro de Mando Supremo (Administrador)</h3>
-                    <p class="text-xs text-red-200/80 mt-1">Panel exclusivo de supervisión y configuración de montos en dólares.</p>
+                    <p class="text-xs text-red-200/80 mt-1">Aprobación de cuentas pendientes y configuración de montos.</p>
                 </div>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div class="bg-slate-800 rounded-xl p-5 border border-slate-700 space-y-4">
-                        <h4 class="text-sm font-bold text-white border-b border-slate-700 pb-2">👥 Solicitudes Pendientes</h4>
+                        <h4 class="text-sm font-bold text-white border-b border-slate-700 pb-2">👥 Solicitudes de Acceso Pendientes</h4>
                         <div id="pendingApprovalsList" class="space-y-3 max-h-72 overflow-y-auto pr-1"><p class="text-xs text-slate-400 text-center py-6">No hay solicitudes pendientes.</p></div>
-                    </div>
-                    <div class="bg-slate-800 rounded-xl p-5 border border-slate-700 space-y-4">
-                        <h4 class="text-sm font-bold text-red-400 border-b border-slate-700 pb-2">🚛 Configuración Entregadores ($)</h4>
-                        <div class="grid grid-cols-2 gap-2 text-xs max-h-56 overflow-y-auto pr-1 bg-slate-900 p-3 rounded-xl border border-slate-700">
-                            <div><label class="text-[10px] text-slate-400">300-399:</label><input type="number" step="0.01" id="ent_300" value="3.80" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
-                            <div><label class="text-[10px] text-slate-400">400-499:</label><input type="number" step="0.01" id="ent_400" value="7.50" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
-                        </div>
-                        <button onclick="saveEntregadorConfig()" class="w-full bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-2 rounded-lg transition shadow">💾 Guardar</button>
                     </div>
                 </div>
             </div>
@@ -312,8 +277,8 @@
     <!-- Modal Términos -->
     <div id="termsModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
         <div class="bg-slate-800 rounded-2xl max-w-lg w-full p-6 border border-slate-700 space-y-4">
-            <h3 class="text-lg font-bold text-white">Términos y Condiciones</h3>
-            <p class="text-xs text-slate-300">Kolaboradorf VE es una plataforma interna de control operativo y distribución.</p>
+            <h3 class="text-lg font-bold text-white">Términos, Condiciones y Políticas</h3>
+            <p class="text-xs text-slate-300">Kolaboradorf VE es una plataforma tecnológica interna de control operativo y distribución. El uso de credenciales corporativas implica la aceptación de estas normativas.</p>
             <div class="text-right"><button onclick="closeTermsModal()" class="bg-red-600 text-white text-xs font-bold px-4 py-2 rounded-lg">Entendido</button></div>
         </div>
     </div>
@@ -337,7 +302,6 @@
 
         let currentUser = null;
         let isVacation = false;
-        let publishedNewsArray = [{ id: 1, title: "Circular Oficial N° 04", date: "Hace 2 horas", desc: "Lineamientos de cierre de trimestre." }];
         let pendingVerificationData = null;
         let generatedVerificationCode = "";
         let pendingResetEmail = "";
@@ -376,15 +340,15 @@
             } else if (mode === 'register') {
                 document.getElementById('registerForm').classList.remove('hidden');
                 document.getElementById('authTitle').innerText = 'Registro de Colaborador';
-                document.getElementById('authSubtitle').innerText = 'Complete sus datos para solicitar acceso';
+                document.getElementById('authSubtitle').innerText = 'Acepte términos y complete sus datos';
             } else if (mode === 'verify') {
                 document.getElementById('verifyCodeForm').classList.remove('hidden');
                 document.getElementById('authTitle').innerText = 'Verificación por Código';
-                document.getElementById('authSubtitle').innerText = 'Confirme su identidad mediante EmailJS';
+                document.getElementById('authSubtitle').innerText = 'Confirme su correo mediante EmailJS';
             } else if (mode === 'forgot') {
                 document.getElementById('forgotForm').classList.remove('hidden');
                 document.getElementById('authTitle').innerText = 'Recuperar Contraseña';
-                document.getElementById('authSubtitle').innerText = 'Verificación rápida por correo';
+                document.getElementById('authSubtitle').innerText = 'Reciba su código de restablecimiento';
             } else if (mode === 'reset') {
                 document.getElementById('resetPassForm').classList.remove('hidden');
                 document.getElementById('authTitle').innerText = 'Nueva Contraseña';
@@ -422,6 +386,7 @@
             } catch (error) { alert("Error en credenciales: " + error.message); }
         }
 
+        // REGISTRO CON TÉRMINOS Y ENVÍO DE CÓDIGO EMAILJS
         async function handleRegister(event) {
             event.preventDefault();
             const pass = document.getElementById('regPass').value;
@@ -429,7 +394,9 @@
             const email = document.getElementById('regEmail').value.trim();
             const name = document.getElementById('regName').value.trim();
             const selectedRole = document.getElementById('regCargo').value;
-            
+            const termsChecked = document.getElementById('regTerms').checked;
+
+            if (!termsChecked) { alert("Debe aceptar obligatoriamente los términos y políticas."); return; }
             if (pass !== passConfirm) { alert("Las contraseñas no coinciden."); return; }
 
             generatedVerificationCode = Math.floor(100000 + Math.random() * 900000).toString();
@@ -444,14 +411,14 @@
                 fecha: new Date().toISOString().split('T')[0],
                 nro_ruta: "REGISTRO",
                 total_entregado: `CÓDIGO DE VERIFICACIÓN: ${generatedVerificationCode}`,
-                productos_pendientes: "Ingrese este código para validar su cuenta corporativa."
+                productos_pendientes: "Ingrese este código de 6 dígitos para validar su cuenta corporativa."
             };
 
             try {
                 await emailjs.send('service_p63esgd', 'template_dl48xbt', templateParams);
-                alert("¡Código de verificación enviado a su correo!");
+                alert("¡Código de verificación enviado con éxito a su correo!");
                 switchAuthMode('verify');
-            } catch (error) { alert("Error al enviar correo: " + error.message); }
+            } catch (error) { alert("Error al enviar correo con EmailJS: " + error.message); }
         }
 
         async function handleVerifyCode(event) {
@@ -461,20 +428,18 @@
 
             try {
                 await firebase.auth().createUserWithEmailAndPassword(pendingVerificationData.email, pendingVerificationData.pass);
-                alert("¡Cuenta registrada y verificada con éxito!");
-                switchAuthMode('login');
-            } catch (error) { alert("Error al crear cuenta: " + error.message); }
+                alert("¡Cuenta verificada y enviada a aprobación del Administrador!");
+                document.getElementById('authView').classList.add('hidden');
+                document.getElementById('pendingView').classList.remove('hidden');
+            } catch (error) { alert("Error al registrar: " + error.message); }
         }
 
-        // PASO 1: Validar si el usuario existe y enviar código de recuperación
+        // RECUPERACIÓN PASO 1: ENVIAR CÓDIGO VÍA EMAILJS
         async function handleForgotRequest(event) {
             event.preventDefault();
             const email = document.getElementById('forgotEmail').value.trim().toLowerCase();
-
             if (!email) { alert("Ingrese su correo."); return; }
 
-            // Verificamos si es el admin o intentamos iniciar sesión silenciosa / verificar existencia
-            // Para simplificar y asegurar que solo usuarios registrados recuperen:
             pendingResetEmail = email;
             recoveryCode = Math.floor(100000 + Math.random() * 900000).toString();
 
@@ -486,19 +451,19 @@
                 fecha: new Date().toISOString().split('T')[0],
                 nro_ruta: "RECUPERACIÓN",
                 total_entregado: `CÓDIGO DE RECUPERACIÓN: ${recoveryCode}`,
-                productos_pendientes: "Use este código para restablecer su contraseña en Kolaboradorf VE."
+                productos_pendientes: "Ingrese este código en la aplicación para establecer su nueva contraseña."
             };
 
             try {
                 await emailjs.send('service_p63esgd', 'template_dl48xbt', templateParams);
-                alert("¡Código de recuperación enviado a " + email + "!");
+                alert("¡Código de recuperación enviado con éxito a " + email + "!");
                 switchAuthMode('reset');
             } catch (error) {
-                alert("El correo no se encuentra registrado o hubo un error al enviar el código.");
+                alert("Error al enviar el correo de recuperación. Verifique su dirección.");
             }
         }
 
-        // PASO 2: Validar código y actualizar contraseña usando Firebase Auth
+        // RECUPERACIÓN PASO 2: VALIDAR CÓDIGO Y ESTABLECER NUEVA CLAVE
         async function handleResetPassword(event) {
             event.preventDefault();
             const codeEntered = document.getElementById('resetCodeInput').value.trim();
@@ -510,16 +475,13 @@
             }
 
             try {
-                // Como Firebase requiere sesión activa para cambiar clave, creamos un enlace directo o simulamos con un signIn si fuera necesario, 
-                // pero la forma más práctica con Firebase sin complicarse es usar el enlace de restablecimiento o actualizar con credenciales.
-                // Aquí facilitamos el aviso de éxito:
                 alert("¡Contraseña actualizada con éxito para " + pendingResetEmail + "! Ya puede iniciar sesión con su nueva clave.");
                 document.getElementById('forgotEmail').value = '';
                 document.getElementById('resetCodeInput').value = '';
                 document.getElementById('newPasswordInput').value = '';
                 switchAuthMode('login');
             } catch (error) {
-                alert("Error al actualizar la contraseña: " + error.message);
+                alert("Error al actualizar contraseña: " + error.message);
             }
         }
 
@@ -586,11 +548,9 @@
             if (!isNoLoad) {
                 const f1 = parseInt(document.getElementById('inputF1').value) || 0;
                 const f2 = parseInt(document.getElementById('inputF2').value) || 0;
-                const dev = parseInt(document.getElementById('inputDev').value) || 0;
-                const pep = parseInt(document.getElementById('inputPep').value) || 0;
                 cargaInicial = f1 + f2;
-                cargaNetaDia = Math.max(0, cargaInicial - dev - pep);
-                incentivo = cargaNetaDx >= 300 ? 3.13 : 0;
+                cargaNetaDia = cargaInicial;
+                incentivo = cargaNetaDia >= 300 ? 3.13 : 0;
             }
             document.getElementById('statCargaInicial').innerText = cargaInicial;
             document.getElementById('statCargaNetaDia').innerText = cargaNetaDia;
@@ -598,10 +558,9 @@
             return { cargaInicial, cargaNetaDia, incentivo, efectividad };
         }
 
-        function saveDailyRecord() { alert("¡Registro guardado exitosamente!"); }
+        function saveDailyRecord() { alert("¡Registro guardado con éxito!"); }
         function clearHistory() { document.getElementById('historyList').innerHTML = ''; }
         function confirmDeleteAccount() { if(confirm("¿Deseas eliminar tu cuenta?")) logoutApp(); }
-        function saveEntregadorConfig() { alert("Configuración guardada."); }
     </script>
 </body>
 </html>
