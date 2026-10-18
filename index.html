@@ -147,7 +147,7 @@
                 <button type="submit" class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-xl transition text-sm shadow-lg shadow-red-600/30 uppercase tracking-wider">Enviar Código por EmailJS</button>
             </form>
 
-            <!-- Paso 2 Recuperación: Ingresar Código y Nueva Clave (CON LOS CAMPOS VISIBLES) -->
+            <!-- Paso 2 Recuperación: Ingresar Código y Nueva Clave -->
             <form id="resetPassForm" onsubmit="handleResetPassword(event)" class="space-y-5 hidden">
                 <div class="text-center bg-slate-950 p-5 rounded-2xl border border-slate-800 shadow-inner">
                     <span class="text-3xl">🔑</span>
@@ -283,7 +283,7 @@
                         </div>
                     </div>
 
-                    <!-- Configuración Montos Entregadores (Con su Botón Guardar Propio) -->
+                    <!-- Configuración Montos Entregadores -->
                     <div class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-4 shadow-xl">
                         <h4 class="text-sm font-extrabold text-red-400 border-b border-slate-800 pb-3 flex items-center gap-2">🚛 Configuración Dólares: Entregadores (Chóferes)</h4>
                         <div class="grid grid-cols-2 gap-3 text-xs max-h-60 overflow-y-auto pr-1 bg-slate-950 p-4 rounded-xl border border-slate-800 shadow-inner">
@@ -301,7 +301,7 @@
                         <button onclick="saveEntregadorConfig()" class="w-full bg-red-600 hover:bg-red-500 text-white text-xs font-bold py-3 rounded-xl transition shadow-lg shadow-red-600/30 uppercase tracking-wider">💾 Guardar Montos Entregadores</button>
                     </div>
 
-                    <!-- Configuración Montos Ayudantes (Con su Botón Guardar Propio) -->
+                    <!-- Configuración Montos Ayudantes -->
                     <div class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-4 lg:col-span-2 shadow-xl">
                         <h4 class="text-sm font-extrabold text-red-400 border-b border-slate-800 pb-3 flex items-center gap-2">🤝 Configuración Dólares: Ayudantes</h4>
                         <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 text-xs bg-slate-950 p-4 rounded-xl border border-slate-800 shadow-inner">
@@ -547,7 +547,6 @@
             try {
                 await emailjs.send('service_p63esgd', 'template_dl48xbt', templateParams);
                 alert("¡Código de recuperación enviado con éxito a " + email + "!");
-                // CAMBIA AUTOMÁTICAMENTE AL FORMULARIO DONDE INTRODUCES EL CÓDIGO Y LA NUEVA CLAVE
                 switchAuthMode('reset');
             } catch (error) {
                 console.error("Error EmailJS:", error);
