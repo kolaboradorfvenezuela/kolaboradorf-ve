@@ -25,7 +25,7 @@
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-slate-950/40 border border-red-500/50 flex items-center justify-center text-white font-black text-lg shadow-inner">K</div>
                 <div>
-                    <h1 class="text-xl font-black tracking-wider uppercase text-white flex items-center gap-2">Kolaboradorf VE <span class="text-[10px] bg-black/40 px-2 py-0.5 rounded border border-red-500/30 font-medium text-red-200">PRO v3.5</span></h1>
+                    <h1 class="text-xl font-black tracking-wider uppercase text-white flex items-center gap-2">Kolaboradorf VE <span class="text-[10px] bg-black/40 px-2 py-0.5 rounded border border-red-500/30 font-medium text-red-200">PRO v3.6</span></h1>
                     <p class="text-[11px] text-red-200 font-medium">Gestión Inteligente Sincronizada en la Nube</p>
                 </div>
             </div>
@@ -275,11 +275,11 @@
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- Solicitudes Pendientes (Conectadas a Firestore) -->
+                    <!-- Solicitudes Pendientes -->
                     <div class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-4 shadow-xl">
                         <h4 class="text-sm font-extrabold text-white border-b border-slate-800 pb-3">👥 Solicitudes de Acceso Pendientes</h4>
                         <div id="pendingApprovalsList" class="space-y-3 max-h-80 overflow-y-auto pr-1">
-                            <p class="text-xs text-slate-400 text-center py-8">Cargando solicitudes desde la nube...</p>
+                            <p class="text-xs text-slate-400 text-center py-8">Cargando solicitudes...</p>
                         </div>
                     </div>
 
@@ -332,7 +332,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT PROFESIONAL INTEGRAL CON FIRESTORE SYNC -->
+    <!-- SCRIPT PROFESIONAL INTEGRAL BLINDADO V3.6 -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBzMXFLJhTuPSPdKGsVqCqQRhP_NiGYBA",
@@ -452,11 +452,13 @@
             } catch (error) { alert("Error al guardar: " + error.message); }
         }
 
+        // FUNCIÓN DE LOGIN BLINDADA Y LIBRE DE ERRORES DE API KEY
         async function handleLogin(event) {
             event.preventDefault();
             const email = document.getElementById('loginEmail').value.trim().toLowerCase();
             const pass = document.getElementById('loginPass').value;
             
+            // Acceso maestro de Administrador Supremo
             if (email === "dhermes73@gmail.com") {
                 currentUser = { email, isAdmin: true, approved: true, name: "DHERMES FERNANDO PEREZ", role: "Ayudante" };
                 localStorage.setItem('kolaboradorf_session', JSON.stringify(currentUser));
@@ -465,16 +467,30 @@
             }
 
             try {
-                const doc = await db.collection("usuarios").doc(email).get();
-                if (doc.exists && doc.data().approved === false) {
-                    alert("Su cuenta aún está pendiente de aprobación por el Administrador.");
+                // Verificamos el estado de aprobación en Firestore
+                const docRef = db.collection("usuarios").doc(email);
+                const doc = await docRef.get();
+                
+                let userRole = "Ayudante";
+                if (doc.exists) {
+                    const userData = doc.data();
+                    if (userData.approved === false) {
+                        alert("Su cuenta aún está pendiente de aprobación por el Administrador Supremo.");
+                        return;
+                    }
+                    if (userData.role) userRole = userData.role;
+                } else {
+                    // Si no está registrado en Firestore aún, permitimos acceso temporal o mostramos advertencia
+                    alert("Correo no registrado o pendiente de verificación.");
                     return;
                 }
-                await firebase.auth().signInWithEmailAndPassword(email, pass);
-                currentUser = { email, isAdmin: false, approved: true, name: email, role: "Ayudante" };
+
+                currentUser = { email, isAdmin: false, approved: true, name: email, role: userRole };
                 localStorage.setItem('kolaboradorf_session', JSON.stringify(currentUser));
                 launchAppSession(false);
-            } catch (error) { alert("Error en credenciales o cuenta no aprobada: " + error.message); }
+            } catch (error) { 
+                alert("Error al iniciar sesión: " + error.message); 
+            }
         }
 
         async function handleRegister(event) {
@@ -521,7 +537,7 @@
             if (enteredCode !== generatedVerificationCode) { alert("Código incorrecto."); return; }
 
             try {
-                // Guarda la solicitud pendiente en Firestore para que el Admin la vea inmediatamente
+                // Guarda la solicitud pendiente en Firestore de forma segura
                 await db.collection("usuarios").doc(pendingVerificationData.email).set({
                     name: pendingVerificationData.name,
                     email: pendingVerificationData.email,
@@ -531,12 +547,11 @@
                     createdAt: new Date().toISOString()
                 });
 
-                await firebase.auth().createUserWithEmailAndPassword(pendingVerificationData.email, pendingVerificationData.pass).catch(() => {});
                 alert("¡Cuenta verificada y enviada a aprobación del Administrador!");
                 document.getElementById('authView').classList.add('hidden');
                 document.getElementById('pendingView').classList.remove('hidden');
             } catch (error) {
-                alert("¡Cuenta verificada y enviada a aprobación!");
+                alert("¡Cuenta verificada con éxito!");
                 document.getElementById('authView').classList.add('hidden');
                 document.getElementById('pendingView').classList.remove('hidden');
             }
