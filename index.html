@@ -175,7 +175,7 @@
 
     <div id="splashScreen">
         <div class="splash-logo">Kolaboradorf VE</div>
-        <div class="splash-sub">Cargando Sistema Operativo...</div>
+        <div class="splash-sub">Cargando Sistema Operativo Cloud...</div>
     </div>
 
     <!-- MODAL DE TÉRMINOS Y CONDICIONES COMPLETO -->
@@ -201,7 +201,7 @@
                 <p>Herramienta estrictamente de gestión personal y referencial para el cálculo de jornadas, cargas e incentivos[cite: 1].</p>
                 
                 <h4>Sección 3: Exención de Responsabilidad y Limitación de Daños</h4>
-                <p>El desarrollador no asume responsabilidad por errores de introducción de datos o fallas en servicios de terceros (API BCV, EmailJS)[cite: 1].</p>
+                <p>El desarrollador no asume responsabilidad por errores de introducción de datos o fallas en servicios de terceros (API BCV, EmailJS, Firebase)[cite: 1].</p>
             </div>
             <div class="terms-footer">
                 <button type="button" class="btn-primary" style="width: auto; padding: 8px 20px;" onclick="cerrarTerminos()">Entendido y Cerrar</button>
@@ -246,13 +246,13 @@
             </div>
         </div>
         <div id="navGuestInfo" style="font-size: 0.75rem; font-weight: 700; color: #4A5568; text-transform: uppercase;">
-            Venezuela <span>Sistema Pro</span>
+            Cloud Pro <span>Firebase</span>
         </div>
     </nav>
 
     <header class="hero">
         <h1>Control Operativo de Distribución</h1>
-        <p>Gestión Inteligente de Jornada y Cargas</p>
+        <p>Gestión Inteligente Sincronizada en la Nube</p>
     </header>
 
     <div class="main-layout" id="mainLayoutContainer">
@@ -261,17 +261,17 @@
         <div id="leftColumnContainer" class="auth-container">
             <!-- 1. INICIAR SESIÓN -->
             <div class="card" id="loginCard">
-                <h2 class="section-title">🔑 Iniciar Sesión</h2>
+                <h2 class="section-title">🔑 Iniciar Sesión Cloud</h2>
                 <form id="loginForm" onsubmit="event.preventDefault(); procesarLogin();">
                     <div class="form-group">
                         <label for="loginEmail">Correo Electrónico *</label>
-                        <input type="email" id="loginEmail" placeholder="Ej. alezander@gmail.com" required>
+                        <input type="email" id="loginEmail" placeholder="Ej. usuario@gmail.com" required>
                     </div>
                     <div class="form-group">
                         <label for="loginPassword">Contraseña *</label>
                         <input type="password" id="loginPassword" placeholder="••••••••" required>
                     </div>
-                    <button type="submit" class="btn-primary">Iniciar Sesión</button>
+                    <button type="submit" class="btn-primary">Iniciar Sesión Cloud</button>
                 </form>
                 <div class="auth-switch">
                     ¿No tienes cuenta? <a onclick="mostrarRegistro()">Regístrate aquí</a>
@@ -280,7 +280,7 @@
 
             <!-- 2. REGISTRO -->
             <div class="card" id="registerCard" style="display: none;">
-                <h2 class="section-title">📝 Regístrate y Verifica Correo</h2>
+                <h2 class="section-title">📝 Registro y Verificación</h2>
                 <form id="registerForm" onsubmit="event.preventDefault(); enviarCodigoVerificacion();">
                     <div class="form-group">
                         <label for="regNombre">Nombre Completo *</label>
@@ -344,7 +344,7 @@
             <!-- 3. PANEL OPERATIVO PRINCIPAL -->
             <div class="card" id="formCard" style="display: none;">
                 <div class="notice-internal">
-                    ℹ️ <strong>Aviso importante:</strong> Esta herramienta ofrece una referencia estimada de tus incentivos y no determina el pago final[cite: 1].
+                    ℹ️ <strong>Aviso importante:</strong> Herramienta conectada a la nube de Firebase para sincronización multi-dispositivo[cite: 1].
                 </div>
 
                 <div class="profile-summary" id="profileDisplay"></div>
@@ -457,19 +457,19 @@
                     </div>
                 </form>
                 
-                <button type="button" class="btn-email" onclick="guardarRegistroLocal()">💾 Guardar Registro</button>
+                <button type="button" class="btn-email" onclick="guardarRegistroCloud()">💾 Guardar Registro en la Nube</button>
             </div>
         </div>
 
         <!-- CONTENEDOR DERECHO: HISTORIAL -->
         <div id="rightColumnContainer" style="display: none;">
             <div class="card">
-                <h2 class="section-title">📂 Historial por Días</h2>
+                <h2 class="section-title">📂 Historial Cloud (Nube)</h2>
                 <div id="historyList">
-                    <div class="empty-history">Inicia sesión para ver tu historial.</div>
+                    <div class="empty-history">Inicia sesión para ver tu historial sincronizado.</div>
                 </div>
                 <div id="deleteHistoryContainer" style="display: none;">
-                    <button type="button" class="btn-danger" onclick="borrarHistorial()">🗑️ Borrar Todo el Historial</button>
+                    <button type="button" class="btn-danger" onclick="borrarHistorialCloud()">🗑️ Borrar Todo el Historial</button>
                 </div>
             </div>
         </div>
@@ -480,7 +480,7 @@
     <div class="bottom-banner">
         <div style="width: 100%;">
             <div class="notice-external">
-                ⚖️ <strong>Aviso legal:</strong> Aplicación independiente de KOLABORADORF Venezuela®, ajena a registros corporativos oficiales[cite: 1].
+                ⚖️ <strong>Aviso legal:</strong> Aplicación independiente de KOLABORADORF Venezuela®, sincronizada mediante Firebase[cite: 1].
             </div>
         </div>
         <div>
@@ -498,10 +498,31 @@
         </div>
     </div>
 
-    <script>
+    <!-- SDK de Firebase (Modular v10) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, deleteUser } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+        // Tus credenciales oficiales de Firebase
+        const firebaseConfig = {
+          apiKey: "AIzaSyBzMXFlJhTuPSPDkGsVqCqFQrhP_NiGYBA",
+          authDomain: "kolaboradorf-ve.firebaseapp.com",
+          projectId: "kolaboradorf-ve",
+          storageBucket: "kolaboradorf-ve.firebasestorage.app",
+          messagingSenderId: "846070913325",
+          appId: "1:846070913325:web:a26cdc0050ed5db0a6dba4",
+          measurementId: "G-XSGR1TYGJ1"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
         document.getElementById('fecha').valueAsDate = new Date();
         let codigoGeneradoTemp = '';
         let datosTemporalesRegistro = null;
+        let currentUserEmail = null;
 
         const EFECTIVIDAD_REPARTO_FIJA_USD = 9.97;
 
@@ -549,21 +570,62 @@
                 splash.style.opacity = '0';
                 setTimeout(() => splash.style.display = 'none', 500);
             }, 800);
-            comprobarEstadoSesion();
             cargarTasaBCV();
         });
 
-        function abrirPromociones() {
+        // Escuchador de Estado de Autenticación de Firebase
+        onAuthStateChanged(auth, async (user) => {
+            const navUserContainer = document.getElementById('navUserContainer');
+            const navGuestInfo = document.getElementById('navGuestInfo');
+            const navUserInfo = document.getElementById('navUserInfo');
+            const mainLayout = document.getElementById('mainLayoutContainer');
+            const leftContainer = document.getElementById('leftColumnContainer');
+            const rightContainer = document.getElementById('rightColumnContainer');
+
+            if (user) {
+                currentUserEmail = user.email;
+                // Buscar perfil en Firestore
+                try {
+                    const docRef = doc(db, "usuarios", user.uid);
+                    const docSnap = await getDoc(docRef);
+                    if (docSnap.exists()) {
+                        const perfil = docSnap.data();
+                        mainLayout.classList.add('logged-in');
+                        leftContainer.classList.remove('auth-container');
+
+                        document.getElementById('registerCard').style.display = 'none';
+                        document.getElementById('loginCard').style.display = 'none';
+                        document.getElementById('formCard').style.display = 'block';
+                        rightContainer.style.display = 'block';
+                        
+                        navUserContainer.style.display = 'flex';
+                        navGuestInfo.style.display = 'none';
+                        navUserInfo.innerHTML = `${perfil.nombre}<span>${perfil.cargo}</span>`;
+
+                        document.getElementById('profileDisplay').innerHTML = `<span><strong>Colaborador Cloud:</strong> ${perfil.nombre}<br><small>${perfil.cargo} (${perfil.anos} años) — ✉️ ${perfil.email}</small></span>`;
+                        loadHistoryCloud(user.uid);
+                        return;
+                    }
+                } catch (e) {
+                    console.error("Error al cargar perfil:", e);
+                }
+            } else {
+                currentUserEmail = null;
+                mostrarLogin();
+            }
+        });
+
+        window.abrirPromociones = function() {
             document.getElementById('promoModal').style.display = 'flex';
         }
-        function cerrarPromociones() {
+        window.cerrarPromociones = function() {
             document.getElementById('promoModal').style.display = 'none';
         }
 
-        function abrirTerminos() {
+        window.abrirTerminos = function() {
             document.getElementById('termsModal').style.display = 'flex';
         }
-        function cerrarTerminos() {
+        window.cerrarTerminos = function() {
             document.getElementById('termsModal').style.display = 'none';
         }
 
@@ -591,39 +653,7 @@
             }
         }
 
-        function comprobarEstadoSesion() {
-            const sesionActiva = localStorage.getItem('kolab_sesion_activa');
-            const navUserContainer = document.getElementById('navUserContainer');
-            const navGuestInfo = document.getElementById('navGuestInfo');
-            const navUserInfo = document.getElementById('navUserInfo');
-            const mainLayout = document.getElementById('mainLayoutContainer');
-            const leftContainer = document.getElementById('leftColumnContainer');
-            const rightContainer = document.getElementById('rightColumnContainer');
-
-            if (sesionActiva) {
-                const perfil = JSON.parse(localStorage.getItem('kolab_profile_' + sesionActiva));
-                if (perfil) {
-                    mainLayout.classList.add('logged-in');
-                    leftContainer.classList.remove('auth-container');
-
-                    document.getElementById('registerCard').style.display = 'none';
-                    document.getElementById('loginCard').style.display = 'none';
-                    document.getElementById('formCard').style.display = 'block';
-                    rightContainer.style.display = 'block';
-                    
-                    navUserContainer.style.display = 'flex';
-                    navGuestInfo.style.display = 'none';
-                    navUserInfo.innerHTML = `${perfil.nombre}<span>${perfil.cargo}</span>`;
-
-                    document.getElementById('profileDisplay').innerHTML = `<span><strong>Colaborador:</strong> ${perfil.nombre}<br><small>${perfil.cargo} (${perfil.anos} años) — ✉️ ${perfil.email}</small></span>`;
-                    loadHistory();
-                    return;
-                }
-            }
-            mostrarLogin();
-        }
-
-        function mostrarRegistro() {
+        window.mostrarRegistro = function() {
             const mainLayout = document.getElementById('mainLayoutContainer');
             const leftContainer = document.getElementById('leftColumnContainer');
             mainLayout.classList.remove('logged-in');
@@ -638,7 +668,7 @@
             document.getElementById('navGuestInfo').style.display = 'block';
         }
 
-        function mostrarLogin() {
+        window.mostrarLogin = function() {
             const mainLayout = document.getElementById('mainLayoutContainer');
             const leftContainer = document.getElementById('leftColumnContainer');
             mainLayout.classList.remove('logged-in');
@@ -651,7 +681,7 @@
             document.getElementById('navGuestInfo').style.display = 'block';
         }
 
-        function enviarCodigoVerificacion() {
+        window.enviarCodigoVerificacion = function() {
             const acepto = document.getElementById('aceptoTerminos').checked;
             if (!acepto) {
                 alert('⚠️ Debes leer y aceptar los Términos y Condiciones para registrarte.');
@@ -684,13 +714,13 @@
                 colaborador_nombre: nombre,
                 cargo_colaborador: cargo,
                 anos_servicio: anos,
-                fecha: "Verificación de Cuenta",
+                fecha: "Verificación de Cuenta Cloud",
                 nro_ruta: "REGISTRO",
                 hora_entrada: "--",
                 hora_salida: "--",
                 carga_f1: 0, carga_f2: 0, carga_g1: 0, carga_g2: 0,
                 carga_total: 0, total_entregado: 0, cajas_devueltas: 0,
-                productos_pendientes: `Tu código de verificación de Kolaboradorf VE es: ${codigoGeneradoTemp}`
+                productos_pendientes: `Tu código de verificación de Kolaboradorf VE Cloud es: ${codigoGeneradoTemp}`
             };
 
             emailjs.send('service_p63esgd', 'template_dl48xbt', templateParams)
@@ -706,67 +736,78 @@
                 });
         }
 
-        function confirmarCodigoYRegistrar() {
+        window.confirmarCodigoYRegistrar = async function() {
             const ingresado = document.getElementById('codigoIngresado').value.trim();
             if (ingresado !== codigoGeneradoTemp) {
                 alert('Código incorrecto. Por favor verifica el número que recibiste en tu correo.');
                 return;
             }
-            localStorage.setItem('kolab_profile_' + datosTemporalesRegistro.email, JSON.stringify(datosTemporalesRegistro));
-            localStorage.setItem('kolab_sesion_activa', datosTemporalesRegistro.email);
-            alert('¡Correo verificado y cuenta creada con éxito en Kolaboradorf VE!');
-            comprobarEstadoSesion();
+
+            try {
+                // Crear usuario en Firebase Authentication
+                const userCredential = await createUserWithEmailAndPassword(auth, datosTemporalesRegistro.email, datosTemporalesRegistro.password);
+                const user = userCredential.user;
+
+                // Guardar perfil en Cloud Firestore
+                await setDoc(doc(db, "usuarios", user.uid), {
+                    nombre: datosTemporalesRegistro.nombre,
+                    anos: datosTemporalesRegistro.anos,
+                    cargo: datosTemporalesRegistro.cargo,
+                    email: datosTemporalesRegistro.email,
+                    createdAt: new Date().toISOString()
+                });
+
+                alert('¡Correo verificado y cuenta creada con éxito en la nube de Kolaboradorf VE!');
+            } catch (error) {
+                alert('Error al registrar en Firebase: ' + error.message);
+                console.error(error);
+            }
         }
 
-        function procesarLogin() {
+        window.procesarLogin = async function() {
             const email = document.getElementById('loginEmail').value.trim().toLowerCase();
             const password = document.getElementById('loginPassword').value.trim();
 
-            const perfilGuardado = localStorage.getItem('kolab_profile_' + email);
-            if (!perfilGuardado) {
-                const irRegistro = confirm('⚠️ No existe ninguna cuenta registrada con este correo en este navegador.\n\n¿Deseas ir al formulario de registro ahora mismo?');
-                if (irRegistro) {
-                    mostrarRegistro();
-                    document.getElementById('emailUser').value = email.split('@')[0];
-                }
-                return;
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                alert('¡Bienvenido de nuevo a la nube!');
+            } catch (error) {
+                alert('Credenciales incorrectas o usuario no encontrado en Firebase.');
+                console.error(error);
             }
-
-            const perfil = JSON.parse(perfilGuardado);
-            if (perfil.password !== password) {
-                alert('Contraseña incorrecta. Inténtalo de nuevo.');
-                return;
-            }
-
-            localStorage.setItem('kolab_sesion_activa', email);
-            alert(`¡Bienvenido de nuevo, ${perfil.nombre}!`);
-            comprobarEstadoSesion();
         }
 
-        function cerrarSesion() {
-            localStorage.removeItem('kolab_sesion_activa');
-            alert('Has cerrado sesión correctamente.');
-            mostrarLogin();
+        window.cerrarSesion = async function() {
+            try {
+                await signOut(auth);
+                alert('Has cerrado sesión correctamente.');
+                mostrarLogin();
+            } catch (e) {
+                console.error(e);
+            }
         }
 
-        function eliminarCuenta() {
-            const sesionActiva = localStorage.getItem('kolab_sesion_activa');
-            if (!sesionActiva) return;
+        window.eliminarCuenta = async function() {
+            const user = auth.currentUser;
+            if (!user) return;
 
-            const confirmar1 = confirm("⚠️ ¿Estás completamente seguro de que deseas eliminar tu cuenta?\n\nEsta acción borrará tu perfil y todo tu historial guardado de este dispositivo.");
+            const confirmar1 = confirm("⚠️ ¿Estás completamente seguro de que deseas eliminar tu cuenta y todos tus datos en la nube?");
             if (confirmar1) {
-                const confirmar2 = confirm("🚨 ÚLTIMA ADVERTENCIA: ¿Confirmas la eliminación permanente?");
+                const confirmar2 = confirm("🚨 ÚLTIMA ADVERTENCIA: Esta acción es permanente.");
                 if (confirmar2) {
-                    localStorage.removeItem('kolab_profile_' + sesionActiva);
-                    localStorage.removeItem('kolab_records_' + sesionActiva);
-                    localStorage.removeItem('kolab_sesion_activa');
-                    alert("Tu cuenta ha sido eliminada con éxito.");
-                    mostrarRegistro();
+                    try {
+                        await deleteUser(user);
+                        alert("Tu cuenta ha sido eliminada con éxito.");
+                        mostrarRegistro();
+                    } catch (error) {
+                        alert("Para eliminar la cuenta por seguridad debes iniciar sesión recientemente. Vuelve a iniciar sesión e inténtalo.");
+                        console.error(error);
+                    }
                 }
             }
         }
 
-        function toggleCargas() {
+        window.toggleCargas = function() {
             const sinCarga = document.getElementById('sinCarga').checked;
             const seccionCargas = document.getElementById('seccionCargas');
             if (sinCarga) {
@@ -781,7 +822,7 @@
             calcularEnVivo();
         }
 
-        function calcularEnVivo() {
+        window.calcularEnVivo = function() {
             const sinCarga = document.getElementById('sinCarga').checked;
             const f1 = sinCarga ? 0 : (parseFloat(document.getElementById('cargaF1').value) || 0);
             const f2 = sinCarga ? 0 : (parseFloat(document.getElementById('cargaF2').value) || 0);
@@ -845,78 +886,79 @@
             }
         }
 
-        function loadHistory() {
-            const sesionActiva = localStorage.getItem('kolab_sesion_activa');
-            if (!sesionActiva) return;
-
-            const perfil = JSON.parse(localStorage.getItem('kolab_profile_' + sesionActiva));
-            const records = JSON.parse(localStorage.getItem('kolab_records_' + sesionActiva) || '[]');
+        async function loadHistoryCloud(uid) {
             const historyList = document.getElementById('historyList');
             const deleteHistoryContainer = document.getElementById('deleteHistoryContainer');
 
-            actualizarAcumuladoSemanal(records, perfil);
+            try {
+                const docRef = doc(db, "usuarios", uid);
+                const docSnap = await getDoc(docRef);
+                const perfil = docSnap.data();
 
-            if (records.length === 0) {
-                historyList.innerHTML = '<div class="empty-history">No hay registros guardados aún.</div>';
-                deleteHistoryContainer.style.display = 'none';
-                return;
-            }
-            historyList.innerHTML = '';
-            deleteHistoryContainer.style.display = 'block';
-            
-            records.forEach((rec, index) => {
-                const diaNombre = obtenerDiaSemana(rec.fecha);
-                const infoIncentivo = calcularIncentivoSegunCajas(rec.cargo, rec.totalEntregado);
-                const porcentajeCumplimiento = calcularPorcentajeEfectividadDia(rec);
+                const querySnapshot = await getDocs(collection(db, "usuarios", uid, "registros"));
+                let records = [];
+                querySnapshot.forEach((d) => {
+                    records.push({ id: d.id, ...d.data() });
+                });
 
-                let incentivoHtml = '';
-                if (infoIncentivo) {
-                    incentivoHtml = `
-                        <div class="incentive-badge">
-                            💰 Incentivo Diario (${rec.cargo}): $${infoIncentivo.diarioUsd.toFixed(2)}<br>
-                            <small>Base Semanal (5d): $${infoIncentivo.semUsd.toFixed(2)} | + Efectividad Fija: $9.97</small>
+                // Ordenar por fecha descendente
+                records.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+
+                actualizarAcumuladoSemanal(records, perfil);
+
+                if (records.length === 0) {
+                    historyList.innerHTML = '<div class="empty-history">No hay registros guardados en la nube aún.</div>';
+                    deleteHistoryContainer.style.display = 'none';
+                    return;
+                }
+                historyList.innerHTML = '';
+                deleteHistoryContainer.style.display = 'block';
+                
+                records.forEach((rec) => {
+                    const diaNombre = obtenerDiaSemana(rec.fecha);
+                    const infoIncentivo = calcularIncentivoSegunCajas(rec.cargo, rec.totalEntregado);
+                    const porcentajeCumplimiento = calcularPorcentajeEfectividadDia(rec);
+
+                    let incentivoHtml = '';
+                    if (infoIncentivo) {
+                        incentivoHtml = `
+                            <div class="incentive-badge">
+                                💰 Incentivo Diario (${rec.cargo}): $${infoIncentivo.diarioUsd.toFixed(2)}<br>
+                                <small>Base Semanal (5d): $${infoIncentivo.semUsd.toFixed(2)} | + Efectividad Fija: $9.97</small>
+                            </div>
+                        `;
+                    }
+
+                    const div = document.createElement('div');
+                    div.className = 'history-card-item';
+                    div.innerHTML = `
+                        <div class="history-header">
+                            <span class="history-day">${diaNombre}</span>
+                            <span class="history-date">${rec.fecha} ${rec.horaRegistro ? '— ' + rec.horaRegistro : ''}</span>
+                        </div>
+                        <div class="collab-badge-card">
+                            <strong>${rec.nombre}</strong><br>
+                            <span>${rec.cargo} (${rec.anos} años de servicio)</span>
+                        </div>
+                        <div class="history-body">
+                            <span><strong>Ruta:</strong> ${rec.nroRuta} | <strong>Horario:</strong> ${rec.horaEntrada} - ${rec.horaSalida}</span>
+                            <span><strong>Cargas:</strong> F1:${rec.f1} | F2:${rec.f2} | G1:${rec.g1} | G2:${rec.g2} (<strong>Total Bruto: ${rec.cargaTotal}</strong>)</span>
+                            <span><strong>Entregado Efectivo (Neto):</strong> ${rec.totalEntregado} | <strong>Devueltas:</strong> ${rec.cajasDevueltas} | <strong>Pepitos:</strong> ${rec.pepitosSnaps || 0} | <strong>Introd. Vacío:</strong> ${rec.introduccionesVacio || 0}</span>
+                            <div><span class="compliance-badge">📈 Efectividad del Día: ${porcentajeCumplimiento.toFixed(1)}%</span></div>
+                            ${rec.productosPendientes ? `<span style="color:#C53030; margin-top:4px;"><strong>Pendientes:</strong> ${rec.productosPendientes}</span>` : ''}
+                            ${incentivoHtml}
                         </div>
                     `;
-                }
-
-                const div = document.createElement('div');
-                div.className = 'history-card-item';
-                div.innerHTML = `
-                    <div class="history-header">
-                        <span class="history-day">${diaNombre}</span>
-                        <span class="history-date">${rec.fecha} ${rec.horaRegistro ? '— ' + rec.horaRegistro : ''}</span>
-                    </div>
-                    <div class="collab-badge-card">
-                        <strong>${rec.nombre}</strong><br>
-                        <span>${rec.cargo} (${rec.anos} años de servicio)</span>
-                    </div>
-                    <div class="history-body">
-                        <span><strong>Ruta:</strong> ${rec.nroRuta} | <strong>Horario:</strong> ${rec.horaEntrada} - ${rec.horaSalida}</span>
-                        <span><strong>Cargas:</strong> F1:${rec.f1} | F2:${rec.f2} | G1:${rec.g1} | G2:${rec.g2} (<strong>Total Bruto: ${rec.cargaTotal}</strong>)</span>
-                        <span><strong>Entregado Efectivo (Neto):</strong> ${rec.totalEntregado} | <strong>Devueltas:</strong> ${rec.cajasDevueltas} | <strong>Pepitos:</strong> ${rec.pepitosSnaps || 0} | <strong>Introd. Vacío:</strong> ${rec.introduccionesVacio || 0}</span>
-                        <div><span class="compliance-badge">📈 Efectividad del Día: ${porcentajeCumplimiento.toFixed(1)}%</span></div>
-                        ${rec.productosPendientes ? `<span style="color:#C53030; margin-top:4px;"><strong>Pendientes:</strong> ${rec.productosPendientes}</span>` : ''}
-                        ${incentivoHtml}
-                    </div>
-                    <button type="button" class="btn-share-history" onclick="compartirHistorialPorCorreo(${index}, this)">✉️ Reenviar este reporte por correo</button>
-                `;
-                historyList.appendChild(div);
-            });
-        }
-
-        function borrarHistorial() {
-            const sesionActiva = localStorage.getItem('kolab_sesion_activa');
-            const confirmar = confirm("¿Estás 100% seguro de que deseas eliminar todo tu historial guardado?");
-            if (confirmar && sesionActiva) {
-                localStorage.removeItem('kolab_records_' + sesionActiva);
-                loadHistory();
-                alert("El historial ha sido eliminado con éxito.");
+                    historyList.appendChild(div);
+                });
+            } catch (e) {
+                console.error("Error cargando historial de la nube:", e);
             }
         }
 
-        function guardarRegistroLocal() {
-            const sesionActiva = localStorage.getItem('kolab_sesion_activa');
-            const perfil = JSON.parse(localStorage.getItem('kolab_profile_' + sesionActiva));
+        window.guardarRegistroCloud = async function() {
+            const user = auth.currentUser;
+            if (!user) return;
 
             const nroRuta = document.getElementById('nroRuta').value.trim();
             const fecha = document.getElementById('fecha').value;
@@ -944,94 +986,71 @@
             const ahora = new Date();
             const horaRegistro = ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-            const newRecord = {
-                nombre: perfil.nombre,
-                anos: perfil.anos,
-                cargo: perfil.cargo,
-                fecha: fecha,
-                horaRegistro: horaRegistro,
-                horaEntrada: horaEntrada,
-                horaSalida: horaSalida,
-                nroRuta: nroRuta,
-                f1, f2, g1, g2,
-                cargaTotal,
-                cajasDevueltas,
-                pepitosSnaps,
-                introduccionesVacio,
-                totalEntregado: totalEntregado >= 0 ? totalEntregado : 0,
-                productosPendientes: document.getElementById('productosPendientes').value.trim()
-            };
+            try {
+                const docRef = doc(db, "usuarios", user.uid);
+                const docSnap = await getDoc(docRef);
+                const perfil = docSnap.data();
 
-            const records = JSON.parse(localStorage.getItem('kolab_records_' + sesionActiva) || '[]');
-            records.unshift(newRecord);
-            localStorage.setItem('kolab_records_' + sesionActiva, JSON.stringify(records));
-            loadHistory();
+                const newRecord = {
+                    nombre: perfil.nombre,
+                    anos: perfil.anos,
+                    cargo: perfil.cargo,
+                    fecha: fecha,
+                    horaRegistro: horaRegistro,
+                    horaEntrada: horaEntrada,
+                    horaSalida: horaSalida,
+                    nroRuta: nroRuta,
+                    f1, f2, g1, g2,
+                    cargaTotal,
+                    cajasDevueltas,
+                    pepitosSnaps,
+                    introduccionesVacio,
+                    totalEntregado: totalEntregado >= 0 ? totalEntregado : 0,
+                    productosPendientes: document.getElementById('productosPendientes').value.trim()
+                };
 
-            alert(`¡Registro guardado con éxito a las ${horaRegistro}!`);
-            
-            document.getElementById('nroRuta').value = '';
-            document.getElementById('sinCarga').checked = false;
-            toggleCargas();
-            document.getElementById('cargaF1').value = 0;
-            document.getElementById('cargaF2').value = 0;
-            document.getElementById('cargaG1').value = 0;
-            document.getElementById('cargaG2').value = 0;
-            document.getElementById('cajasDevueltas').value = 0;
-            document.getElementById('pepitosSnaps').value = 0;
-            document.getElementById('introduccionesVacio').value = 0;
-            document.getElementById('productosPendientes').value = '';
-            document.getElementById('fecha').valueAsDate = new Date();
-            calcularEnVivo();
+                // Guardar en la subcolección "registros" de Firestore
+                await addDoc(collection(db, "usuarios", user.uid, "registros"), newRecord);
+                loadHistoryCloud(user.uid);
+
+                alert(`¡Registro guardado en la nube con éxito a las ${horaRegistro}!`);
+                
+                document.getElementById('nroRuta').value = '';
+                document.getElementById('sinCarga').checked = false;
+                toggleCargas();
+                document.getElementById('cargaF1').value = 0;
+                document.getElementById('cargaF2').value = 0;
+                document.getElementById('cargaG1').value = 0;
+                document.getElementById('cargaG2').value = 0;
+                document.getElementById('cajasDevueltas').value = 0;
+                document.getElementById('pepitosSnaps').value = 0;
+                document.getElementById('introduccionesVacio').value = 0;
+                document.getElementById('productosPendientes').value = '';
+                document.getElementById('fecha').valueAsDate = new Date();
+                calcularEnVivo();
+            } catch (e) {
+                alert("Error al guardar en la nube: " + e.message);
+                console.error(e);
+            }
         }
 
-        function compartirHistorialPorCorreo(index, botonElement) {
-            const confirmarEnvio = confirm("¿Deseas enviar este reporte por correo electrónico?");
-            if (!confirmarEnvio) return;
-
-            const sesionActiva = localStorage.getItem('kolab_sesion_activa');
-            const perfil = JSON.parse(localStorage.getItem('kolab_profile_' + sesionActiva));
-            const records = JSON.parse(localStorage.getItem('kolab_records_' + sesionActiva) || '[]');
-            
-            const rec = records[index];
-            if (!rec) return;
-
-            const infoIncentivo = calcularIncentivoSegunCajas(rec.cargo, rec.totalEntregado);
-            let detalleIncentivoTxt = infoIncentivo ? `Incentivo Diario: $${infoIncentivo.diarioUsd.toFixed(2)}` : '';
-
-            const templateParams = {
-                to_email: perfil.email,
-                email: perfil.email,
-                colaborador_nombre: rec.nombre,
-                cargo_colaborador: rec.cargo,
-                anos_servicio: rec.anos,
-                fecha: `${rec.fecha} (Registrado a las ${rec.horaRegistro || '--'})`,
-                nro_ruta: rec.nroRuta,
-                hora_entrada: rec.horaEntrada,
-                hora_salida: rec.horaSalida,
-                carga_f1: rec.f1,
-                carga_f2: rec.f2,
-                carga_g1: rec.g1,
-                carga_g2: rec.g2,
-                carga_total: rec.cargaTotal,
-                total_entregado: rec.totalEntregado,
-                cajas_devueltas: rec.cajasDevueltas,
-                productos_pendientes: `${rec.productosPendientes || 'Ninguno'} | Pepitos: ${rec.pepitosSnaps || 0} | Introd. Vacío: ${rec.introduccionesVacio || 0} | ${detalleIncentivoTxt}`
-            };
-
-            botonElement.innerText = "Enviando...";
-            botonElement.disabled = true;
-
-            emailjs.send('service_p63esgd', 'template_dl48xbt', templateParams)
-                .then(function(response) {
-                    alert(`¡Reporte del día ${rec.fecha} reenviado con éxito a:\n${perfil.email}!`);
-                    botonElement.innerText = "✉️ Reenviar este reporte por correo";
-                    botonElement.disabled = false;
-                }, function(error) {
-                    alert('Error al enviar el correo. Revisa tu conexión a internet.');
-                    console.error('FAILED...', error);
-                    botonElement.innerText = "✉️ Reenviar este reporte por correo";
-                    botonElement.disabled = false;
-                });
+        window.borrarHistorialCloud = async function() {
+            const user = auth.currentUser;
+            const confirmar = confirm("¿Estás 100% seguro de que deseas eliminar todo tu historial guardado en la nube?");
+            if (confirmar && user) {
+                try {
+                    const querySnapshot = await getDocs(collection(db, "usuarios", user.uid, "registros"));
+                    let batchPromises = [];
+                    querySnapshot.forEach((d) => {
+                        batchPromises.push(deleteDoc(doc(db, "usuarios", user.uid, "registros", d.id)));
+                    });
+                    await Promise.all(batchPromises);
+                    loadHistoryCloud(user.uid);
+                    alert("El historial en la nube ha sido eliminado con éxito.");
+                } catch (e) {
+                    alert("Error al borrar historial: " + e.message);
+                }
+            }
         }
     </script>
 </body>
