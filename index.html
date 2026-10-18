@@ -262,11 +262,11 @@
                 </div>
             </div>
 
-            <!-- CENTRO DE MANDO ADMINISTRADOR SUPREMO (CON CONFIGURACIÓN SEPARADA PARA AYUDANTE Y ENTREGADOR) -->
+            <!-- CENTRO DE MANDO ADMINISTRADOR SUPREMO (CON BOTONES INDEPENDIENTES DE GUARDADO) -->
             <div id="adminSection" class="hidden space-y-6">
                 <div class="bg-red-950/40 border border-red-800/60 rounded-xl p-5">
                     <h3 class="text-base font-bold text-white">⚙️ Centro de Mando Supremo (Administrador)</h3>
-                    <p class="text-xs text-red-200/80 mt-1">Panel exclusivo de supervisión, aprobación de cuentas y configuración independiente de montos en dólares para Ayudantes y Entregadores.</p>
+                    <p class="text-xs text-red-200/80 mt-1">Panel exclusivo de supervisión, aprobación de cuentas y configuración independiente de montos en dólares.</p>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -278,7 +278,7 @@
                         </div>
                     </div>
 
-                    <!-- Configuración Montos Entregadores (Chóferes) -->
+                    <!-- Configuración Montos Entregadores (Con su Botón Guardar Propio) -->
                     <div class="bg-slate-800 rounded-xl p-5 border border-slate-700 space-y-4">
                         <h4 class="text-sm font-bold text-red-400 border-b border-slate-700 pb-2">🚛 Configuración Dólares: Entregadores (Chóferes)</h4>
                         <div class="grid grid-cols-2 gap-2 text-xs max-h-56 overflow-y-auto pr-1 bg-slate-900 p-3 rounded-xl border border-slate-700">
@@ -293,10 +293,10 @@
                             <div><label class="text-[10px] text-slate-400">1100 - 1199 ($):</label><input type="number" step="0.01" id="ent_1100" value="15.10" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
                             <div><label class="text-[10px] text-slate-400">1200 - 1299 ($):</label><input type="number" step="0.01" id="ent_1200" value="16.03" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
                         </div>
-                        <button onclick="saveEntregadorConfig()" class="w-full bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-2 rounded-lg transition shadow">💾 Guardar Montos Entregadores</button>
+                        <button onclick="saveEntregadorConfig()" class="w-full bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-2.5 rounded-lg transition shadow">💾 Guardar Montos Entregadores</button>
                     </div>
 
-                    <!-- Configuración Montos Ayudantes -->
+                    <!-- Configuración Montos Ayudantes (Con su Botón Guardar Propio) -->
                     <div class="bg-slate-800 rounded-xl p-5 border border-slate-700 space-y-4 lg:col-span-2">
                         <h4 class="text-sm font-bold text-red-400 border-b border-slate-700 pb-2">🤝 Configuración Dólares: Ayudantes</h4>
                         <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs bg-slate-900 p-3 rounded-xl border border-slate-700">
@@ -327,7 +327,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT COMPLETO CON FÓRMULAS Y CONFIGURACIÓN INDEPENDIENTE -->
+    <!-- SCRIPT COMPLETO CON BOTONES DE GUARDADO INDEPENDIENTES -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBzMXFLJhTuPSPdKGsVqCqQRhP_NiGYBA",
@@ -431,7 +431,8 @@
             try {
                 await db.collection("config").doc("incentivos").set(configData, { merge: true });
                 alert("¡Montos para Entregadores guardados exitosamente!");
-            } catch (error) { alert("Error: " + error.message); }
+                calculateRealTime();
+            } catch (error) { alert("Error al guardar: " + error.message); }
         }
 
         async function saveAyudanteConfig() {
@@ -442,7 +443,8 @@
             try {
                 await db.collection("config").doc("incentivos").set(configData, { merge: true });
                 alert("¡Montos para Ayudantes guardados exitosamente!");
-            } catch (error) { alert("Error: " + error.message); }
+                calculateRealTime();
+            } catch (error) { alert("Error al guardar: " + error.message); }
         }
 
         async function handleLogin(event) {
