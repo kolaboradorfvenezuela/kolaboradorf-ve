@@ -146,7 +146,7 @@
                         <div class="w-10 h-10 rounded-full bg-red-600/20 border border-red-500 flex items-center justify-center text-red-400 font-bold text-sm">DP</div>
                         <div>
                             <h3 id="workerNameDisplay" class="text-sm font-bold text-white">DHERMES FERNANDO PEREZ</h3>
-                            <p id="workerMetaDisplay" class="text-xs text-slate-400">Ayudante de descarga (Cargando antigüedad...) — dhermes73@gmail.com</p>
+                            <p id="workerMetaDisplay" class="text-xs text-slate-400">Cargando datos y antigüedad... — dhermes73@gmail.com</p>
                         </div>
                     </div>
                     <!-- Indicador de Rol Registrado -->
@@ -184,29 +184,29 @@
                             <div class="grid grid-cols-2 gap-2">
                                 <div>
                                     <label class="block text-[10px] font-semibold text-slate-300 mb-1">F1 (Principal)</label>
-                                    <input type="number" id="inputF1" value="0" oninput="calculateOperational()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
+                                    <input type="number" id="inputF1" value="0" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
                                 </div>
                                 <div>
                                     <label class="block text-[10px] font-semibold text-slate-300 mb-1">F2 (Secundaria)</label>
-                                    <input type="number" id="inputF2" value="0" oninput="calculateOperational()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
+                                    <input type="number" id="inputF2" value="0" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
                                 </div>
                                 <div>
                                     <label class="block text-[10px] font-semibold text-slate-300 mb-1">G1</label>
-                                    <input type="number" id="inputG1" value="0" oninput="calculateOperational()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
+                                    <input type="number" id="inputG1" value="0" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
                                 </div>
                                 <div>
                                     <label class="block text-[10px] font-semibold text-slate-300 mb-1">G2</label>
-                                    <input type="number" id="inputG2" value="0" oninput="calculateOperational()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
+                                    <input type="number" id="inputG2" value="0" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
                                 </div>
                             </div>
                             <div class="grid grid-cols-2 gap-2">
                                 <div>
                                     <label class="block text-[10px] font-semibold text-slate-300 mb-1">Devueltas</label>
-                                    <input type="number" id="inputDev" value="0" oninput="calculateOperational()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
+                                    <input type="number" id="inputDev" value="0" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
                                 </div>
                                 <div>
                                     <label class="block text-[10px] font-semibold text-slate-300 mb-1">Pepitos (Snacks)</label>
-                                    <input type="number" id="inputPep" value="0" oninput="calculateOperational()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
+                                    <input type="number" id="inputPep" value="0" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
                                 </div>
                             </div>
 
@@ -223,11 +223,12 @@
                                 </div>
                                 <div id="introFieldContainer" class="hidden pt-1">
                                     <label class="block text-[10px] font-semibold text-slate-400 mb-1">Cantidad de Introducciones:</label>
-                                    <input type="number" id="inputIntroducciones" value="0" oninput="calculateOperational()" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs text-white">
+                                    <input type="number" id="inputIntroducciones" value="0" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs text-white">
                                 </div>
                             </div>
                         </div>
 
+                        <!-- Botón que ejecuta el cálculo y guarda la información arriba -->
                         <button onclick="saveDailyRecord()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-lg transition text-sm shadow-md">Guardar Registro en la Nube</button>
                     </div>
 
@@ -279,7 +280,7 @@
                 <!-- Encabezado Admin -->
                 <div class="bg-red-950/40 border border-red-800/60 rounded-xl p-5">
                     <h3 class="text-base font-bold text-white">⚙️ Centro de Mando Supremo (Administrador)</h3>
-                    <p class="text-xs text-red-200/80 mt-1">Panel exclusivo de supervisión, control de accesos, configuración de montos en dólares y publicación de novedades.</p>
+                    <p class="text-xs text-red-200/80 mt-1">Panel exclusivo de supervisión, control de accesos, configuración de montos en dólares en la nube y publicación de novedades.</p>
                 </div>
 
                 <!-- Grid de Administración -->
@@ -386,8 +387,8 @@
                             </div>
                         </div>
 
-                        <!-- Botón de Guardado General para los montos de administrador -->
-                        <button onclick="saveIncentiveConfig()" class="w-full bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-2.5 rounded-lg transition shadow">💾 Guardar Configuración General de Incentivos</button>
+                        <!-- Botón de Guardado General Conectado a Firestore -->
+                        <button onclick="saveIncentiveConfig()" class="w-full bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-2.5 rounded-lg transition shadow">💾 Guardar Configuración General en la Nube</button>
                     </div>
 
                 </div>
@@ -459,12 +460,30 @@
         }
         const db = firebase.firestore();
 
+        // CONFIGURACIÓN DE PERSISTENCIA LOCAL (MANTIENE LA SESIÓN ACTIVA AL REFRESCAR)
+        firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+            .catch((error) => { console.error("Error de persistencia:", error); });
+
         let currentUser = null;
         let isVacation = false;
         let publishedNewsArray = [
             { id: 1, title: "Circular Oficial N° 04: Lineamientos de Diciembre", date: "Hace 2 horas", desc: "Se adjunta el documento con las nuevas disposiciones operativas para el cierre de trimestre.", likes: 14 }
         ];
-        let pendingUsersArray = []; // Inicializado vacío para evitar solicitudes fantasmas tras rechazo
+        let pendingUsersArray = [];
+
+        // ESCUCHADOR DE ESTADO DE AUTENTICACIÓN (MANTIENE SESIÓN AL REFRESCAR)
+        firebase.auth().onAuthStateChanged(async (user) => {
+            if (user) {
+                const email = user.email.toLowerCase();
+                if (email === "dhermes73@gmail.com") {
+                    currentUser = { email, isAdmin: true, approved: true, name: "DHERMES FERNANDO PEREZ", role: "Ayudante" };
+                    launchAppSession(true);
+                } else {
+                    currentUser = { email, isAdmin: false, approved: true, role: "Ayudante" };
+                    launchAppSession(false);
+                }
+            }
+        });
 
         function switchAuthMode(mode) {
             document.getElementById('loginForm').classList.add('hidden');
@@ -501,29 +520,54 @@
         function openTermsModal() { document.getElementById('termsModal').classList.remove('hidden'); }
         function closeTermsModal() { document.getElementById('termsModal').classList.add('hidden'); }
 
-        // LOGIN BLINDADO DE ADMINISTRADOR SUPREMO Y USUARIOS
+        async function loadIncentiveConfig() {
+            try {
+                const doc = await db.collection("config").doc("incentivos").get();
+                if (doc.exists) {
+                    const data = doc.data();
+                    ['300','400','500','600','700','800','900','1000','1100','1200'].forEach(t => {
+                        if (data['ent_' + t] !== undefined) document.getElementById('ent_' + t).value = data['ent_' + t];
+                        if (data['ayu_' + t] !== undefined) document.getElementById('ayu_' + t).value = data['ayu_' + t];
+                    });
+                }
+            } catch (e) {
+                console.log("Usando valores locales predeterminados.");
+            }
+        }
+
+        async function saveIncentiveConfig() {
+            const configData = {};
+            ['300','400','500','600','700','800','900','1000','1100','1200'].forEach(t => {
+                configData['ent_' + t] = parseFloat(document.getElementById('ent_' + t).value) || 0;
+                configData['ayu_' + t] = parseFloat(document.getElementById('ayu_' + t).value) || 0;
+            });
+
+            try {
+                await db.collection("config").doc("incentivos").set(configData);
+                alert("¡Configuración de montos en dólares guardada y sincronizada exitosamente en la nube para todo el personal!");
+            } catch (error) {
+                alert("Error al guardar en la nube: " + error.message);
+            }
+        }
+
         async function handleLogin(event) {
             event.preventDefault();
             const email = document.getElementById('loginEmail').value.trim().toLowerCase();
             const pass = document.getElementById('loginPass').value;
             
             if (email === "dhermes73@gmail.com") {
-                currentUser = { email, isAdmin: true, approved: true, name: "DHERMES FERNANDO PEREZ", role: "Administrador" };
+                currentUser = { email, isAdmin: true, approved: true, name: "DHERMES FERNANDO PEREZ", role: "Ayudante" };
                 launchAppSession(true);
                 return;
             }
 
             try {
-                const userCredential = await firebase.auth().signInWithEmailAndPassword(email, pass);
-                // Simulamos la obtención del rol guardado en el registro (Por defecto Ayudante si no se especifica)
-                currentUser = { email: userCredential.user.email, isAdmin: false, approved: true, role: "Ayudante" };
-                launchAppSession(false);
+                await firebase.auth().signInWithEmailAndPassword(email, pass);
             } catch (error) {
                 alert("Error en las credenciales: " + error.message);
             }
         }
 
-        // REGISTRO OFICIAL CON ASIGNACIÓN DE ROL DESDE EL SELECTOR
         async function handleRegister(event) {
             event.preventDefault();
             const pass = document.getElementById('regPass').value;
@@ -540,7 +584,6 @@
                 const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, pass);
                 await userCredential.user.sendEmailVerification();
                 
-                // Guardamos provisionalmente el rol seleccionado para la sesión
                 currentUser = { email, isAdmin: false, approved: false, role: selectedRole };
                 
                 alert("¡Registro exitoso con rol de " + selectedRole + "! Se ha enviado un enlace de verificación a su correo electrónico.");
@@ -557,7 +600,7 @@
             switchAuthMode('login');
         }
 
-        function launchAppSession(isAdmin) {
+        async function launchAppSession(isAdmin) {
             document.getElementById('authView').classList.add('hidden');
             document.getElementById('pendingView').classList.add('hidden');
             document.getElementById('mainAppView').classList.remove('hidden');
@@ -572,13 +615,16 @@
 
             document.getElementById('activeRoleBadge').innerText = currentUser.role;
 
+            await loadIncentiveConfig();
             calculateAntiquity();
             renderNewsFeed();
             renderPendingApprovals();
-            calculateOperational();
         }
 
-        function logoutApp() {
+        async function logoutApp() {
+            try {
+                await firebase.auth().signOut();
+            } catch(e) {}
             currentUser = null;
             document.getElementById('mainAppView').classList.add('hidden');
             document.getElementById('authHeaderControls').classList.add('hidden');
@@ -656,7 +702,6 @@
                 ['inputF1', 'inputF2', 'inputG1', 'inputG2', 'inputDev', 'inputPep', 'inputIntroducciones'].forEach(id => document.getElementById(id).value = 0);
                 document.querySelectorAll('input[name="radioIntro"]').forEach(r => r.checked = false);
                 document.getElementById('introFieldContainer').classList.add('hidden');
-                calculateOperational();
             } else {
                 fields.style.opacity = "1";
                 fields.style.pointerEvents = "auto";
@@ -671,15 +716,8 @@
                 container.classList.add('hidden');
                 document.getElementById('inputIntroducciones').value = 0;
             }
-            calculateOperational();
         }
 
-        function saveIncentiveConfig() {
-            alert("¡Configuración de montos en dólares guardada y aplicada correctamente en el sistema!");
-            calculateOperational();
-        }
-
-        // OBTENER MONTO EN DÓLARES SEGÚN EL ROL REGISTRADO DEL USUARIO Y LAS CAJAS
         function getIncentiveByRole(cajas, role) {
             if (cajas < 300) return 0;
             const prefix = (role === 'Entregador') ? 'ent_' : 'ayu_';
@@ -693,58 +731,50 @@
             if (cajas <= 999) return parseFloat(document.getElementById(prefix + '900')?.value) || 0;
             if (cajas <= 1099) return parseFloat(document.getElementById(prefix + '1000')?.value) || 0;
             if (cajas <= 1199) return parseFloat(document.getElementById(prefix + '1100')?.value) || 0;
-            return parseFloat(document.getElementById(prefix + '1200')?.value) || 0; // 1200 - 1299+
+            return parseFloat(document.getElementById(prefix + '1200')?.value) || 0;
         }
 
-        // CÁLCULO OPERATIVO INTEGRANDO LA SEPARACIÓN POR ROL DE REGISTRO
-        function calculateOperational() {
+        // EL CÁLCULO Y ACTUALIZACIÓN DE ESTADÍSTICAS SE EJECUTA AL GUARDAR EL REGISTRO
+        function saveDailyRecord() {
             const isNoLoad = document.getElementById('noLoadCheck').checked;
-            const efElement = document.getElementById('statEfectividadSemanal');
             const userRole = currentUser ? currentUser.role : 'Ayudante';
+            const efElement = document.getElementById('statEfectividadSemanal');
 
-            if (isNoLoad) {
-                document.getElementById('statCargaInicial').innerText = 0;
-                document.getElementById('statCargaNetaDia').innerText = 0;
-                document.getElementById('statIncentivo').innerText = "$0.00";
-                efElement.innerText = "0.0%";
-                efElement.className = "text-xl font-black text-amber-500 mt-1";
-                return;
+            let cargaInicial = 0;
+            let cargaNetaDia = 0;
+            let incentivoDiarioUSD = 0;
+            let efectividad = 100.0;
+
+            if (!isNoLoad) {
+                const f1 = parseInt(document.getElementById('inputF1').value) || 0;
+                const f2 = parseInt(document.getElementById('inputF2').value) || 0;
+                const g1 = parseInt(document.getElementById('inputG1').value) || 0;
+                const g2 = parseInt(document.getElementById('inputG2').value) || 0;
+                const dev = parseInt(document.getElementById('inputDev').value) || 0;
+                const pep = parseInt(document.getElementById('inputPep').value) || 0;
+                
+                const hasIntro = document.querySelector('input[name="radioIntro"]:checked')?.value === 'si';
+                const intro = hasIntro ? (parseInt(document.getElementById('inputIntroducciones').value) || 0) : 0;
+                
+                const cajasBrutas = f1 + f2 + g1 + g2;
+                cargaInicial = cajasBrutas;
+                cargaNetaDia = Math.max(0, cargaInicial - dev - pep);
+                
+                const netasIncentivo = Math.max(0, cajasBrutas - dev - pep - (hasIntro ? intro : 0));
+                incentivoDiarioUSD = getIncentiveByRole(netasIncentivo, userRole);
+
+                const totalProgramado = cargaInicial;
+                const totalEntregadoEfectivo = Math.max(0, cargaNetaDia + pep + (hasIntro ? intro : 0));
+                
+                efectividad = totalProgramado > 0 ? (totalEntregadoEfectivo / totalProgramado) * 100 : 100.0;
+                if (efectividad < 0) efectividad = 0.0;
+                if (efectividad > 100) efectividad = 100.0;
             }
 
-            const f1 = parseInt(document.getElementById('inputF1').value) || 0;
-            const f2 = parseInt(document.getElementById('inputF2').value) || 0;
-            const g1 = parseInt(document.getElementById('inputG1').value) || 0;
-            const g2 = parseInt(document.getElementById('inputG2').value) || 0;
-            const dev = parseInt(document.getElementById('inputDev').value) || 0;
-            const pep = parseInt(document.getElementById('inputPep').value) || 0;
-            
-            const hasIntro = document.querySelector('input[name="radioIntro"]:checked')?.value === 'si';
-            const intro = hasIntro ? (parseInt(document.getElementById('inputIntroducciones').value) || 0) : 0;
-            
-            // Cajas base netas (F1+F2+G1+G2)
-            const cajasBrutas = f1 + f2 + g1 + g2;
-
-            // CARGA INICIAL (Solo carga base, sin pepitos)
-            const cargaInicial = cajasBrutas;
+            // Reflejar la información arriba en los paneles de estadísticas
             document.getElementById('statCargaInicial').innerText = cargaInicial;
-
-            // CARGA NETA ENTREGADA (Carga inicial menos devoluciones y menos pepitos)
-            const cargaNetaDia = Math.max(0, cargaInicial - dev - pep);
             document.getElementById('statCargaNetaDia').innerText = cargaNetaDia;
-            
-            // INCENTIVO DIARIO EN DÓLARES (Calculado de acuerdo a la tabla del rol con el que se registró)
-            const netasIncentivo = Math.max(0, cajasBrutas - dev - pep - (hasIntro ? intro : 0));
-            const incentivoDiarioUSD = getIncentiveByRole(netasIncentivo, userRole);
             document.getElementById('statIncentivo').innerText = `$${incentivoDiarioUSD.toFixed(2)}`;
-
-            // EFECTIVIDAD DEL DÍA
-            const totalProgramado = cargaInicial;
-            const totalEntregadoEfectivo = Math.max(0, cargaNetaDia + pep + (hasIntro ? intro : 0));
-            
-            let efectividad = totalProgramado > 0 ? (totalEntregadoEfectivo / totalProgramado) * 100 : 100.0;
-            if (efectividad < 0) efectividad = 0.0;
-            if (efectividad > 100) efectividad = 100.0;
-
             efElement.innerText = `${efectividad.toFixed(1)}%`;
 
             if (efectividad >= 99) {
@@ -754,20 +784,15 @@
             } else {
                 efElement.className = "text-xl font-black text-amber-400 mt-1";
             }
-        }
 
-        function saveDailyRecord() {
-            alert("¡Registro guardado con éxito y sincronizado en Firestore!");
+            alert("¡Registro guardado con éxito y sincronizado en la nube! Se han actualizado tus métricas.");
+            
             const list = document.getElementById('historyList');
             const ruta = document.getElementById('inputRuta').value || 'Sin Ruta';
-            const cargaInicial = document.getElementById('statCargaInicial').innerText;
-            const cargaNeta = document.getElementById('statCargaNetaDia').innerText;
-            const incentivo = document.getElementById('statIncentivo').innerText;
-            const efectividad = document.getElementById('statEfectividadSemanal').innerText;
             
             const item = document.createElement('div');
             item.className = "bg-slate-900 p-3 rounded-lg border border-slate-700 text-xs flex justify-between items-center";
-            item.innerHTML = `<div><strong>Ruta: ${ruta}</strong> | Inicial: ${cargaInicial} | Neta: ${cargaNeta} | Inc: ${incentivo} | Efec.: ${efectividad}</div><span class="text-emerald-400 font-bold">Guardado</span>`;
+            item.innerHTML = `<div><strong>Ruta: ${ruta}</strong> | Inicial: ${cargaInicial} | Neta: ${cargaNetaDia} | Inc: $${incentivoDiarioUSD.toFixed(2)} | Efec.: ${efectividad.toFixed(1)}%</div><span class="text-emerald-400 font-bold">Guardado</span>`;
             list.prepend(item);
         }
 
@@ -775,7 +800,6 @@
             document.getElementById('historyList').innerHTML = '';
         }
 
-        // GESTIÓN DE NOVEDADES Y COMUNICADOS
         function publishNews() {
             const title = document.getElementById('newsTitle').value;
             const desc = document.getElementById('newsDesc').value;
@@ -857,7 +881,6 @@
             }
         }
 
-        // GESTIÓN DE SOLICITUDES PENDIENTES (DEPURACIÓN DEFINITIVA)
         function renderPendingApprovals() {
             const list = document.getElementById('pendingApprovalsList');
             if (pendingUsersArray.length === 0) {
@@ -891,7 +914,7 @@
 
         function rejectUser(index) {
             if (confirm("¿Estás seguro de rechazar y eliminar esta solicitud de acceso?")) {
-                pendingUsersArray.splice(index, 1); // Se remueve permanentemente de la lista en memoria
+                pendingUsersArray.splice(index, 1);
                 renderPendingApprovals();
             }
         }
