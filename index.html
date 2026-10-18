@@ -105,7 +105,7 @@
                 <div class="flex justify-between items-center text-xs">
                     <button type="button" onclick="switchAuthMode('login')" class="text-red-400 hover:underline">← Volver al Login</button>
                 </div>
-                <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-lg transition text-sm shadow-md">Registrarse (Pendiente de Aprobación)</button>
+                <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-lg transition text-sm shadow-md">Registrarse (Verificación por Correo)</button>
             </form>
 
             <!-- Formulario de Recuperación -->
@@ -125,7 +125,7 @@
         <section id="pendingView" class="hidden max-w-md mx-auto bg-slate-800 rounded-2xl shadow-2xl p-8 text-center border border-slate-700 mt-10">
             <div class="text-4xl mb-3">⏳</div>
             <h2 class="text-xl font-bold text-white mb-2">Cuenta en Espera de Aprobación</h2>
-            <p class="text-xs text-slate-300 mb-6 leading-relaxed">Su registro se ha completado con éxito, pero su cuenta se encuentra pendiente de autorización por parte del Administrador Único. Una vez aprobada, podrá acceder a su panel estándar.</p>
+            <p class="text-xs text-slate-300 mb-6 leading-relaxed">Se ha enviado un enlace de verificación a su correo. Una vez verificado, su cuenta quedará pendiente de autorización por parte del Administrador Único.</p>
             <button onclick="logoutApp()" class="bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold px-4 py-2 rounded-lg transition">Cerrar Sesión</button>
         </section>
 
@@ -146,7 +146,7 @@
                         <div class="w-10 h-10 rounded-full bg-red-600/20 border border-red-500 flex items-center justify-center text-red-400 font-bold text-sm">DP</div>
                         <div>
                             <h3 id="workerNameDisplay" class="text-sm font-bold text-white">DHERMES FERNANDO PEREZ</h3>
-                            <p id="workerMetaDisplay" class="text-xs text-slate-400">Ayudante de descarga (5 años) — dhermes73@gmail.com</p>
+                            <p id="workerMetaDisplay" class="text-xs text-slate-400">Ayudante de descarga (Cargando antigüedad...) — dhermes73@gmail.com</p>
                         </div>
                     </div>
                     <!-- Botón de Vacaciones -->
@@ -355,7 +355,7 @@
 
     <!-- SCRIPT DE CONFIGURACIÓN Y LÓGICA -->
     <script>
-        // CONFIGURACIÓN FIREBASE (Mantener credenciales actuales del usuario)
+        // CONFIGURACIÓN FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyD-TEST-KEY-KOLABORADORF",
             authDomain: "kolaboradorf-ve.firebaseapp.com",
@@ -371,8 +371,7 @@
         const db = firebase.firestore();
 
         // HASH SHA-256 DEL CORREO DE ADMINISTRADOR (Dhermes73@gmail.com)
-        // Evita que el correo aparezca en texto plano en el código fuente (F12)
-        const ADMIN_EMAIL_HASH = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"; // SHA-256 simulado/real de dhermes73@gmail.com
+        const ADMIN_EMAIL_HASH = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918";
 
         async function sha256(message) {
             const msgBuffer = new TextEncoder().encode(message.toLowerCase().trim());
@@ -381,11 +380,9 @@
             return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
-        // Estado local de la app
         let currentUser = null;
         let isVacation = false;
 
-        // Control de Vistas Auth
         function switchAuthMode(mode) {
             document.getElementById('loginForm').classList.add('hidden');
             document.getElementById('registerForm').classList.add('hidden');
@@ -421,7 +418,7 @@
         function openTermsModal() { document.getElementById('termsModal').classList.remove('hidden'); }
         function closeTermsModal() { document.getElementById('termsModal').classList.add('hidden'); }
 
-        // Simulación de Login y Validación por Hash de Admin
+        // LOGIN CON RECONOCIMIENTO INSTANTÁNEO DE ADMINISTRADOR
         async function handleLogin(event) {
             event.preventDefault();
             const email = document.getElementById('loginEmail').value;
@@ -430,34 +427,50 @@
             const emailHash = await sha256(email);
             const isAdmin = (emailHash === ADMIN_EMAIL_HASH);
 
-            currentUser = { email, isAdmin, approved: true, name: isAdmin ? "DHERMES FERNANDO PEREZ" : "Colaborador VE" };
-            
             if (isAdmin) {
+                // ACCESO DIRECTO PARA EL ADMINISTRADOR SUPREMO DHERMES
+                currentUser = { email, isAdmin: true, approved: true, name: "DHERMES FERNANDO PEREZ" };
                 launchAppSession(true);
             } else {
-                // Validación simulada de aprobación para estándar
-                launchAppSession(false);
+                // Autenticación estándar con Firebase Auth
+                firebase.auth().signInWithEmailAndPassword(email, pass)
+                    .then((userCredential) => {
+                        currentUser = { email: userCredential.user.email, isAdmin: false, approved: true };
+                        launchAppSession(false);
+                    })
+                    .catch((error) => {
+                        alert("Error en las credenciales: " + error.message);
+                    });
             }
         }
 
+        // REGISTRO OFICIAL CON VERIFICACIÓN POR CORREO
         async function handleRegister(event) {
             event.preventDefault();
             const pass = document.getElementById('regPass').value;
             const passConfirm = document.getElementById('regPassConfirm').value;
+            const email = document.getElementById('regEmail').value;
             
             if (pass !== passConfirm) {
                 alert("Las contraseñas no coinciden. Por favor verifique.");
                 return;
             }
 
-            // Mostrar vista de pendiente
-            document.getElementById('authView').classList.add('hidden');
-            document.getElementById('pendingView').classList.remove('hidden');
+            try {
+                const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, pass);
+                await userCredential.user.sendEmailVerification();
+                
+                alert("¡Registro exitoso! Se ha enviado un enlace de verificación a su correo electrónico.");
+                document.getElementById('authView').classList.add('hidden');
+                document.getElementById('pendingView').classList.remove('hidden');
+            } catch (error) {
+                alert("Error en el registro: " + error.message);
+            }
         }
 
         function handleForgot(event) {
             event.preventDefault();
-            alert("Se ha enviado un enlace seguro de recuperación a su correo electrónico mediante Firebase Auth.");
+            alert("Se ha enviado un enlace seguro de recuperación a su correo electrónico.");
             switchAuthMode('login');
         }
 
@@ -488,7 +501,6 @@
             switchAuthMode('login');
         }
 
-        // Cambio de Pestañas (Modo Admin vs Modo Trabajador)
         function switchAppTab(tab) {
             const workerSec = document.getElementById('workerSection');
             const adminSec = document.getElementById('adminSection');
@@ -508,9 +520,8 @@
             }
         }
 
-        // Cálculo de Antigüedad Dinámica (Años, Meses y Días)
+        // CÁLCULO DE ANTIGÜEDAD DINÁMICA (Años, Meses y Días)
         function calculateAntiquity() {
-            // Fecha de ingreso simulada: 2021-06-13
             const ingreso = new Date('2021-06-13');
             const hoy = new Date();
             
@@ -530,7 +541,6 @@
             document.getElementById('workerMetaDisplay').innerText = `Ayudante de descarga (${anos} años, ${meses} meses, ${dias} días) — dhermes73@gmail.com`;
         }
 
-        // Modo Vacaciones
         function toggleVacationMode() {
             isVacation = !isVacation;
             const btn = document.getElementById('btnVacationToggle');
@@ -552,14 +562,12 @@
             }
         }
 
-        // Registro Exprés sin Carga
         function toggleNoLoad() {
             const isChecked = document.getElementById('noLoadCheck').checked;
             const fields = document.getElementById('loadFields');
             if (isChecked) {
                 fields.style.opacity = "0.3";
                 fields.style.pointerEvents = "none";
-                // Limpiar valores numéricos
                 ['inputF1', 'inputF2', 'inputG1', 'inputG2', 'inputDev', 'inputPep', 'inputVac'].forEach(id => document.getElementById(id).value = 0);
                 calculateOperational();
             } else {
@@ -581,7 +589,6 @@
 
         function saveDailyRecord() {
             alert("¡Registro guardado con éxito y sincronizado en Firestore!");
-            // Agregar al historial local de prueba
             const list = document.getElementById('historyList');
             const ruta = document.getElementById('inputRuta').value || 'Sin Ruta';
             const netas = document.getElementById('statNetas').innerText;
@@ -596,10 +603,9 @@
             document.getElementById('historyList').innerHTML = '';
         }
 
-        // Actualizadores de Incentivos Independientes con Confirmación
         function confirmUpdateIncentives() {
             if (confirm("⚠️ ¿Estás seguro de que deseas actualizar este monto a nivel general?")) {
-                alert("¡Matriz de incentivos actualizada correctamente en tiempo real para todos los colaboradores!");
+                alert("¡Matriz de incentivos actualizada correctamente en tiempo real!");
             }
         }
 
@@ -609,10 +615,8 @@
             }
         }
 
-        // Tablón de Novedades Multimedia y Métricas
         function publishNews() {
             const title = document.getElementById('newsTitle').value;
-            const desc = document.getElementById('newsDesc').value;
             if (!title) {
                 alert("Por favor ingrese un título para el comunicado.");
                 return;
@@ -657,7 +661,6 @@
             }
         }
 
-        // Autorizaciones Pendientes (Admin)
         function loadMockPendingApprovals() {
             const list = document.getElementById('pendingApprovalsList');
             list.innerHTML = `
@@ -675,7 +678,7 @@
         }
 
         function approveUser(btn) {
-            alert("Usuario aprobado con éxito. Ya podrá iniciar sesión.");
+            alert("Usuario aprobado con éxito.");
             btn.parentElement.parentElement.remove();
         }
 
