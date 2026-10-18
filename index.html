@@ -100,7 +100,6 @@
                     <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Confirmar Contraseña</label>
                     <input type="password" id="regPassConfirm" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-red-500">
                 </div>
-                <!-- Aceptación obligatoria de términos -->
                 <div class="text-xs text-slate-300 flex items-center gap-2 bg-slate-900 p-2.5 rounded-lg border border-slate-700">
                     <input type="checkbox" id="regTerms" required class="rounded bg-slate-800 border-slate-700 text-red-600 focus:ring-0 w-4 h-4">
                     <span>Acepto obligatoriamente los <button type="button" onclick="openTermsModal()" class="text-red-400 underline font-bold">Términos y Políticas</button></span>
@@ -169,7 +168,7 @@
         <section id="pendingView" class="hidden max-w-md mx-auto bg-slate-800 rounded-2xl shadow-2xl p-8 text-center border border-slate-700 mt-10">
             <div class="text-4xl mb-3">⏳</div>
             <h2 class="text-xl font-bold text-white mb-2">Cuenta en Espera de Aprobación</h2>
-            <p class="text-xs text-slate-300 mb-6 leading-relaxed">Su correo ha sido verificado correctamente y su cuenta se encuentra pendiente de autorización por el Administrador Supremo (Dhermes).</p>
+            <p class="text-xs text-slate-300 mb-6 leading-relaxed">Su correo ha sido verificado correctamente y su cuenta se encuentra pendiente de autorización por el Administrador Supremo.</p>
             <button onclick="logoutApp()" class="bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold px-4 py-2 rounded-lg transition">Cerrar Sesión</button>
         </section>
 
@@ -180,7 +179,6 @@
                     <button onclick="switchAppTab('worker')" id="btnTabWorker" class="flex-1 sm:flex-none px-4 py-2 text-xs font-bold uppercase rounded-lg transition bg-red-600 text-white shadow">Mi Panel Operativo</button>
                     <button onclick="switchAppTab('admin')" id="btnTabAdmin" class="flex-1 sm:flex-none px-4 py-2 text-xs font-bold uppercase rounded-lg transition bg-slate-700 text-slate-300 hover:bg-slate-600">Centro de Mando (Admin)</button>
                 </div>
-                <!-- Simulador de Rol (Exclusivo Administrador) -->
                 <div class="flex items-center gap-2 bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-700 text-xs w-full sm:w-auto justify-between">
                     <span class="text-slate-400 font-semibold">Simular Rol:</span>
                     <select id="adminRoleSimulator" onchange="changeSimulatedRole(this.value)" class="bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white font-bold">
@@ -212,6 +210,7 @@
                     ⚠️ Su cuenta se encuentra en **Modo Vacaciones**. El registro operativo se encuentra pausado.
                 </div>
 
+                <!-- Formulario de Jornada y Fórmulas de Cajas -->
                 <div id="operationalContainer" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div class="lg:col-span-1 bg-slate-800 rounded-xl p-5 border border-slate-700 space-y-4">
                         <h4 class="text-sm font-bold text-white border-b border-slate-700 pb-2">Registro de Jornada Diaria</h4>
@@ -230,15 +229,20 @@
                                 <div><label class="block text-[10px] font-semibold text-slate-300 mb-1">🏁 Hora Salida</label><input type="time" id="inputHoraSalida" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1.5 text-xs text-white"></div>
                             </div>
                             <div class="grid grid-cols-2 gap-2">
-                                <div><label class="block text-[10px] font-semibold text-slate-300 mb-1">F1</label><input type="number" id="inputF1" value="0" oninput="calculateRealTime()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white"></div>
-                                <div><label class="block text-[10px] font-semibold text-slate-300 mb-1">F2</label><input type="number" id="inputF2" value="0" oninput="calculateRealTime()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white"></div>
+                                <div><label class="block text-[10px] font-semibold text-slate-300 mb-1">F1 (Principal)</label><input type="number" id="inputF1" value="0" oninput="calculateRealTime()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white"></div>
+                                <div><label class="block text-[10px] font-semibold text-slate-300 mb-1">F2 (Secundaria)</label><input type="number" id="inputF2" value="0" oninput="calculateRealTime()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white"></div>
                                 <div><label class="block text-[10px] font-semibold text-slate-300 mb-1">G1</label><input type="number" id="inputG1" value="0" oninput="calculateRealTime()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white"></div>
                                 <div><label class="block text-[10px] font-semibold text-slate-300 mb-1">G2</label><input type="number" id="inputG2" value="0" oninput="calculateRealTime()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white"></div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div><label class="block text-[10px] font-semibold text-slate-300 mb-1">Devueltas</label><input type="number" id="inputDev" value="0" oninput="calculateRealTime()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white"></div>
+                                <div><label class="block text-[10px] font-semibold text-slate-300 mb-1">Pepitos (Snacks)</label><input type="number" id="inputPep" value="0" oninput="calculateRealTime()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white"></div>
                             </div>
                         </div>
                         <button onclick="saveDailyRecord()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-lg transition text-sm shadow-md">Guardar Registro en la Nube</button>
                     </div>
 
+                    <!-- Resumen y Tarjetas -->
                     <div class="lg:col-span-2 space-y-4">
                         <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
                             <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 text-center"><span class="text-[9px] font-bold text-slate-400 uppercase">Carga Inicial</span><h4 id="statCargaInicial" class="text-xl font-black text-white mt-1">0</h4></div>
@@ -248,7 +252,7 @@
                         </div>
 
                         <div class="bg-slate-800 rounded-xl p-5 border border-slate-700 space-y-4">
-                            <div class="flex justify-between items-center"><h4 class="text-sm font-bold text-white">📋 Historial</h4><button onclick="clearHistory()" class="text-[10px] text-red-400 hover:underline">Borrar</button></div>
+                            <div class="flex justify-between items-center"><h4 class="text-sm font-bold text-white">📋 Historial de Jornadas</h4><button onclick="clearHistory()" class="text-[10px] text-red-400 hover:underline">Borrar Historial</button></div>
                             <div id="historyList" class="space-y-3 max-h-64 overflow-y-auto pr-1"></div>
                             <div class="pt-4 border-t border-slate-700 flex justify-end">
                                 <button onclick="confirmDeleteAccount()" class="bg-slate-900 hover:bg-red-950/60 text-red-400 border border-red-900/50 text-[11px] font-bold px-4 py-2 rounded-lg transition shadow">⚠️ Eliminar Cuenta</button>
@@ -258,16 +262,56 @@
                 </div>
             </div>
 
-            <!-- Centro de Mando Admin -->
+            <!-- CENTRO DE MANDO ADMINISTRADOR SUPREMO (RESTAURADO) -->
             <div id="adminSection" class="hidden space-y-6">
                 <div class="bg-red-950/40 border border-red-800/60 rounded-xl p-5">
                     <h3 class="text-base font-bold text-white">⚙️ Centro de Mando Supremo (Administrador)</h3>
-                    <p class="text-xs text-red-200/80 mt-1">Aprobación de cuentas pendientes y configuración de montos.</p>
+                    <p class="text-xs text-red-200/80 mt-1">Panel exclusivo de supervisión, aprobación de cuentas y configuración independiente de montos en dólares.</p>
                 </div>
+
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Solicitudes Pendientes -->
                     <div class="bg-slate-800 rounded-xl p-5 border border-slate-700 space-y-4">
                         <h4 class="text-sm font-bold text-white border-b border-slate-700 pb-2">👥 Solicitudes de Acceso Pendientes</h4>
-                        <div id="pendingApprovalsList" class="space-y-3 max-h-72 overflow-y-auto pr-1"><p class="text-xs text-slate-400 text-center py-6">No hay solicitudes pendientes.</p></div>
+                        <div id="pendingApprovalsList" class="space-y-3 max-h-72 overflow-y-auto pr-1">
+                            <p class="text-xs text-slate-400 text-center py-6">No hay solicitudes de acceso pendientes.</p>
+                        </div>
+                    </div>
+
+                    <!-- Configuración Montos Entregadores -->
+                    <div class="bg-slate-800 rounded-xl p-5 border border-slate-700 space-y-4">
+                        <h4 class="text-sm font-bold text-red-400 border-b border-slate-700 pb-2">🚛 Configuración Dólares: Entregadores</h4>
+                        <div class="grid grid-cols-2 gap-2 text-xs max-h-56 overflow-y-auto pr-1 bg-slate-900 p-3 rounded-xl border border-slate-700">
+                            <div><label class="text-[10px] text-slate-400">300-399 ($):</label><input type="number" step="0.01" id="ent_300" value="3.80" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">400-499 ($):</label><input type="number" step="0.01" id="ent_400" value="7.50" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">500-599 ($):</label><input type="number" step="0.01" id="ent_500" value="8.91" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">600-699 ($):</label><input type="number" step="0.01" id="ent_600" value="10.40" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">700-799 ($):</label><input type="number" step="0.01" id="ent_700" value="11.36" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">800-899 ($):</label><input type="number" step="0.01" id="ent_800" value="12.47" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">900-999 ($):</label><input type="number" step="0.01" id="ent_900" value="13.15" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">1000-1099 ($):</label><input type="number" step="0.01" id="ent_1000" value="14.11" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">1100-1199 ($):</label><input type="number" step="0.01" id="ent_1100" value="15.10" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">1200-1299 ($):</label><input type="number" step="0.01" id="ent_1200" value="16.03" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                        </div>
+                        <button onclick="saveEntregadorConfig()" class="w-full bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-2 rounded-lg transition shadow">💾 Guardar Montos Entregadores</button>
+                    </div>
+
+                    <!-- Configuración Montos Ayudantes -->
+                    <div class="bg-slate-800 rounded-xl p-5 border border-slate-700 space-y-4 lg:col-span-2">
+                        <h4 class="text-sm font-bold text-red-400 border-b border-slate-700 pb-2">🤝 Configuración Dólares: Ayudantes</h4>
+                        <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs bg-slate-900 p-3 rounded-xl border border-slate-700">
+                            <div><label class="text-[10px] text-slate-400">300-399 ($):</label><input type="number" step="0.01" id="ayu_300" value="3.13" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">400-499 ($):</label><input type="number" step="0.01" id="ayu_400" value="6.94" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">500-599 ($):</label><input type="number" step="0.01" id="ayu_500" value="7.58" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">600-699 ($):</label><input type="number" step="0.01" id="ayu_600" value="8.17" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">700-799 ($):</label><input type="number" step="0.01" id="ayu_700" value="8.82" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">800-899 ($):</label><input type="number" step="0.01" id="ayu_800" value="9.44" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">900-999 ($):</label><input type="number" step="0.01" id="ayu_900" value="10.06" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">1000-1099 ($):</label><input type="number" step="0.01" id="ayu_1000" value="10.65" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">1100-1199 ($):</label><input type="number" step="0.01" id="ayu_1100" value="12.93" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                            <div><label class="text-[10px] text-slate-400">1200-1299 ($):</label><input type="number" step="0.01" id="ayu_1200" value="14.23" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white"></div>
+                        </div>
+                        <button onclick="saveAyudanteConfig()" class="w-full bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-2.5 rounded-lg transition shadow">💾 Guardar Montos Ayudantes</button>
                     </div>
                 </div>
             </div>
@@ -283,7 +327,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT -->
+    <!-- SCRIPT COMPLETO CON FÓRMULAS Y CENTRO DE MANDO -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBzMXFLJhTuPSPdKGsVqCqQRhP_NiGYBA",
@@ -366,6 +410,41 @@
         function openTermsModal() { document.getElementById('termsModal').classList.remove('hidden'); }
         function closeTermsModal() { document.getElementById('termsModal').classList.add('hidden'); }
 
+        async function loadIncentiveConfig() {
+            try {
+                const doc = await db.collection("config").doc("incentivos").get();
+                if (doc.exists) {
+                    const data = doc.data();
+                    ['300','400','500','600','700','800','900','1000','1100','1200'].forEach(t => {
+                        if (data['ent_' + t] !== undefined) document.getElementById('ent_' + t).value = data['ent_' + t];
+                        if (data['ayu_' + t] !== undefined) document.getElementById('ayu_' + t).value = data['ayu_' + t];
+                    });
+                }
+            } catch (e) {}
+        }
+
+        async function saveEntregadorConfig() {
+            const configData = {};
+            ['300','400','500','600','700','800','900','1000','1100','1200'].forEach(t => {
+                configData['ent_' + t] = parseFloat(document.getElementById('ent_' + t).value) || 0;
+            });
+            try {
+                await db.collection("config").doc("incentivos").set(configData, { merge: true });
+                alert("¡Montos para Entregadores guardados exitosamente!");
+            } catch (error) { alert("Error: " + error.message); }
+        }
+
+        async function saveAyudanteConfig() {
+            const configData = {};
+            ['300','400','500','600','700','800','900','1000','1100','1200'].forEach(t => {
+                configData['ayu_' + t] = parseFloat(document.getElementById('ayu_' + t).value) || 0;
+            });
+            try {
+                await db.collection("config").doc("incentivos").set(configData, { merge: true });
+                alert("¡Montos para Ayudantes guardados exitosamente!");
+            } catch (error) { alert("Error: " + error.message); }
+        }
+
         async function handleLogin(event) {
             event.preventDefault();
             const email = document.getElementById('loginEmail').value.trim().toLowerCase();
@@ -386,7 +465,6 @@
             } catch (error) { alert("Error en credenciales: " + error.message); }
         }
 
-        // REGISTRO CON TÉRMINOS Y ENVÍO DE CÓDIGO EMAILJS
         async function handleRegister(event) {
             event.preventDefault();
             const pass = document.getElementById('regPass').value;
@@ -434,7 +512,6 @@
             } catch (error) { alert("Error al registrar: " + error.message); }
         }
 
-        // RECUPERACIÓN PASO 1: ENVIAR CÓDIGO VÍA EMAILJS
         async function handleForgotRequest(event) {
             event.preventDefault();
             const email = document.getElementById('forgotEmail').value.trim().toLowerCase();
@@ -463,7 +540,6 @@
             }
         }
 
-        // RECUPERACIÓN PASO 2: VALIDAR CÓDIGO Y ESTABLECER NUEVA CLAVE
         async function handleResetPassword(event) {
             event.preventDefault();
             const codeEntered = document.getElementById('resetCodeInput').value.trim();
@@ -492,6 +568,7 @@
             document.getElementById('authHeaderControls').classList.remove('hidden');
             document.getElementById('userHeaderBadge').innerText = isAdmin ? "ADMINISTRADOR SUPREMO" : `COLABORADOR (${currentUser.role.toUpperCase()})`;
             if (isAdmin) document.getElementById('adminNavTabs').classList.remove('hidden');
+            await loadIncentiveConfig();
             calculateAntiquity();
             calculateRealTime();
         }
@@ -514,12 +591,19 @@
         function switchAppTab(tab) {
             const workerSec = document.getElementById('workerSection');
             const adminSec = document.getElementById('adminSection');
+            const btnWorker = document.getElementById('btnTabWorker');
+            const btnAdmin = document.getElementById('btnTabAdmin');
+
             if (tab === 'worker') {
                 workerSec.classList.remove('hidden');
                 adminSec.classList.add('hidden');
+                btnWorker.className = "flex-1 sm:flex-none px-4 py-2 text-xs font-bold uppercase rounded-lg transition bg-red-600 text-white shadow";
+                btnAdmin.className = "flex-1 sm:flex-none px-4 py-2 text-xs font-bold uppercase rounded-lg transition bg-slate-700 text-slate-300 hover:bg-slate-600";
             } else {
                 workerSec.classList.add('hidden');
                 adminSec.classList.remove('hidden');
+                btnAdmin.className = "flex-1 sm:flex-none px-4 py-2 text-xs font-bold uppercase rounded-lg transition bg-red-600 text-white shadow";
+                btnWorker.className = "flex-1 sm:flex-none px-4 py-2 text-xs font-bold uppercase rounded-lg transition bg-slate-700 text-slate-300 hover:bg-slate-600";
             }
         }
 
@@ -527,39 +611,144 @@
             const ingreso = new Date('2021-06-13');
             const hoy = new Date();
             let anos = hoy.getFullYear() - ingreso.getFullYear();
-            document.getElementById('workerMetaDisplay').innerText = `Ayudante (${anos} años de antigüedad) — dhermes73@gmail.com`;
+            let meses = hoy.getMonth() - ingreso.getMonth();
+            let dias = hoy.getDate() - ingreso.getDate();
+            if (dias < 0) { meses--; dias += new Date(hoy.getFullYear(), hoy.getMonth(), 0).getDate(); }
+            if (meses < 0) { anos--; meses += 12; }
+            document.getElementById('workerMetaDisplay').innerText = `${currentUser.role || 'Ayudante'} (${anos} años, ${meses} meses) — dhermes73@gmail.com`;
         }
 
         function toggleVacationMode() {
             isVacation = !isVacation;
-            document.getElementById('vacationAlert').classList.toggle('hidden', !isVacation);
+            const btn = document.getElementById('btnVacationToggle');
+            const alertBox = document.getElementById('vacationAlert');
+            const container = document.getElementById('operationalContainer');
+
+            if (isVacation) {
+                btn.innerText = "🌴 Ya regresé";
+                btn.className = "bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition shadow";
+                alertBox.classList.remove('hidden');
+                container.style.opacity = "0.4";
+                container.style.pointerEvents = "none";
+            } else {
+                btn.innerText = "🌴 Estoy de vacaciones";
+                btn.className = "bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition shadow";
+                alertBox.classList.add('hidden');
+                container.style.opacity = "1";
+                container.style.pointerEvents = "auto";
+            }
         }
 
         function toggleNoLoad() {
             const isChecked = document.getElementById('noLoadCheck').checked;
-            document.getElementById('loadFields').style.opacity = isChecked ? "0.3" : "1";
-            document.getElementById('loadFields').style.pointerEvents = isChecked ? "none" : "auto";
+            const fields = document.getElementById('loadFields');
+            if (isChecked) {
+                fields.style.opacity = "0.3";
+                fields.style.pointerEvents = "none";
+                ['inputF1', 'inputF2', 'inputG1', 'inputG2', 'inputDev', 'inputPep'].forEach(id => document.getElementById(id).value = 0);
+            } else {
+                fields.style.opacity = "1";
+                fields.style.pointerEvents = "auto";
+            }
             calculateRealTime();
         }
 
+        function getIncentiveByRole(cajas, role) {
+            if (cajas < 300) return 0;
+            const prefix = (role === 'Entregador') ? 'ent_' : 'ayu_';
+            if (cajas <= 399) return parseFloat(document.getElementById(prefix + '300')?.value) || 0;
+            if (cajas <= 499) return parseFloat(document.getElementById(prefix + '400')?.value) || 0;
+            if (cajas <= 599) return parseFloat(document.getElementById(prefix + '500')?.value) || 0;
+            if (cajas <= 699) return parseFloat(document.getElementById(prefix + '600')?.value) || 0;
+            if (cajas <= 799) return parseFloat(document.getElementById(prefix + '700')?.value) || 0;
+            if (cajas <= 899) return parseFloat(document.getElementById(prefix + '800')?.value) || 0;
+            if (cajas <= 999) return parseFloat(document.getElementById(prefix + '900')?.value) || 0;
+            if (cajas <= 1099) return parseFloat(document.getElementById(prefix + '1000')?.value) || 0;
+            if (cajas <= 1199) return parseFloat(document.getElementById(prefix + '1100')?.value) || 0;
+            return parseFloat(document.getElementById(prefix + '1200')?.value) || 0;
+        }
+
+        // FÓRMULAS DE CÁLCULO EN TIEMPO REAL
         function calculateRealTime() {
             const isNoLoad = document.getElementById('noLoadCheck').checked;
-            let cargaInicial = 0, cargaNetaDia = 0, incentivo = 0, efectividad = 100.0;
+            const userRole = currentUser ? currentUser.role : 'Ayudante';
+            const efElement = document.getElementById('statEfectividadSemanal');
+
+            let cargaInicial = 0;
+            let cargaNetaDia = 0;
+            let incentivoDiarioUSD = 0;
+            let efectividad = 100.0;
+
             if (!isNoLoad) {
                 const f1 = parseInt(document.getElementById('inputF1').value) || 0;
                 const f2 = parseInt(document.getElementById('inputF2').value) || 0;
-                cargaInicial = f1 + f2;
-                cargaNetaDia = cargaInicial;
-                incentivo = cargaNetaDia >= 300 ? 3.13 : 0;
+                const g1 = parseInt(document.getElementById('inputG1').value) || 0;
+                const g2 = parseInt(document.getElementById('inputG2').value) || 0;
+                const dev = parseInt(document.getElementById('inputDev').value) || 0;
+                const pep = parseInt(document.getElementById('inputPep').value) || 0;
+                
+                const cajasBrutas = f1 + f2 + g1 + g2;
+                cargaInicial = cajasBrutas;
+                cargaNetaDia = Math.max(0, cargaInicial - dev - pep);
+                
+                incentivoDiarioUSD = getIncentiveByRole(cargaNetaDia, userRole);
+
+                const totalProgramado = cargaInicial;
+                const totalEntregadoEfectivo = Math.max(0, cargaNetaDia + pep);
+                
+                efectividad = totalProgramado > 0 ? (totalEntregadoEfectivo / totalProgramado) * 100 : 100.0;
+                if (efectividad < 0) efectividad = 0.0;
+                if (efectividad > 100) efectividad = 100.0;
             }
+
             document.getElementById('statCargaInicial').innerText = cargaInicial;
             document.getElementById('statCargaNetaDia').innerText = cargaNetaDia;
-            document.getElementById('statIncentivo').innerText = `$${incentivo.toFixed(2)}`;
-            return { cargaInicial, cargaNetaDia, incentivo, efectividad };
+            document.getElementById('statIncentivo').innerText = `$${incentivoDiarioUSD.toFixed(2)}`;
+            
+            if (efectividad >= 97) {
+                efElement.innerText = `${efectividad.toFixed(1)}% (Califica)`;
+                efElement.className = "text-xl font-black text-emerald-400 mt-1";
+            } else {
+                efElement.innerText = `${efectividad.toFixed(1)}% (No Califica)`;
+                efElement.className = "text-xl font-black text-red-400 mt-1";
+            }
+
+            return { cargaInicial, cargaNetaDia, incentivoDiarioUSD, efectividad };
         }
 
-        function saveDailyRecord() { alert("¡Registro guardado con éxito!"); }
-        function clearHistory() { document.getElementById('historyList').innerHTML = ''; }
+        function saveDailyRecord() {
+            const metrics = calculateRealTime();
+            const ruta = document.getElementById('inputRuta').value || 'Sin Ruta';
+            const fecha = document.getElementById('inputFechaJornada').value || 'Fecha no especificada';
+            const userRole = currentUser ? currentUser.role : 'Ayudante';
+            const isQualified = metrics.efectividad >= 97;
+
+            alert("¡Registro guardado y consolidado con éxito!");
+
+            const list = document.getElementById('historyList');
+            const card = document.createElement('div');
+            card.className = "bg-slate-900 p-4 rounded-xl border border-slate-700 space-y-2 text-xs shadow-md";
+            card.innerHTML = `
+                <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                    <div>
+                        <strong class="text-white text-sm">Ruta: ${ruta} (${userRole})</strong>
+                        <p class="text-[10px] text-slate-400">📅 ${fecha}</p>
+                    </div>
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold ${isQualified ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'}">
+                        ${isQualified ? '✅ Efectividad Calificada' : '❌ No Califica'}
+                    </span>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-slate-300">
+                    <div>Carga Inicial: <strong class="text-white">${metrics.cargaInicial}</strong></div>
+                    <div>Carga Neta: <strong class="text-white">${metrics.cargaNetaDia}</strong></div>
+                    <div>Incentivo: <strong class="text-emerald-400">$${metrics.incentivoDiarioUSD.toFixed(2)}</strong></div>
+                    <div>Efectividad: <strong class="text-blue-400">${metrics.efectividad.toFixed(1)}%</strong></div>
+                </div>
+            `;
+            list.prepend(card);
+        }
+
+        function clearHistory() { document.getElementById('historyList').innerHTML = ''; alert("Historial borrado."); }
         function confirmDeleteAccount() { if(confirm("¿Deseas eliminar tu cuenta?")) logoutApp(); }
     </script>
 </body>
