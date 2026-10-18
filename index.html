@@ -504,15 +504,15 @@
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, deleteUser } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
         import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-        // Tus credenciales oficiales de Firebase corregidas
+        // Credenciales oficiales de Firebase limpias
         const firebaseConfig = {
-          apiKey: "AIzaSyBzMXFlJhTuPSPDkGsVqCqFQrhP_NiGYBA",
-          authDomain: "kolaboradorf-ve.firebaseapp.com",
-          projectId: "kolaboradorf-ve",
-          storageBucket: "kolaboradorf-ve.firebasestorage.app",
-          messagingSenderId: "846070913325",
-          appId: "1:846070913325:web:a26cdc0050ed5db0a6dba4",
-          measurementId: "G-XSGR1TYGJ1"
+            apiKey: "AIzaSyBzMXFLJhTuPSPDkGsVqCqfQRhP_NiGYBA",
+            authDomain: "kolaboradorf-ve.firebaseapp.com",
+            projectId: "kolaboradorf-ve",
+            storageBucket: "kolaboradorf-ve.firebasestorage.app",
+            messagingSenderId: "846070913325",
+            appId: "1:846070913325:web:a26cdc0050ed5db0a6dba4",
+            measurementId: "G-XSGR1TYGJ1"
         };
 
         const app = initializeApp(firebaseConfig);
