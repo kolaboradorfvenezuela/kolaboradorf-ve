@@ -10,7 +10,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-    <!-- EmailJS SDK -->
+    <!-- EmailJS SDK (Solo para verificación/recuperación base) -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -25,7 +25,7 @@
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-slate-950/40 border border-red-500/50 flex items-center justify-center text-white font-black text-lg shadow-inner">K</div>
                 <div>
-                    <h1 class="text-xl font-black tracking-wider uppercase text-white flex items-center gap-2">Kolaboradorf VE <span class="text-[10px] bg-black/40 px-2 py-0.5 rounded border border-red-500/30 font-medium text-red-200">PRO v4.5</span></h1>
+                    <h1 class="text-xl font-black tracking-wider uppercase text-white flex items-center gap-2">Kolaboradorf VE <span class="text-[10px] bg-black/40 px-2 py-0.5 rounded border border-red-500/30 font-medium text-red-200">PRO v4.6</span></h1>
                     <p class="text-[11px] text-red-200 font-medium">Gestión Inteligente Sincronizada en la Nube</p>
                 </div>
             </div>
@@ -178,7 +178,7 @@
 
         <!-- 3. INTERFAZ PRINCIPAL -->
         <div id="mainAppView" class="hidden space-y-6">
-            <!-- Navegación Admin / Simulador de Roles (Oculto para perfiles estándar) -->
+            <!-- Navegación Admin / Simulador de Roles -->
             <div id="adminNavTabs" class="hidden bg-slate-900/90 backdrop-blur-xl p-3 rounded-2xl border border-slate-800 flex flex-col sm:flex-row gap-3 justify-between items-center shadow-lg">
                 <div class="flex gap-2 w-full sm:w-auto">
                     <button onclick="switchAppTab('worker')" id="btnTabWorker" class="flex-1 sm:flex-none px-5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-xl transition bg-red-600 text-white shadow-lg shadow-red-600/20">Mi Panel Operativo</button>
@@ -215,7 +215,7 @@
                     ⚠️ Su cuenta se encuentra en **Modo Vacaciones**. El registro operativo se encuentra temporalmente pausado.
                 </div>
 
-                <!-- Formulario de Jornada y Fórmulas de Cajas -->
+                <!-- Formulario de Jornada -->
                 <div id="operationalContainer" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div class="lg:col-span-1 bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-5 shadow-xl">
                         <h4 class="text-sm font-extrabold text-white border-b border-slate-800 pb-3 flex items-center gap-2">📋 Registro de Jornada Diaria</h4>
@@ -230,14 +230,9 @@
                                 <div><label class="block text-[10px] font-bold text-slate-300 uppercase tracking-wider mb-1.5">Fecha</label><input type="date" id="inputFechaJornada" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-2 text-xs text-white focus:outline-none focus:border-red-600 shadow-inner"></div>
                             </div>
                             
-                            <!-- NUEVOS CAMPOS AÑADIDOS -->
-                            <div>
-                                <label class="block text-[10px] font-bold text-slate-300 uppercase tracking-wider mb-1.5">🏢 Nombre del Comercio</label>
-                                <input type="text" id="inputComercio" placeholder="Ej. Inversiones La Estrella C.A." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-600 shadow-inner">
-                            </div>
                             <div>
                                 <label class="block text-[10px] font-bold text-slate-300 uppercase tracking-wider mb-1.5">📦 Productos Pendientes / Adeudados</label>
-                                <input type="text" id="inputProductosPendientes" placeholder="Ej. 2 bultos de refresco 2L" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-600 shadow-inner">
+                                <textarea id="inputProductosPendientes" rows="2" placeholder="Ej. Le debo una caja de 2L o una unidad de 2L a la bodega María" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-600 shadow-inner resize-none"></textarea>
                             </div>
 
                             <div class="grid grid-cols-2 gap-3 bg-slate-950 p-3.5 rounded-xl border border-slate-800 shadow-inner">
@@ -258,7 +253,7 @@
                         <button onclick="saveDailyRecord()" class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-xl transition text-xs shadow-lg shadow-red-600/30 uppercase tracking-wider mt-2">Guardar Registro en la Nube</button>
                     </div>
 
-                    <!-- Resumen y Tarjetas -->
+                    <!-- Resumen Diario y Histórico Jerárquico (Mensual / Semanal Lunes a Viernes) -->
                     <div class="lg:col-span-2 space-y-6">
                         <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
                             <div class="bg-slate-900/90 backdrop-blur-xl p-4 rounded-2xl border border-slate-800 text-center shadow-lg"><span class="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">Carga Inicial</span><h4 id="statCargaInicial" class="text-2xl font-black text-white mt-1.5">0</h4></div>
@@ -267,24 +262,16 @@
                             <div class="bg-slate-900/90 backdrop-blur-xl p-4 rounded-2xl border border-slate-800 text-center shadow-lg"><span class="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">Efectividad</span><h4 id="statEfectividadSemanal" class="text-2xl font-black text-blue-400 mt-1.5">100.0%</h4></div>
                         </div>
 
-                        <!-- NUEVO CUADRO ADICIONAL: EFECTIVIDAD GLOBAL ACUMULADA -->
-                        <div class="bg-gradient-to-r from-slate-900 via-slate-900/90 to-slate-900 p-5 rounded-2xl border border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-4 shadow-xl">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-xl bg-blue-600/10 border border-blue-500/30 flex items-center justify-center text-blue-400 font-bold text-lg">📊</div>
-                                <div>
-                                    <h4 class="text-xs font-black uppercase tracking-wider text-white">Efectividad Global Acumulada (Semanal)</h4>
-                                    <p class="text-[11px] text-slate-400">Promedio general calculado a partir de tus jornadas registradas</p>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <h3 id="statGlobalSemanal" class="text-xl font-black text-blue-400">100.0%</h3>
-                                <span id="statGlobalBadge" class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-300 border border-blue-500/20">Calculando...</span>
-                            </div>
-                        </div>
-
+                        <!-- HISTÓRICO JERÁRQUICO (MENSUAL Y SEMANAL LUNES-VIERNES) -->
                         <div class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-4 shadow-xl">
-                            <div class="flex justify-between items-center border-b border-slate-800 pb-3"><h4 class="text-sm font-extrabold text-white flex items-center gap-2">📋 Historial de Jornadas</h4><button onclick="clearHistory()" class="text-[11px] text-red-400 hover:text-red-300 font-semibold transition">Borrar Historial</button></div>
-                            <div id="historyList" class="space-y-3 max-h-72 overflow-y-auto pr-1"></div>
+                            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                                <h4 class="text-sm font-extrabold text-white flex items-center gap-2">📂 Histórico por Mes y Semana (Lunes a Viernes)</h4>
+                                <button onclick="clearHistory()" class="text-[11px] text-red-400 hover:text-red-300 font-semibold transition">Borrar Historial</button>
+                            </div>
+                            <!-- Contenedor del Árbol Jerárquico Mensual/Semanal -->
+                            <div id="hierarchicalHistoryContainer" class="space-y-4 max-h-[420px] overflow-y-auto pr-1">
+                                <p class="text-xs text-slate-400 text-center py-6">Cargando histórico estructurado...</p>
+                            </div>
                             <div class="pt-4 border-t border-slate-800 flex justify-end">
                                 <button onclick="confirmDeleteAccount()" class="bg-slate-950 hover:bg-red-950/40 text-red-400 border border-red-900/40 text-[11px] font-bold px-5 py-2.5 rounded-xl transition shadow">⚠️ Eliminar Cuenta</button>
                             </div>
@@ -358,7 +345,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT PROFESIONAL INTEGRAL V4.5 -->
+    <!-- SCRIPT PROFESIONAL INTEGRAL V4.6 -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBzMXFLJhTuPSPdKGsVqCqQRhP_NiGYBA",
@@ -381,7 +368,7 @@
         let generatedVerificationCode = "";
         let pendingResetEmail = "";
         let recoveryCode = "";
-        let cachedUserRecords = []; // Almacenamiento local del historial para cálculos globales
+        let cachedUserRecords = [];
 
         window.addEventListener('DOMContentLoaded', () => {
             const todayStr = new Date().toISOString().split('T')[0];
@@ -570,7 +557,6 @@
                 alert("¡Código de verificación enviado con éxito a su correo!");
                 switchAuthMode('verify');
             } catch (error) {
-                console.error("Error EmailJS:", error);
                 alert("Error al enviar correo con EmailJS: " + (error.text || error.message || JSON.stringify(error)));
             }
         }
@@ -677,7 +663,6 @@
                 alert("¡Código de recuperación enviado con éxito a " + email + "!");
                 switchAuthMode('reset');
             } catch (error) {
-                console.error("Error EmailJS:", error);
                 alert("Error al enviar el correo de recuperación: " + (error.text || error.message || JSON.stringify(error)));
             }
         }
@@ -878,106 +863,187 @@
             return { cargaInicial, cargaNetaDia, incentivoDiarioUSD, efectividad };
         }
 
-        // CÁLCULO DE LA EFECTIVIDAD GLOBAL ACUMULADA DE LA SEMANA
-        function updateGlobalWeeklyEffectiveness() {
-            const globalElem = document.getElementById('statGlobalSemanal');
-            const badgeElem = document.getElementById('statGlobalBadge');
-            
-            if (!cachedUserRecords || cachedUserRecords.length === 0) {
-                globalElem.innerText = "100.0%";
-                badgeElem.innerText = "Sin registros recientes";
-                badgeElem.className = "text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700";
-                return;
-            }
-
-            let sumaEfectividades = 0;
-            cachedUserRecords.forEach(rec => {
-                sumaEfectividades += parseFloat(rec.efectividad) || 0;
-            });
-
-            const promedioGlobal = sumaEfectividades / cachedUserRecords.length;
-            globalElem.innerText = `${promedioGlobal.toFixed(1)}%`;
-
-            if (promedioGlobal >= 97) {
-                badgeElem.innerText = "✅ Aprobación Global (Califica)";
-                badgeElem.className = "text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
-            } else {
-                badgeElem.innerText = "⚠️ Por debajo del rango (No Califica)";
-                badgeElem.className = "text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-red-500/10 text-red-400 border border-red-500/20";
-            }
-        }
-
         async function loadUserHistory() {
             if (!currentUser || !currentUser.email) return;
-            const list = document.getElementById('historyList');
-            list.innerHTML = '<p class="text-xs text-slate-400 text-center py-4">Cargando historial...</p>';
+            const container = document.getElementById('hierarchicalHistoryContainer');
+            container.innerHTML = '<p class="text-xs text-slate-400 text-center py-6">Cargando histórico estructurado...</p>';
 
             try {
                 const docRef = db.collection("historial_jornadas").doc(currentUser.email);
                 const doc = await docRef.get();
-                list.innerHTML = '';
                 cachedUserRecords = [];
 
                 if (doc.exists && doc.data().registros) {
                     cachedUserRecords = doc.data().registros;
-                    cachedUserRecords.forEach(record => {
-                        appendRecordCard(record, false);
-                    });
+                    renderHierarchicalHistory(cachedUserRecords);
                 } else {
-                    list.innerHTML = '<p class="text-xs text-slate-400 text-center py-4">No hay jornadas registradas.</p>';
+                    container.innerHTML = '<p class="text-xs text-slate-400 text-center py-6">No hay jornadas registradas.</p>';
                 }
-                updateGlobalWeeklyEffectiveness();
             } catch (e) {
-                list.innerHTML = '<p class="text-xs text-red-400 text-center py-4">Error al cargar historial.</p>';
+                container.innerHTML = '<p class="text-xs text-red-400 text-center py-6">Error al cargar el histórico.</p>';
             }
         }
 
-        function appendRecordCard(record, prepend = true) {
-            const list = document.getElementById('historyList');
-            if (list.innerHTML.includes('No hay jornadas registradas.') || list.innerHTML.includes('Cargando historial...')) {
-                list.innerHTML = '';
+        // FUNCION PARA AGRUPAR Y RENDERIZAR EN MESES Y SEMANAS (LUNES A VIERNES)
+        function renderHierarchicalHistory(records) {
+            const container = document.getElementById('hierarchicalHistoryContainer');
+            container.innerHTML = '';
+
+            if (!records || records.length === 0) {
+                container.innerHTML = '<p class="text-xs text-slate-400 text-center py-6">No hay jornadas registradas.</p>';
+                return;
             }
 
-            const comercioText = record.comercio ? ` | 🏢 ${record.comercio}` : '';
-            const productosText = record.productosPendientes ? `<div class="text-[11px] text-amber-300 mt-1">📦 Pendientes: ${record.productosPendientes}</div>` : '';
+            const nombresMeses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
 
-            const card = document.createElement('div');
-            card.className = "bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3 text-xs shadow-inner";
-            card.innerHTML = `
-                <div class="flex justify-between items-center border-b border-slate-900 pb-2">
-                    <div>
-                        <strong class="text-white text-sm font-extrabold">Ruta: ${record.ruta} (${record.userRole})${comercioText}</strong>
-                        <p class="text-[10px] text-slate-400 mt-0.5">📅 ${record.fecha} — 👤 ${record.colaboradorNombre}</p>
+            // Agrupar registros por Mes (YYYY-MM)
+            const mesesMap = {};
+            records.forEach(rec => {
+                const fechaObj = new Date(rec.fecha + "T00:00:00");
+                const year = fechaObj.getFullYear();
+                const monthIndex = fechaObj.getMonth();
+                const monthKey = `${year}-${String(monthIndex + 1).padStart(2, '0')}`;
+                const monthName = `${nombresMeses[monthIndex]} ${year}`;
+
+                if (!mesesMap[monthKey]) {
+                    mesesMap[monthKey] = { name: monthName, records: [] };
+                }
+                mesesMap[monthKey].records.push({ ...rec, fechaObj });
+            });
+
+            // Ordenar meses descendentemente
+            const sortedMonthKeys = Object.keys(mesesMap).sort().reverse();
+
+            sortedMonthKeys.forEach(mKey => {
+                const mesData = mesesMap[mKey];
+                
+                // Calcular totales del Mes
+                let mesCargaInicial = 0;
+                let mesCargaNeta = 0;
+                let mesIncentivo = 0;
+                let sumaEfMes = 0;
+
+                mesData.records.forEach(r => {
+                    mesCargaInicial += parseInt(r.cargaInicial) || 0;
+                    mesCargaNeta += parseInt(r.cargaNetaDia) || 0;
+                    mesIncentivo += parseFloat(r.incentivoDiarioUSD) || 0;
+                    sumaEfMes += parseFloat(r.efectividad) || 0;
+                });
+                const mesEfPromedio = mesData.records.length > 0 ? (sumaEfMes / mesData.records.length) : 100;
+
+                // Contenedor Mes
+                const monthBox = document.createElement('div');
+                monthBox.className = "bg-slate-950 rounded-2xl border border-slate-800 p-4 space-y-3 shadow-inner";
+                monthBox.innerHTML = `
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-900 pb-3 gap-2">
+                        <div>
+                            <h5 class="text-sm font-extrabold text-white flex items-center gap-2">📁 Mes: <span class="text-red-400 uppercase">${mesData.name}</span></h5>
+                            <p class="text-[10px] text-slate-400">Cierre mensual consolidado</p>
+                        </div>
+                        <div class="flex flex-wrap gap-2 text-[10px] font-bold">
+                            <span class="bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800 text-slate-300">C. Inicial: ${mesCargaInicial}</span>
+                            <span class="bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800 text-slate-300">C. Neta: ${mesCargaNeta}</span>
+                            <span class="bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded-lg border border-emerald-500/20">Incentivo: $${mesIncentivo.toFixed(2)}</span>
+                            <span class="bg-blue-500/10 text-blue-400 px-2.5 py-1 rounded-lg border border-blue-500/20">Ef. Promedio: ${mesEfPromedio.toFixed(1)}%</span>
+                        </div>
                     </div>
-                    <span class="px-2.5 py-1 rounded-xl text-[10px] font-bold ${record.isQualified ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}">
-                        ${record.isQualified ? '✅ Efectividad Calificada' : '❌ No Califica'}
-                    </span>
-                </div>
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-slate-300 font-medium">
-                    <div>Carga Inicial: <strong class="text-white">${record.cargaInicial}</strong></div>
-                    <div>Carga Neta: <strong class="text-white">${record.cargaNetaDia}</strong></div>
-                    <div>Incentivo: <strong class="text-emerald-400">$${record.incentivoDiarioUSD}</strong></div>
-                    <div>Efectividad: <strong class="text-blue-400">${record.efectividad}%</strong></div>
-                </div>
-                ${productosText}
-                <div class="pt-2 border-t border-slate-900 flex justify-end">
-                    <button onclick="shareRecordByEmail('${record.ruta}', '${record.fecha}', '${record.cargaInicial}', '${record.cargaNetaDia}', '${record.incentivoDiarioUSD}', '${record.efectividad}', '${record.isQualified ? 'Califica' : 'No Califica'}', '${record.comercio || ''}', '${record.productosPendientes || ''}')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-4 py-1.5 rounded-lg transition text-[10px] shadow uppercase tracking-wider flex items-center gap-1">
-                        📤 Compartir por Correo
-                    </button>
-                </div>
-            `;
-            if (prepend) {
-                list.prepend(card);
-            } else {
-                list.appendChild(card);
-            }
+                `;
+
+                // Agrupar dentro del mes por Semanas (Lunes a Viernes)
+                const semanasMap = {};
+                mesData.records.forEach(r => {
+                    const d = r.fechaObj;
+                    // Calcular número de semana ISO o semana del mes
+                    const startOfMonth = new Date(d.getFullYear(), d.getMonth(), 1);
+                    const weekNumber = Math.ceil(((d.getDay() === 0 ? 7 : d.getDay()) + Math.floor((d.getDate() - 1 + startOfMonth.getDay()) / 7)) / 7) || 1;
+                    const weekKey = `Semana ${weekNumber}`;
+
+                    // Filtrar estrictamente de Lunes (1) a Viernes (5)
+                    const dayOfWeek = d.getDay(); // 0: Dom, 1: Lun, ..., 6: Sáb
+                    if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+                        if (!semanasMap[weekKey]) semanasMap[weekKey] = [];
+                        semanasMap[weekKey].push(r);
+                    } else {
+                        // Si cayó fin de semana, se agrupa en una categoría general o se muestra igual en la semana correspondiente
+                        const weekendKey = `Semana ${weekNumber} (Fin de Semana)`;
+                        if (!semanasMap[weekendKey]) semanasMap[weekendKey] = [];
+                        semanasMap[weekendKey].push(r);
+                    }
+                });
+
+                const weeksContainer = document.createElement('div');
+                weeksContainer.className = "space-y-3 pl-2 sm:pl-4 border-l border-red-600/30 mt-3";
+
+                Object.keys(semanasMap).sort().forEach(wKey => {
+                    const weekRecords = semanasMap[wKey];
+
+                    let wCargaInicial = 0;
+                    let wCargaNeta = 0;
+                    let wIncentivo = 0;
+                    let sumaEfWeek = 0;
+
+                    weekRecords.forEach(r => {
+                        wCargaInicial += parseInt(r.cargaInicial) || 0;
+                        wCargaNeta += parseInt(r.cargaNetaDia) || 0;
+                        wIncentivo += parseFloat(r.incentivoDiarioUSD) || 0;
+                        sumaEfWeek += parseFloat(r.efectividad) || 0;
+                    });
+                    const wEfPromedio = weekRecords.length > 0 ? (sumaEfWeek / weekRecords.length) : 100;
+
+                    const weekBox = document.createElement('div');
+                    weekBox.className = "bg-slate-900/80 rounded-xl border border-slate-800 p-3 space-y-2 shadow-inner";
+                    weekBox.innerHTML = `
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1">
+                            <h6 class="text-xs font-bold text-slate-200 flex items-center gap-1.5">📅 Subcarpeta: <span class="text-red-400">${wKey}</span> <span class="text-[9px] text-slate-400 font-normal">(Lunes a Viernes)</span></h6>
+                            <div class="flex gap-2 text-[10px] font-bold text-slate-300">
+                                <span>CI: ${wCargaInicial}</span> | <span>CN: ${wCargaNeta}</span> | <span class="text-emerald-400">Inc: $${wIncentivo.toFixed(2)}</span> | <span class="text-blue-400">Ef: ${wEfPromedio.toFixed(1)}%</span>
+                            </div>
+                        </div>
+                    `;
+
+                    // Listado de registros diarios dentro de la semana
+                    const recordsList = document.createElement('div');
+                    recordsList.className = "space-y-2 pt-2";
+
+                    weekRecords.forEach(rec => {
+                        const recCard = document.createElement('div');
+                        recCard.className = "bg-slate-950 p-3 rounded-lg border border-slate-800/80 text-xs space-y-1.5";
+                        
+                        const pendientesHtml = rec.productosPendientes ? `
+                            <div class="bg-amber-500/10 border border-amber-500/30 p-2 rounded-lg text-amber-300 text-[11px] font-medium">
+                                📦 <strong>Nota de Pendientes / Adeudados:</strong> ${rec.productosPendientes}
+                            </div>
+                        ` : '';
+
+                        recCard.innerHTML = `
+                            <div class="flex justify-between items-center">
+                                <span class="font-extrabold text-white">Ruta: ${rec.ruta} (${rec.userRole})</span>
+                                <span class="text-[10px] text-slate-400">${rec.fecha}</span>
+                            </div>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-slate-300 text-[11px]">
+                                <div>Carga Inicial: <strong class="text-white">${rec.cargaInicial}</strong></div>
+                                <div>Carga Neta: <strong class="text-white">${rec.cargaNetaDia}</strong></div>
+                                <div>Incentivo: <strong class="text-emerald-400">$${rec.incentivoDiarioUSD}</strong></div>
+                                <div>Efectividad: <strong class="text-blue-400">${rec.efectividad}%</strong></div>
+                            </div>
+                            ${pendientesHtml}
+                        `;
+                        recordsList.appendChild(recCard);
+                    });
+
+                    weekBox.appendChild(recordsList);
+                    weeksContainer.appendChild(weekBox);
+                });
+
+                monthBox.appendChild(weeksContainer);
+                container.appendChild(monthBox);
+            });
         }
 
         async function saveDailyRecord() {
             const metrics = calculateRealTime();
             const ruta = document.getElementById('inputRuta').value || 'Sin Ruta';
-            const fecha = document.getElementById('inputFechaJornada').value || 'Fecha no especificada';
-            const comercio = document.getElementById('inputComercio').value.trim();
+            const fecha = document.getElementById('inputFechaJornada').value || new Date().toISOString().split('T')[0];
             const productosPendientes = document.getElementById('inputProductosPendientes').value.trim();
             const userRole = currentUser ? currentUser.role : 'Ayudante';
             const isQualified = metrics.efectividad >= 97;
@@ -986,7 +1052,6 @@
             const newRecord = {
                 ruta,
                 fecha,
-                comercio,
                 productosPendientes,
                 userRole,
                 cargaInicial: metrics.cargaInicial,
@@ -1009,16 +1074,14 @@
 
                 await docRef.set({ registros }, { merge: true });
 
-                alert("¡Registro guardado y sincronizado en la nube con éxito!");
+                alert("¡Registro guardado y sincronizado en la nube con éxito dentro de su carpeta mensual/semanal!");
                 cachedUserRecords = registros;
-                appendRecordCard(newRecord, true);
-                updateGlobalWeeklyEffectiveness();
+                renderHierarchicalHistory(cachedUserRecords);
 
-                // Limpiar campos opcionales del comercio
-                document.getElementById('inputComercio').value = '';
+                // Limpiar campos del formulario
                 document.getElementById('inputProductosPendientes').value = '';
+                document.getElementById('inputRuta').value = '';
             } catch (error) {
-                console.error("Error al guardar en Firestore:", error);
                 alert("Error al guardar el registro en la nube.");
             }
         }
@@ -1027,46 +1090,11 @@
             if (!confirm("¿Deseas borrar todo tu historial de jornadas?")) return;
             try {
                 await db.collection("historial_jornadas").doc(currentUser.email).set({ registros: [] });
-                document.getElementById('historyList').innerHTML = '<p class="text-xs text-slate-400 text-center py-4">No hay jornadas registradas.</p>';
+                document.getElementById('hierarchicalHistoryContainer').innerHTML = '<p class="text-xs text-slate-400 text-center py-6">No hay jornadas registradas.</p>';
                 cachedUserRecords = [];
-                updateGlobalWeeklyEffectiveness();
                 alert("Historial borrado exitosamente.");
             } catch (e) {
                 alert("Error al borrar el historial en la nube.");
-            }
-        }
-
-        // COMPARTIR POR CORREO INCLUYENDO COMERCIO Y PRODUCTOS PENDIENTES
-        async function shareRecordByEmail(ruta, fecha, cargaInicial, cargaNeta, incentivo, efectividad, estado, comercio, productosPendientes) {
-            let emailDestino = prompt("Ingrese el correo electrónico al cual desea enviar el reporte de esta jornada:", currentUser ? currentUser.email : "");
-            if (!emailDestino) return;
-            emailDestino = emailDestino.trim();
-
-            const comercioInfo = comercio ? `Comercio: ${comercio}` : `Ruta: ${ruta}`;
-            const pendientesInfo = productosPendientes ? `Pendientes: ${productosPendientes}` : `Efectividad: ${efectividad}% (${estado})`;
-
-            const templateParams = {
-                email: emailDestino,
-                to_email: emailDestino,
-                reply_to: emailDestino,
-                name: currentUser ? currentUser.name : "Colaborador",
-                colaborador_nombre: currentUser ? currentUser.name : "Colaborador",
-                cargo_colaborador: currentUser ? currentUser.role : "Ayudante",
-                anos_servicio: comercioInfo,
-                fecha: fecha,
-                nro_ruta: ruta,
-                total_entregado: `Carga Inicial: ${cargaInicial} | Carga Neta: ${cargaNeta} | Incentivo: $${incentivo}`,
-                productos_pendientes: pendientesInfo
-            };
-
-            try {
-                alert("Enviando reporte por correo...");
-                await emailjs.send('service_p63esgd', 'template_dl48xbt', templateParams);
-                alert("¡Reporte de jornada compartido por correo exitosamente a " + emailDestino + "!");
-            } catch (error) {
-                console.error("Error EmailJS:", error);
-                const errorMsg = error.text || error.message || (typeof error === 'string' ? error : JSON.stringify(error));
-                alert("Error al enviar el correo: " + errorMsg);
             }
         }
         
@@ -1078,9 +1106,7 @@
                     await db.collection("usuarios").doc(currentUser.email).delete();
                     await db.collection("historial_jornadas").doc(currentUser.email).delete();
                     alert("Cuenta e historial eliminados correctamente de la base de datos.");
-                } catch (e) {
-                    console.error("Error al eliminar en Firestore:", e);
-                }
+                } catch (e) {}
             }
             logoutApp();
         }
