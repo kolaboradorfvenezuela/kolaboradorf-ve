@@ -25,7 +25,7 @@
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-slate-950/40 border border-red-500/50 flex items-center justify-center text-white font-black text-lg shadow-inner">K</div>
                 <div>
-                    <h1 class="text-xl font-black tracking-wider uppercase text-white flex items-center gap-2">Kolaboradorf VE <span class="text-[10px] bg-black/40 px-2 py-0.5 rounded border border-red-500/30 font-medium text-red-200">PRO v4.0</span></h1>
+                    <h1 class="text-xl font-black tracking-wider uppercase text-white flex items-center gap-2">Kolaboradorf VE <span class="text-[10px] bg-black/40 px-2 py-0.5 rounded border border-red-500/30 font-medium text-red-200">PRO v4.2</span></h1>
                     <p class="text-[11px] text-red-200 font-medium">Gestión Inteligente Sincronizada en la Nube</p>
                 </div>
             </div>
@@ -332,7 +332,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT PROFESIONAL INTEGRAL V4.1 -->
+    <!-- SCRIPT PROFESIONAL INTEGRAL V4.2 -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBzMXFLJhTuPSPdKGsVqCqQRhP_NiGYBA",
@@ -562,7 +562,7 @@
                     fechaIngreso: pendingVerificationData.fechaIngreso,
                     approved: false,
                     createdAt: new Date().toISOString()
-                });
+                }, { merge: true });
 
                 alert("¡Cuenta verificada y enviada a aprobación del Administrador!");
                 document.getElementById('authView').classList.add('hidden');
@@ -697,6 +697,7 @@
 
             await loadIncentiveConfig();
             calculateAntiquity();
+            await loadUserHistory(); // Carga el historial guardado en Firestore para este usuario
             calculateRealTime();
         }
 
@@ -850,46 +851,121 @@
             return { cargaInicial, cargaNetaDia, incentivoDiarioUSD, efectividad };
         }
 
-        function saveDailyRecord() {
+        // NUEVO: Función para cargar el historial guardado en Firestore para el usuario actual
+        async function loadUserHistory() {
+            if (!currentUser || !currentUser.email) return;
+            const list = document.getElementById('historyList');
+            list.innerHTML = '<p class="text-xs text-slate-400 text-center py-4">Cargando historial...</p>';
+
+            try {
+                const docRef = db.collection("historial_jornadas").doc(currentUser.email);
+                const doc = await docRef.get();
+                list.innerHTML = '';
+
+                if (doc.exists && doc.data().registros) {
+                    const registros = doc.data().registros;
+                    registros.forEach(record => {
+                        appendRecordCard(record, false);
+                    });
+                } else {
+                    list.innerHTML = '<p class="text-xs text-slate-400 text-center py-4">No hay jornadas registradas.</p>';
+                }
+            } catch (e) {
+                list.innerHTML = '<p class="text-xs text-red-400 text-center py-4">Error al cargar historial.</p>';
+            }
+        }
+
+        // NUEVO: Función auxiliar para pintar una tarjeta de registro en el DOM
+        function appendRecordCard(record, prepend = true) {
+            const list = document.getElementById('historyList');
+            if (list.innerHTML.includes('No hay jornadas registradas.') || list.innerHTML.includes('Cargando historial...')) {
+                list.innerHTML = '';
+            }
+
+            const card = document.createElement('div');
+            card.className = "bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3 text-xs shadow-inner";
+            card.innerHTML = `
+                <div class="flex justify-between items-center border-b border-slate-900 pb-2">
+                    <div>
+                        <strong class="text-white text-sm font-extrabold">Ruta: ${record.ruta} (${record.userRole})</strong>
+                        <p class="text-[10px] text-slate-400 mt-0.5">📅 ${record.fecha} — 👤 ${record.colaboradorNombre}</p>
+                    </div>
+                    <span class="px-2.5 py-1 rounded-xl text-[10px] font-bold ${record.isQualified ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}">
+                        ${record.isQualified ? '✅ Efectividad Calificada' : '❌ No Califica'}
+                    </span>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-slate-300 font-medium">
+                    <div>Carga Inicial: <strong class="text-white">${record.cargaInicial}</strong></div>
+                    <div>Carga Neta: <strong class="text-white">${record.cargaNetaDia}</strong></div>
+                    <div>Incentivo: <strong class="text-emerald-400">$${record.incentivoDiarioUSD}</strong></div>
+                    <div>Efectividad: <strong class="text-blue-400">${record.efectividad}%</strong></div>
+                </div>
+                <div class="pt-2 border-t border-slate-900 flex justify-end">
+                    <button onclick="shareRecordByEmail('${record.ruta}', '${record.fecha}', '${record.cargaInicial}', '${record.cargaNetaDia}', '${record.incentivoDiarioUSD}', '${record.efectividad}', '${record.isQualified ? 'Califica' : 'No Califica'}')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-4 py-1.5 rounded-lg transition text-[10px] shadow uppercase tracking-wider flex items-center gap-1">
+                        📤 Compartir por Correo
+                    </button>
+                </div>
+            `;
+            if (prepend) {
+                list.prepend(card);
+            } else {
+                list.appendChild(card);
+            }
+        }
+
+        // MODIFICADO: Guarda el registro en Firestore de manera persistente por usuario
+        async function saveDailyRecord() {
             const metrics = calculateRealTime();
             const ruta = document.getElementById('inputRuta').value || 'Sin Ruta';
             const fecha = document.getElementById('inputFechaJornada').value || 'Fecha no especificada';
             const userRole = currentUser ? currentUser.role : 'Ayudante';
             const isQualified = metrics.efectividad >= 97;
             const colaboradorNombre = currentUser ? currentUser.name : 'Colaborador';
-            const colaboradorEmail = currentUser ? currentUser.email : 'Sin email';
 
-            alert("¡Registro guardado y consolidado con éxito!");
+            const newRecord = {
+                ruta,
+                fecha,
+                userRole,
+                cargaInicial: metrics.cargaInicial,
+                cargaNetaDia: metrics.cargaNetaDia,
+                incentivoDiarioUSD: metrics.incentivoDiarioUSD.toFixed(2),
+                efectividad: metrics.efectividad.toFixed(1),
+                isQualified,
+                colaboradorNombre,
+                timestamp: new Date().toISOString()
+            };
 
-            const list = document.getElementById('historyList');
-            const card = document.createElement('div');
-            card.className = "bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3 text-xs shadow-inner";
-            card.innerHTML = `
-                <div class="flex justify-between items-center border-b border-slate-900 pb-2">
-                    <div>
-                        <strong class="text-white text-sm font-extrabold">Ruta: ${ruta} (${userRole})</strong>
-                        <p class="text-[10px] text-slate-400 mt-0.5">📅 ${fecha} — 👤 ${colaboradorNombre}</p>
-                    </div>
-                    <span class="px-2.5 py-1 rounded-xl text-[10px] font-bold ${isQualified ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}">
-                        ${isQualified ? '✅ Efectividad Calificada' : '❌ No Califica'}
-                    </span>
-                </div>
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-slate-300 font-medium">
-                    <div>Carga Inicial: <strong class="text-white">${metrics.cargaInicial}</strong></div>
-                    <div>Carga Neta: <strong class="text-white">${metrics.cargaNetaDia}</strong></div>
-                    <div>Incentivo: <strong class="text-emerald-400">$${metrics.incentivoDiarioUSD.toFixed(2)}</strong></div>
-                    <div>Efectividad: <strong class="text-blue-400">${metrics.efectividad.toFixed(1)}%</strong></div>
-                </div>
-                <div class="pt-2 border-t border-slate-900 flex justify-end">
-                    <button onclick="shareRecordByEmail('${ruta}', '${fecha}', '${metrics.cargaInicial}', '${metrics.cargaNetaDia}', '${metrics.incentivoDiarioUSD.toFixed(2)}', '${metrics.efectividad.toFixed(1)}', '${isQualified ? 'Califica' : 'No Califica'}')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-4 py-1.5 rounded-lg transition text-[10px] shadow uppercase tracking-wider flex items-center gap-1">
-                        📤 Compartir por Correo
-                    </button>
-                </div>
-            `;
-            list.prepend(card);
+            try {
+                const docRef = db.collection("historial_jornadas").doc(currentUser.email);
+                const doc = await docRef.get();
+                let registros = [];
+                if (doc.exists && doc.data().registros) {
+                    registros = doc.data().registros;
+                }
+                registros.unshift(newRecord); // Agrega al inicio
+
+                await docRef.set({ registros }, { merge: true });
+
+                alert("¡Registro guardado y sincronizado en la nube con éxito!");
+                appendRecordCard(newRecord, true);
+            } catch (error) {
+                console.error("Error al guardar en Firestore:", error);
+                alert("Error al guardar el registro en la nube.");
+            }
         }
 
-        // Función añadida exclusivamente para enviar la tarjeta por correo mediante EmailJS
+        // MODIFICADO: Borra el historial tanto visualmente como en Firestore para el usuario actual
+        async function clearHistory() {
+            if (!confirm("¿Deseas borrar todo tu historial de jornadas?")) return;
+            try {
+                await db.collection("historial_jornadas").doc(currentUser.email).set({ registros: [] });
+                document.getElementById('historyList').innerHTML = '<p class="text-xs text-slate-400 text-center py-4">No hay jornadas registradas.</p>';
+                alert("Historial borrado exitosamente.");
+            } catch (e) {
+                alert("Error al borrar el historial en la nube.");
+            }
+        }
+
         async function shareRecordByEmail(ruta, fecha, cargaInicial, cargaNeta, incentivo, efectividad, estado) {
             const emailDestino = prompt("Ingrese el correo electrónico al cual desea enviar el reporte de esta jornada:", currentUser ? currentUser.email : "");
             if (!emailDestino) return;
@@ -916,8 +992,6 @@
                 alert("Error al enviar el correo: " + (error.text || error.message || error));
             }
         }
-
-        function clearHistory() { document.getElementById('historyList').innerHTML = ''; alert("Historial borrado."); }
         
         async function confirmDeleteAccount() {
             if (!confirm("⚠️ ¿Estás seguro de que deseas eliminar permanentemente tu cuenta? Esta acción no se puede deshacer.")) return;
@@ -925,7 +999,8 @@
             if (currentUser && currentUser.email) {
                 try {
                     await db.collection("usuarios").doc(currentUser.email).delete();
-                    alert("Cuenta eliminada correctamente de la base de datos.");
+                    await db.collection("historial_jornadas").doc(currentUser.email).delete();
+                    alert("Cuenta e historial eliminados correctamente de la base de datos.");
                 } catch (e) {
                     console.error("Error al eliminar en Firestore:", e);
                 }
