@@ -25,7 +25,7 @@
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-slate-950/40 border border-red-500/50 flex items-center justify-center text-white font-black text-lg shadow-inner">K</div>
                 <div>
-                    <h1 class="text-xl font-black tracking-wider uppercase text-white flex items-center gap-2">Kolaboradorf VE <span class="text-[10px] bg-black/40 px-2 py-0.5 rounded border border-red-500/30 font-medium text-red-200">PRO v4.3</span></h1>
+                    <h1 class="text-xl font-black tracking-wider uppercase text-white flex items-center gap-2">Kolaboradorf VE <span class="text-[10px] bg-black/40 px-2 py-0.5 rounded border border-red-500/30 font-medium text-red-200">PRO v4.4</span></h1>
                     <p class="text-[11px] text-red-200 font-medium">Gestión Inteligente Sincronizada en la Nube</p>
                 </div>
             </div>
@@ -332,7 +332,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT PROFESIONAL INTEGRAL V4.3 -->
+    <!-- SCRIPT PROFESIONAL INTEGRAL V4.4 -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBzMXFLJhTuPSPdKGsVqCqQRhP_NiGYBA",
@@ -544,7 +544,7 @@
                 switchAuthMode('verify');
             } catch (error) {
                 console.error("Error EmailJS:", error);
-                alert("Error al enviar correo con EmailJS: " + (error.text || error.message || error));
+                alert("Error al enviar correo con EmailJS: " + (error.text || error.message || JSON.stringify(error)));
             }
         }
 
@@ -651,7 +651,7 @@
                 switchAuthMode('reset');
             } catch (error) {
                 console.error("Error EmailJS:", error);
-                alert("Error al enviar el correo de recuperación. Verifique su dirección o conexión.");
+                alert("Error al enviar el correo de recuperación: " + (error.text || error.message || JSON.stringify(error)));
             }
         }
 
@@ -962,7 +962,7 @@
             }
         }
 
-        // CORREGIDO: Limpieza de espacios en el correo con .trim() para evitar errores de cuenta en EmailJS
+        // CORREGIDO: Manejo seguro de errores de EmailJS para evitar [object Object] y asegurar la entrega
         async function shareRecordByEmail(ruta, fecha, cargaInicial, cargaNeta, incentivo, efectividad, estado) {
             let emailDestino = prompt("Ingrese el correo electrónico al cual desea enviar el reporte de esta jornada:", currentUser ? currentUser.email : "");
             if (!emailDestino) return;
@@ -988,7 +988,8 @@
                 alert("¡Reporte de jornada compartido por correo exitosamente a " + emailDestino + "!");
             } catch (error) {
                 console.error("Error EmailJS:", error);
-                alert("Error al enviar el correo: " + (error.text || error.message || error));
+                const errorMsg = error.text || error.message || (typeof error === 'string' ? error : JSON.stringify(error));
+                alert("Error al enviar el correo: " + errorMsg);
             }
         }
         
