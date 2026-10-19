@@ -25,7 +25,7 @@
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-slate-950/40 border border-red-500/50 flex items-center justify-center text-white font-black text-lg shadow-inner">K</div>
                 <div>
-                    <h1 class="text-xl font-black tracking-wider uppercase text-white flex items-center gap-2">Kolaboradorf VE <span class="text-[10px] bg-black/40 px-2 py-0.5 rounded border border-red-500/30 font-medium text-red-200">PRO v4.2</span></h1>
+                    <h1 class="text-xl font-black tracking-wider uppercase text-white flex items-center gap-2">Kolaboradorf VE <span class="text-[10px] bg-black/40 px-2 py-0.5 rounded border border-red-500/30 font-medium text-red-200">PRO v4.3</span></h1>
                     <p class="text-[11px] text-red-200 font-medium">Gestión Inteligente Sincronizada en la Nube</p>
                 </div>
             </div>
@@ -332,7 +332,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT PROFESIONAL INTEGRAL V4.2 -->
+    <!-- SCRIPT PROFESIONAL INTEGRAL V4.3 -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBzMXFLJhTuPSPdKGsVqCqQRhP_NiGYBA",
@@ -697,7 +697,7 @@
 
             await loadIncentiveConfig();
             calculateAntiquity();
-            await loadUserHistory(); // Carga el historial guardado en Firestore para este usuario
+            await loadUserHistory();
             calculateRealTime();
         }
 
@@ -851,7 +851,6 @@
             return { cargaInicial, cargaNetaDia, incentivoDiarioUSD, efectividad };
         }
 
-        // NUEVO: Función para cargar el historial guardado en Firestore para el usuario actual
         async function loadUserHistory() {
             if (!currentUser || !currentUser.email) return;
             const list = document.getElementById('historyList');
@@ -875,7 +874,6 @@
             }
         }
 
-        // NUEVO: Función auxiliar para pintar una tarjeta de registro en el DOM
         function appendRecordCard(record, prepend = true) {
             const list = document.getElementById('historyList');
             if (list.innerHTML.includes('No hay jornadas registradas.') || list.innerHTML.includes('Cargando historial...')) {
@@ -913,7 +911,6 @@
             }
         }
 
-        // MODIFICADO: Guarda el registro en Firestore de manera persistente por usuario
         async function saveDailyRecord() {
             const metrics = calculateRealTime();
             const ruta = document.getElementById('inputRuta').value || 'Sin Ruta';
@@ -942,7 +939,7 @@
                 if (doc.exists && doc.data().registros) {
                     registros = doc.data().registros;
                 }
-                registros.unshift(newRecord); // Agrega al inicio
+                registros.unshift(newRecord);
 
                 await docRef.set({ registros }, { merge: true });
 
@@ -954,7 +951,6 @@
             }
         }
 
-        // MODIFICADO: Borra el historial tanto visualmente como en Firestore para el usuario actual
         async function clearHistory() {
             if (!confirm("¿Deseas borrar todo tu historial de jornadas?")) return;
             try {
@@ -966,13 +962,16 @@
             }
         }
 
+        // CORREGIDO: Limpieza de espacios en el correo con .trim() para evitar errores de cuenta en EmailJS
         async function shareRecordByEmail(ruta, fecha, cargaInicial, cargaNeta, incentivo, efectividad, estado) {
-            const emailDestino = prompt("Ingrese el correo electrónico al cual desea enviar el reporte de esta jornada:", currentUser ? currentUser.email : "");
+            let emailDestino = prompt("Ingrese el correo electrónico al cual desea enviar el reporte de esta jornada:", currentUser ? currentUser.email : "");
             if (!emailDestino) return;
+            emailDestino = emailDestino.trim();
 
             const templateParams = {
                 email: emailDestino,
                 to_email: emailDestino,
+                reply_to: emailDestino,
                 name: currentUser ? currentUser.name : "Colaborador",
                 colaborador_nombre: currentUser ? currentUser.name : "Colaborador",
                 cargo_colaborador: currentUser ? currentUser.role : "Ayudante",
