@@ -13,17 +13,20 @@
     <!-- EmailJS SDK (Solo para verificación y recuperación) -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playball&display=swap');
         body { 
             font-family: 'Inter', sans-serif; 
             background-color: #030712;
             background-image: 
-                radial-gradient(at 0% 0%, rgba(153, 27, 27, 0.15) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(30, 41, 59, 0.4) 0px, transparent 50%),
-                radial-gradient(at 50% 50%, rgba(15, 23, 42, 0.8) 0px, transparent 100%),
-                radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-            background-size: 100% 100%, 100% 100%, 100% 100%, 24px 24px;
+                linear-gradient(to bottom, rgba(3, 7, 18, 0.88), rgba(3, 7, 18, 0.94)),
+                url('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=1920&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
             background-attachment: fixed;
+        }
+        .brand-cursive {
+            font-family: 'Playball', cursive;
+            letter-spacing: 0.05em;
         }
     </style>
 </head>
@@ -33,10 +36,9 @@
     <header class="bg-gradient-to-r from-red-900 via-red-700 to-red-900 shadow-2xl border-b border-red-800/80 sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-slate-950/40 border border-red-500/50 flex items-center justify-center text-white font-black text-lg shadow-inner">K</div>
                 <div>
-                    <h1 class="text-xl font-black tracking-wider uppercase text-white flex items-center gap-2">Kolaboradorf VE <span class="text-[10px] bg-black/40 px-2 py-0.5 rounded border border-red-500/30 font-medium text-red-200">PRO v5.5</span></h1>
-                    <p class="text-[11px] text-red-200 font-medium">Gestión Inteligente Sincronizada en la Nube</p>
+                    <h1 class="text-2xl font-bold tracking-wide text-white brand-cursive drop-shadow-md">Kolaboradorf VE</h1>
+                    <p class="text-[11px] text-red-200 font-medium tracking-wide">Gestión Inteligente de Trabajo</p>
                 </div>
             </div>
             <!-- Controles de Sesión -->
@@ -369,6 +371,11 @@
             </div>
         </div>
     </main>
+
+    <!-- PIE DE PÁGINA INSTITUCIONAL -->
+    <footer class="bg-slate-950/80 border-t border-slate-900 py-4 text-center text-xs text-slate-400 backdrop-blur-md mt-auto">
+        <p>© 2026 Kolaboradorf VE. Todos los derechos reservados.</p>
+    </footer>
 
     <!-- Modal Términos -->
     <div id="termsModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
@@ -1037,7 +1044,7 @@
                     return;
                 }
                 if (f1Input === "" || isNaN(f1Input)) {
-                    alert("⚠️ El campo F1 (Principal) es obligatorio.");
+                    alert("⚠️ El campo F1 (Principal) is obligatorio.");
                     document.getElementById('inputF1').focus();
                     return;
                 }
