@@ -25,7 +25,7 @@
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-slate-950/40 border border-red-500/50 flex items-center justify-center text-white font-black text-lg shadow-inner">K</div>
                 <div>
-                    <h1 class="text-xl font-black tracking-wider uppercase text-white flex items-center gap-2">Kolaboradorf VE <span class="text-[10px] bg-black/40 px-2 py-0.5 rounded border border-red-500/30 font-medium text-red-200">PRO v5.2</span></h1>
+                    <h1 class="text-xl font-black tracking-wider uppercase text-white flex items-center gap-2">Kolaboradorf VE <span class="text-[10px] bg-black/40 px-2 py-0.5 rounded border border-red-500/30 font-medium text-red-200">PRO v5.3</span></h1>
                     <p class="text-[11px] text-red-200 font-medium">Gestión Inteligente Sincronizada en la Nube</p>
                 </div>
             </div>
@@ -253,7 +253,7 @@
                         <button onclick="saveDailyRecord()" class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-xl transition text-xs shadow-lg shadow-red-600/30 uppercase tracking-wider mt-2">Guardar Registro en la Nube</button>
                     </div>
 
-                    <!-- Resumen Diario, Histórico del Día, Tarjeta de Efectividad Semanal y Histórico Mensual -->
+                    <!-- Resumen Diario, Histórico del Día y Tarjeta de Efectividad e Incentivo Semanal (Histórico Mensual removido para simplificar) -->
                     <div class="lg:col-span-2 space-y-6">
                         <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
                             <div class="bg-slate-900/90 backdrop-blur-xl p-4 rounded-2xl border border-slate-800 text-center shadow-lg"><span class="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">Carga Inicial</span><h4 id="statCargaInicial" class="text-2xl font-black text-white mt-1.5">0</h4></div>
@@ -262,7 +262,7 @@
                             <div class="bg-slate-900/90 backdrop-blur-xl p-4 rounded-2xl border border-slate-800 text-center shadow-lg"><span class="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">Efectividad Diaria</span><h4 id="statEfectividadSemanal" class="text-2xl font-black text-blue-400 mt-1.5">100.0%</h4></div>
                         </div>
 
-                        <!-- HISTÓRICO DEL DÍA CON BOTÓN PARA LIMPIAR (SINCRONIZADO CON REINICIO SEMANAL) -->
+                        <!-- HISTÓRICO DEL DÍA CON BOTÓN PARA LIMPIAR -->
                         <div class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-3 shadow-xl">
                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-800 pb-3 gap-2">
                                 <h4 class="text-sm font-extrabold text-white flex items-center gap-2">📊 Histórico del Día (Registros de Hoy)</h4>
@@ -276,38 +276,34 @@
                             </div>
                         </div>
 
-                        <!-- TARJETA DE EFECTIVIDAD ACUMULADA DE LA SEMANA -->
-                        <div class="bg-gradient-to-br from-slate-900 via-slate-900/90 to-red-950/40 p-5 rounded-2xl border border-red-900/35 shadow-xl flex flex-col sm:flex-row justify-between items-center gap-4">
-                            <div>
-                                <div class="flex items-center gap-3">
-                                    <span class="text-[10px] font-extrabold text-red-400 uppercase tracking-wider">Evolución Semanal Activa</span>
-                                    <!-- Botón discreto y bonito para reinicio manual -->
-                                    <button onclick="resetManualWeeklyCycle()" title="Reiniciar ciclo semanal manualmente" class="text-[10px] bg-slate-800 hover:bg-red-600/30 text-slate-300 hover:text-red-300 px-2.5 py-0.5 rounded-lg border border-slate-700 transition flex items-center gap-1 font-semibold shadow">
-                                        🔄 Reiniciar Semana
-                                    </button>
+                        <!-- TARJETA DE EFECTIVIDAD Y ACUMULADO DE INCENTIVOS DE LA SEMANA -->
+                        <div class="bg-gradient-to-br from-slate-900 via-slate-900/90 to-red-950/40 p-5 rounded-2xl border border-red-900/35 shadow-xl space-y-4">
+                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                                <div>
+                                    <div class="flex items-center gap-3">
+                                        <span class="text-[10px] font-extrabold text-red-400 uppercase tracking-wider">Evolución Semanal Activa</span>
+                                        <button onclick="resetManualWeeklyCycle()" title="Reiniciar ciclo semanal manualmente" class="text-[10px] bg-slate-800 hover:bg-red-600/30 text-slate-300 hover:text-red-300 px-2.5 py-0.5 rounded-lg border border-slate-700 transition flex items-center gap-1 font-semibold shadow">
+                                            🔄 Reiniciar Semana
+                                        </button>
+                                    </div>
+                                    <h4 class="text-sm font-black text-white mt-0.5">Efectividad y Acumulado Semanal</h4>
+                                    <p class="text-[11px] text-slate-400 mt-0.5">Promedio de efectividad y suma total de tus incentivos en el ciclo (meta mínima: 97.0%).</p>
                                 </div>
-                                <h4 class="text-sm font-black text-white mt-0.5">Efectividad Acumulada de la Semana</h4>
-                                <p class="text-[11px] text-slate-400 mt-0.5">Promedio de tus registros diarios (meta mínima para cobrar: 97.0%).</p>
+                                <div class="text-center sm:text-right bg-slate-950/80 px-6 py-3 rounded-xl border border-slate-800 shadow-inner">
+                                    <span id="globalEfectividadBadge" class="text-2xl font-black text-emerald-400">100.0%</span>
+                                    <p id="globalEfectividadLabel" class="text-[10px] font-bold text-slate-400 uppercase mt-0.5">Listo para la semana</p>
+                                </div>
                             </div>
-                            <div class="text-center sm:text-right bg-slate-950/80 px-6 py-3 rounded-xl border border-slate-800 shadow-inner">
-                                <span id="globalEfectividadBadge" class="text-2xl font-black text-emerald-400">100.0%</span>
-                                <p id="globalEfectividadLabel" class="text-[10px] font-bold text-slate-400 uppercase mt-0.5">Listo para la semana</p>
+
+                            <!-- NUEVO APARTADO: TOTAL INCENTIVO ACUMULADO EN LA SEMANA -->
+                            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex justify-between items-center shadow-inner">
+                                <span class="text-xs font-bold text-slate-300 uppercase tracking-wider">💰 Total Incentivo de la Semana:</span>
+                                <span id="globalIncentivoSemanalBadge" class="text-xl font-black text-emerald-400">$0.00</span>
                             </div>
                         </div>
 
-                        <!-- HISTÓRICO MENSUAL (CARPETAS DESPLEGABLES) -->
-                        <div class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-4 shadow-xl">
-                            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                                <h4 class="text-sm font-extrabold text-white flex items-center gap-2">📂 Histórico Mensual</h4>
-                                <span class="text-[10px] text-slate-400">Tus registros almacenados por mes y semana</span>
-                            </div>
-                            <!-- Contenedor del Histórico Jerárquico Mensual -->
-                            <div id="hierarchicalHistoryContainer" class="space-y-4 max-h-[420px] overflow-y-auto pr-1">
-                                <p class="text-xs text-slate-400 text-center py-6">Cargando histórico estructurado...</p>
-                            </div>
-                            <div class="pt-4 border-t border-slate-800 flex justify-end">
-                                <button onclick="confirmDeleteAccount()" class="bg-slate-950 hover:bg-red-950/40 text-red-400 border border-red-900/40 text-[11px] font-bold px-5 py-2.5 rounded-xl transition shadow">⚠️ Eliminar Cuenta</button>
-                            </div>
+                        <div class="flex justify-end pt-2">
+                            <button onclick="confirmDeleteAccount()" class="bg-slate-900 hover:bg-red-950/40 text-red-400 border border-red-900/40 text-[11px] font-bold px-5 py-2.5 rounded-xl transition shadow">⚠️ Eliminar Cuenta</button>
                         </div>
                     </div>
                 </div>
@@ -378,7 +374,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT PROFESIONAL INTEGRAL V5.2 -->
+    <!-- SCRIPT PROFESIONAL INTEGRAL V5.3 -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBzMXFLJhTuPSPdKGsVqCqQRhP_NiGYBA",
@@ -899,9 +895,6 @@
 
         async function loadUserHistory() {
             if (!currentUser || !currentUser.email) return;
-            const container = document.getElementById('hierarchicalHistoryContainer');
-            container.innerHTML = '<p class="text-xs text-slate-400 text-center py-6">Cargando histórico estructurado...</p>';
-
             try {
                 const docRef = db.collection("historial_jornadas").doc(currentUser.email);
                 const doc = await docRef.get();
@@ -910,14 +903,13 @@
                 if (doc.exists && doc.data().registros) {
                     cachedUserRecords = doc.data().registros;
                     renderTodayHistory(cachedUserRecords);
-                    renderHierarchicalHistory(cachedUserRecords);
+                    updateWeeklyCardFromHistory(cachedUserRecords);
                 } else {
-                    container.innerHTML = '<p class="text-xs text-slate-400 text-center py-6">No hay jornadas registradas.</p>';
                     document.getElementById('todayHistoryContainer').innerHTML = '<p class="text-xs text-slate-400 text-center py-4">No hay registros guardados para el día de hoy.</p>';
                     updateWeeklyCardFromHistory([]);
                 }
             } catch (e) {
-                container.innerHTML = '<p class="text-xs text-red-400 text-center py-6">Error al cargar el histórico.</p>';
+                console.error("Error al cargar historial", e);
             }
         }
 
@@ -961,27 +953,24 @@
             });
         }
 
-        // FUNCIÓN PARA LIMPIAR EL HISTORIAL DEL DÍA (Y REINICIAR AUTOMÁTICAMENTE EL ACUMULADO SEMANAL)
+        // LIMPIAR HISTORIAL DEL DÍA
         async function clearTodayHistory() {
             if (!confirm("⚠️ ¿Deseas limpiar/eliminar los registros del día de hoy? Esto también reiniciará automáticamente el acumulado semanal.")) return;
 
             const todayStr = new Date().toISOString().split('T')[0];
-            
-            // Filtramos conservando únicamente los registros que NO sean de hoy
             const updatedRecords = cachedUserRecords.filter(r => r.fecha !== todayStr);
 
             try {
                 const docRef = db.collection("historial_jornadas").doc(currentUser.email);
                 await docRef.set({ registros: updatedRecords }, { merge: true });
 
-                // Sincronización automática: Reiniciamos también el ciclo semanal con la fecha de hoy
                 if (currentUser && currentUser.email) {
                     localStorage.setItem(`last_reset_date_${currentUser.email}`, todayStr);
                 }
 
                 cachedUserRecords = updatedRecords;
                 renderTodayHistory(cachedUserRecords);
-                renderHierarchicalHistory(cachedUserRecords);
+                updateWeeklyCardFromHistory(cachedUserRecords);
 
                 alert("🗑️ ¡Historial del día limpiado y acumulado semanal reiniciado con éxito!");
             } catch (error) {
@@ -989,182 +978,39 @@
             }
         }
 
-        // RENDERIZADO DEL HISTÓRICO MENSUAL CON CARPETAS DESPLEGABLES
-        function renderHierarchicalHistory(records) {
-            const container = document.getElementById('hierarchicalHistoryContainer');
-            container.innerHTML = '';
-
-            if (!records || records.length === 0) {
-                container.innerHTML = '<p class="text-xs text-slate-400 text-center py-6">No hay jornadas registradas.</p>';
-                updateWeeklyCardFromHistory([]);
-                return;
-            }
-
-            updateWeeklyCardFromHistory(records);
-
-            const nombresMeses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-
-            const mesesMap = {};
-            records.forEach(rec => {
-                const fechaObj = new Date(rec.fecha + "T00:00:00");
-                const year = fechaObj.getFullYear();
-                const monthIndex = fechaObj.getMonth();
-                const monthKey = `${year}-${String(monthIndex + 1).padStart(2, '0')}`;
-                const monthName = `${nombresMeses[monthIndex]} ${year}`;
-
-                if (!mesesMap[monthKey]) {
-                    mesesMap[monthKey] = { name: monthName, records: [] };
-                }
-                mesesMap[monthKey].records.push({ ...rec, fechaObj });
-            });
-
-            const sortedMonthKeys = Object.keys(mesesMap).sort().reverse();
-
-            sortedMonthKeys.forEach(mKey => {
-                const mesData = mesesMap[mKey];
-                
-                let mesCargaInicial = 0;
-                let mesCargaNeta = 0;
-                let mesIncentivo = 0;
-                let sumaEfMes = 0;
-
-                mesData.records.forEach(r => {
-                    mesCargaInicial += parseInt(r.cargaInicial) || 0;
-                    mesCargaNeta += parseInt(r.cargaNetaDia) || 0;
-                    mesIncentivo += parseFloat(r.incentivoDiarioUSD) || 0;
-                    sumaEfMes += parseFloat(r.efectividad) || 0;
-                });
-                const mesEfPromedio = mesData.records.length > 0 ? (sumaEfMes / mesData.records.length) : 100;
-
-                const monthBox = document.createElement('div');
-                monthBox.className = "bg-slate-950 rounded-2xl border border-slate-800 p-4 space-y-3 shadow-inner";
-                monthBox.innerHTML = `
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-900 pb-3 gap-2">
-                        <div>
-                            <h5 class="text-sm font-extrabold text-white flex items-center gap-2">📁 Carpeta Mensual: <span class="text-red-400 uppercase">${mesData.name}</span></h5>
-                            <p class="text-[10px] text-slate-400">Histórico acumulado permanente</p>
-                        </div>
-                        <div class="flex flex-wrap gap-2 text-[10px] font-bold">
-                            <span class="bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800 text-slate-300">C. Inicial: ${mesCargaInicial}</span>
-                            <span class="bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800 text-slate-300">C. Neta: ${mesCargaNeta}</span>
-                            <span class="bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded-lg border border-emerald-500/20">Incentivo: $${mesIncentivo.toFixed(2)}</span>
-                            <span class="bg-blue-500/10 text-blue-400 px-2.5 py-1 rounded-lg border border-blue-500/20">Ef. Promedio: ${mesEfPromedio.toFixed(1)}%</span>
-                        </div>
-                    </div>
-                `;
-
-                const semanasMap = {};
-                mesData.records.forEach(r => {
-                    const d = r.fechaObj;
-                    const startOfMonth = new Date(d.getFullYear(), d.getMonth(), 1);
-                    const weekNumber = Math.ceil(((d.getDay() === 0 ? 7 : d.getDay()) + Math.floor((d.getDate() - 1 + startOfMonth.getDay()) / 7)) / 7) || 1;
-                    const weekKey = `Semana ${weekNumber}`;
-
-                    const dayOfWeek = d.getDay();
-                    if (dayOfWeek >= 1 && dayOfWeek <= 5) {
-                        if (!semanasMap[weekKey]) semanasMap[weekKey] = [];
-                        semanasMap[weekKey].push(r);
-                    } else {
-                        const weekendKey = `Semana ${weekNumber} (Fin de Semana)`;
-                        if (!semanasMap[weekendKey]) semanasMap[weekendKey] = [];
-                        semanasMap[weekendKey].push(r);
-                    }
-                });
-
-                const weeksContainer = document.createElement('div');
-                weeksContainer.className = "space-y-3 pl-2 sm:pl-4 border-l border-red-600/30 mt-3";
-
-                Object.keys(semanasMap).sort().forEach(wKey => {
-                    const weekRecords = semanasMap[wKey];
-
-                    let wCargaInicial = 0;
-                    let wCargaNeta = 0;
-                    let wIncentivo = 0;
-                    let sumaEfWeek = 0;
-
-                    weekRecords.forEach(r => {
-                        wCargaInicial += parseInt(r.cargaInicial) || 0;
-                        wCargaNeta += parseInt(r.cargaNetaDia) || 0;
-                        wIncentivo += parseFloat(r.incentivoDiarioUSD) || 0;
-                        sumaEfWeek += parseFloat(r.efectividad) || 0;
-                    });
-                    const wEfPromedio = weekRecords.length > 0 ? (sumaEfWeek / weekRecords.length) : 100;
-
-                    const weekBox = document.createElement('div');
-                    weekBox.className = "bg-slate-900/80 rounded-xl border border-slate-800 p-3 space-y-2 shadow-inner";
-                    weekBox.innerHTML = `
-                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1">
-                            <h6 class="text-xs font-bold text-slate-200 flex items-center gap-1.5">📅 Subcarpeta: <span class="text-red-400">${wKey}</span> <span class="text-[9px] text-slate-400 font-normal">(Lunes a Viernes)</span></h6>
-                            <div class="flex gap-2 text-[10px] font-bold text-slate-300">
-                                <span>CI: ${wCargaInicial}</span> | <span>CN: ${wCargaNeta}</span> | <span class="text-emerald-400">Inc: $${wIncentivo.toFixed(2)}</span> | <span class="text-blue-400">Ef: ${wEfPromedio.toFixed(1)}%</span>
-                            </div>
-                        </div>
-                    `;
-
-                    const recordsList = document.createElement('div');
-                    recordsList.className = "space-y-2 pt-2";
-
-                    weekRecords.forEach(rec => {
-                        const recCard = document.createElement('div');
-                        recCard.className = "bg-slate-950 p-3 rounded-lg border border-slate-800/80 text-xs space-y-1.5";
-                        
-                        const pendientesHtml = rec.productosPendientes ? `
-                            <div class="bg-amber-500/10 border border-amber-500/30 p-2 rounded-lg text-amber-300 text-[11px] font-medium">
-                                📦 <strong>Nota de Pendientes / Adeudados:</strong> ${rec.productosPendientes}
-                            </div>
-                        ` : '';
-
-                        recCard.innerHTML = `
-                            <div class="flex justify-between items-center">
-                                <span class="font-extrabold text-white">Ruta: ${rec.ruta} (${rec.userRole})</span>
-                                <span class="text-[10px] text-slate-400">${rec.fecha}</span>
-                            </div>
-                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-slate-300 text-[11px]">
-                                <div>Carga Inicial: <strong class="text-white">${rec.cargaInicial}</strong></div>
-                                <div>Carga Neta: <strong class="text-white">${rec.cargaNetaDia}</strong></div>
-                                <div>Incentivo: <strong class="text-emerald-400">$${rec.incentivoDiarioUSD}</strong></div>
-                                <div>Efectividad: <strong class="text-blue-400">${rec.efectividad}%</strong></div>
-                            </div>
-                            ${pendientesHtml}
-                        `;
-                        recordsList.appendChild(recCard);
-                    });
-
-                    weekBox.appendChild(recordsList);
-                    weeksContainer.appendChild(weekBox);
-                });
-
-                monthBox.appendChild(weeksContainer);
-                container.appendChild(monthBox);
-            });
-        }
-
-        // CÁLCULO DE LA TARJETA SEMANAL BASADO EN LOS REGISTROS DIARIOS Y EL REINICIO MANUAL
+        // CÁLCULO DE LA TARJETA SEMANAL Y TOTAL DE INCENTIVO ACUMULADO
         function updateWeeklyCardFromHistory(records) {
             const badge = document.getElementById('globalEfectividadBadge');
             const label = document.getElementById('globalEfectividadLabel');
+            const incBadge = document.getElementById('globalIncentivoSemanalBadge');
 
             if (!currentUser || !currentUser.email) return;
             const resetKey = `last_reset_date_${currentUser.email}`;
             const lastResetDate = localStorage.getItem(resetKey) || "2000-01-01";
 
-            // Filtramos la historia diaria a partir de la fecha del último reinicio manual
             const activeWeekRecords = records.filter(r => r.fecha >= lastResetDate);
 
             if (activeWeekRecords.length === 0) {
                 badge.innerText = "100.0%";
                 badge.className = "text-2xl font-black text-slate-400";
                 label.innerText = "Ciclo semanal reiniciado (Listo)";
+                incBadge.innerText = "$0.00";
                 return;
             }
 
             let sumaEf = 0;
-            activeWeekRecords.forEach(r => sumaEf += parseFloat(r.efectividad) || 0);
+            let totalIncentivoSemana = 0;
+
+            activeWeekRecords.forEach(r => {
+                sumaEf += parseFloat(r.efectividad) || 0;
+                totalIncentivoSemana += parseFloat(r.incentivoDiarioUSD) || 0;
+            });
+
             const promedioSemanal = sumaEf / activeWeekRecords.length;
 
             badge.innerText = `${promedioSemanal.toFixed(1)}%`;
+            incBadge.innerText = `$${totalIncentivoSemana.toFixed(2)}`;
 
-            // Validación estricta: 97% o más califica para cobrar, menos de 97% no califica
             if (promedioSemanal >= 97.0) {
                 badge.className = "text-2xl font-black text-emerald-400";
                 label.innerText = "¡Califica Óptimo para Cobrar! (>= 97%)";
@@ -1175,13 +1021,13 @@
         }
 
         function resetManualWeeklyCycle() {
-            if (!confirm("¿Deseas reiniciar el ciclo semanal para empezar a acumular desde hoy? (Tus registros anteriores se mantienen seguros en el Histórico Mensual).")) return;
+            if (!confirm("¿Deseas reiniciar el ciclo semanal para empezar a acumular desde hoy?")) return;
 
             if (currentUser && currentUser.email) {
                 const todayStr = new Date().toISOString().split('T')[0];
                 localStorage.setItem(`last_reset_date_${currentUser.email}`, todayStr);
                 updateWeeklyCardFromHistory(cachedUserRecords);
-                alert("🔄 ¡Ciclo semanal reiniciado! La tarjeta está lista para empezar a promediar tus registros diarios.");
+                alert("🔄 ¡Ciclo semanal reiniciado con éxito!");
             }
         }
 
@@ -1239,7 +1085,7 @@
                 alert("¡Registro guardado exitosamente!");
                 cachedUserRecords = registros;
                 renderTodayHistory(cachedUserRecords);
-                renderHierarchicalHistory(cachedUserRecords);
+                updateWeeklyCardFromHistory(cachedUserRecords);
 
                 document.getElementById('inputProductosPendientes').value = '';
                 document.getElementById('inputRuta').value = '';
