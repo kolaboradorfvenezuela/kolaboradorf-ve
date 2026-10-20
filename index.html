@@ -137,8 +137,8 @@
                     <input type="password" id="regPassConfirm" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-red-600 transition shadow-inner">
                 </div>
                 <div class="text-xs text-slate-300 flex items-center gap-3 bg-slate-950 p-3 rounded-xl border border-slate-800">
-                    <input type="checkbox" id="regTerms" required class="rounded bg-slate-900 border-slate-700 text-red-600 focus:ring-0 w-4 h-4 cursor-pointer">
-                    <span class="leading-relaxed">Acepto obligatoriamente los <button type="button" onclick="openTermsModal()" class="text-red-400 hover:text-red-300 underline font-bold">Términos y Políticas</button></span>
+                    <input type="checkbox" id="regTerms" required class="rounded bg-slate-900 border-slate-700 text-red-600 focus:ring-0 w-4 h-4 cursor-pointer" onclick="openTermsModal(event)">
+                    <span class="leading-relaxed">Acepto obligatoriamente las <button type="button" onclick="openTermsModal(event)" class="text-red-400 hover:text-red-300 underline font-bold">Políticas y Términos Generales</button></span>
                 </div>
                 <div class="flex justify-between items-center text-xs pt-1">
                     <button type="button" onclick="switchAuthMode('login')" class="text-red-400 hover:underline">← Volver al Login</button>
@@ -398,12 +398,63 @@
         <p>© 2026 Kolaboradorf VE. Todos los derechos reservados.</p>
     </footer>
 
-    <!-- Modal Términos -->
+    <!-- MODAL DE POLÍTICAS Y TÉRMINOS (Con barra de desplazamiento y texto íntegro) -->
     <div id="termsModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-slate-900 rounded-3xl max-w-lg w-full p-8 border border-slate-800 space-y-5 shadow-2xl">
-            <h3 class="text-lg font-black text-white">Términos, Condiciones y Políticas</h3>
-            <p class="text-xs text-slate-300 leading-relaxed">Kolaboradorf VE es una plataforma tecnológica interna de control operativo y distribución. El uso de credenciales corporativas implica la aceptación estricta de estas normativas de seguridad y registro.</p>
-            <div class="text-right pt-2"><button onclick="closeTermsModal()" class="bg-red-600 hover:bg-red-500 text-white text-xs font-bold px-6 py-2.5 rounded-xl uppercase tracking-wider transition shadow-lg">Entendido</button></div>
+        <div class="bg-slate-900 rounded-3xl max-w-2xl w-full p-8 border border-slate-800 space-y-5 shadow-2xl flex flex-col max-h-[85vh]">
+            <h3 class="text-base font-black text-white border-b border-slate-800 pb-3">Políticas de Privacidad, Términos y Condiciones Generales de Uso</h3>
+            
+            <!-- Contenedor con barra lateral (Scroll) con todo el texto íntegro proporcionado -->
+            <div id="termsScrollContainer" onscroll="checkTermsScroll()" class="space-y-4 text-xs text-slate-300 leading-relaxed overflow-y-auto pr-2 max-h-[50vh] bg-slate-950 p-4 rounded-xl border border-slate-800 shadow-inner">
+                <p><strong>Última actualización:</strong> 20 de octubre de 2026<br>
+                <strong>Aplicación:</strong> KOLABORADORF VE<br>
+                <strong>Desarrollador / Titular:</strong> DFPfantasy CorVe (DFPFANTASY)<br>
+                <strong>Jurisdicción Base:</strong> República Bolivariana de Venezuela<br>
+                <strong>Contacto Legal y Soporte:</strong> DFPfantasyvnzla@gmail.com</p>
+
+                <h4 class="font-bold text-white uppercase mt-3">CAPÍTULO I: MARCO GENERAL Y RECONOCIMIENTO DEL SERVICIO</h4>
+                <p><strong>Artículo 1.1 — Definiciones y Naturaleza Jurídica</strong><br>
+                El presente instrumento legal constituye un contrato de adhesión vinculante conforme a la legislación de la República Bolivariana de Venezuela y a los principios generales de derecho internacional para aplicaciones digitales.<br>
+                - La Aplicación: KOLABORADORF VE, desarrollada y operada bajo la denominación comercial DFPfantasy CorVe (DFPFANTASY).<br>
+                - El Usuario: Toda persona natural que descargue, instale, acceda o utilice el software para llevar un control personal, diario o logístico de sus actividades de reparto o transporte.<br>
+                - Terceros / Empresas de Reparto: Entidades mercantiles, franquicias, distribuidores o empleadores para los cuales el Usuario preste servicios de manera directa, indirecta o independiente.</p>
+
+                <p><strong>Artículo 1.2 — Carácter Autónomo e Independencia Corporativa</strong><br>
+                KOLABORADORF VE y DFPfantasy CorVe son entidades tecnológicas totalmente independientes. No existe ningún vínculo de afiliación, asociación, sociedad, agencia, franquicia ni relación de dependencia o representación comercial entre la Aplicación y ninguna empresa, marca o patrono para el cual el Usuario trabaje o preste servicios de reparto.</p>
+
+                <h4 class="font-bold text-white uppercase mt-3">CAPÍTULO II: EXONERACIÓN TOTAL DE RESPONSABILIDAD LABORAL Y PATRIMONIAL</h4>
+                <p><strong>Artículo 2.1 — Inexistencia de Relación Laboral</strong><br>
+                El uso de KOLABORADORF VE no crea ni sugiere una relación de trabajo entre DFPfantasy CorVe y el Usuario, ni entre DFPfantasy CorVe y las empresas empleadoras del Usuario. La Aplicación es única y exclusivamente una herramienta digital auxiliar de uso personal.</p>
+
+                <p><strong>Artículo 2.2 — Inconsistencias en Nómina, Pagos o Comisiones</strong><br>
+                La Aplicación ejecuta cálculos automatizados basados únicamente en la información ingresada directamente por el Usuario.<br>
+                1. Falta de Valor Legal: Los reportes, sumatorias, contabilidad interna o métricas generadas por KOLABORADORF VE no constituyen comprobantes de nómina, recibos de pago ni documentos probatorios con validez mercantil o laboral frente a terceros.<br>
+                2. Procedimiento ante Discrepancias: En caso de que el Usuario observe diferencias o inconsistencias entre los datos calculados por la Aplicación y sus pagos reales, cómputos de nómina o liquidaciones, el Usuario se compromete de manera expresa a no presentar reclamos ni demandas contra la Aplicación ni sus desarrolladores. Debe dirigir cualquier aclaratoria directamente al supervisor, gerencia de operaciones o departamento de Recursos Humanos de su empresa contratante.</p>
+
+                <h4 class="font-bold text-white uppercase mt-3">CAPÍTULO III: ORIGEN DE LOS DATOS Y RESPONSABILIDAD DE CARGA</h4>
+                <p><strong>Artículo 3.1 — Insumo de Información por el Usuario</strong><br>
+                KOLABORADORF VE es una plataforma que se alimenta de la información suministrada voluntaria e independientemente por el Usuario. La Aplicación no almacena por cuenta propia, no verifica, no audita ni valida la veracidad, exactitud o legalidad de los datos introducidos (tales como cantidad de cajas, tarifas, rutas, montos recopilados o nombres de clientes).</p>
+
+                <p><strong>Artículo 3.2 — Uso Inadecuado de Marcas, Imagen y Propiedad Intelectual</strong><br>
+                Queda estrictamente prohibido al Usuario ingresar imágenes, logotipos, registros fotográficos o información confidencial de terceros o empresas sin contar con la autorización correspondiente. DFPfantasy CorVe no responderá bajo ningún concepto por demandas, sanciones o reclamos derivados del uso indebido de imagen, marcas registradas o secretos comerciales ingresados por los usuarios en la plataforma.</p>
+
+                <h4 class="font-bold text-white uppercase mt-3">CAPÍTULO IV: INFRAESTRUCTURA TÉCNICA, GRATUIDAD Y ACTUALIZACIONES</h4>
+                <p><strong>Artículo 4.1 — Modelo de Servicio Gratuito y Modificaciones</strong><br>
+                KOLABORADORF VE se distribuye bajo la modalidad de software gratuito (freeware). DFPfantasy CorVe se reserva el derecho inalienable de:<br>
+                - Modificar, reestructurar o actualizar la interfaz, algoritmos o funcionalidades de la Aplicación en cualquier momento y sin previo aviso.<br>
+                - Suspender o discontinuar el servicio temporal o definitivamente sin que ello genere derecho a indemnización alguna a favor del Usuario.</p>
+
+                <p><strong>Artículo 4.2 — Almacenamiento en Base de Datos Segura</strong><br>
+                La plataforma utiliza soluciones de almacenamiento e infraestructura de bases de datos respaldadas en tecnologías de Google (tales como Firebase / Google Cloud Platform / Feedback Data), garantizando altos estándares internacionales de encriptación y seguridad digital. La Aplicación no recopila ni comercializa información sensible para fines de perfilamiento publicitario sin consentimiento.</p>
+
+                <h4 class="font-bold text-white uppercase mt-3">CAPÍTULO V: JURISDICCIÓN Y MARCO LEGAL APLICABLE</h4>
+                <p>Este contrato se rige íntegramente por las leyes de la República Bolivariana de Venezuela (Constitución, Ley Orgánica de Telecomunicaciones, Ley Contra los Delitos Informáticos y Código Civil) y los estándares internacionales de comercio electrónico. Para cualquier controversia, las partes se someten expresamente a la jurisdicción de los Tribunales Ordinarios de la República Bolivariana de Venezuela.</p>
+            </div>
+
+            <!-- Botón de Aceptar (Habilitado solo al llegar al final del scroll) -->
+            <div class="pt-2 text-center">
+                <p id="scrollWarning" class="text-[10px] text-amber-400 mb-2 font-semibold">↓ Desplace hasta el final del documento para habilitar el botón de aceptación ↓</p>
+                <button id="btnAcceptTerms" disabled onclick="acceptTermsAndClose()" class="w-full bg-slate-800 text-slate-500 font-bold py-3 rounded-xl transition text-xs uppercase tracking-wider cursor-not-allowed shadow">Aceptar Políticas y Términos</button>
+            </div>
         </div>
     </div>
 
@@ -492,8 +543,36 @@
             else { input.type = 'password'; eye.innerText = '👁️'; }
         }
 
-        function openTermsModal() { document.getElementById('termsModal').classList.remove('hidden'); }
-        function closeTermsModal() { document.getElementById('termsModal').classList.add('hidden'); }
+        // FUNCIONES DE TÉRMINOS Y CONDICIONES CON SCROLL OBLIGATORIO
+        function openTermsModal(event) {
+            if (event) event.preventDefault();
+            const modal = document.getElementById('termsModal');
+            modal.classList.remove('hidden');
+            
+            // Reiniciar estado del scroll y botón al abrir
+            const container = document.getElementById('termsScrollContainer');
+            container.scrollTop = 0;
+            const btn = document.getElementById('btnAcceptTerms');
+            btn.disabled = true;
+            btn.className = "w-full bg-slate-800 text-slate-500 font-bold py-3 rounded-xl transition text-xs uppercase tracking-wider cursor-not-allowed shadow";
+            document.getElementById('scrollWarning').classList.remove('hidden');
+        }
+
+        function checkTermsScroll() {
+            const container = document.getElementById('termsScrollContainer');
+            // Verificar si el usuario llegó al final (con un margen de tolerancia de 5px)
+            if (container.scrollTop + container.clientHeight >= container.scrollHeight - 5) {
+                const btn = document.getElementById('btnAcceptTerms');
+                btn.disabled = false;
+                btn.className = "w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl transition text-xs shadow-lg shadow-emerald-600/30 uppercase tracking-wider cursor-pointer";
+                document.getElementById('scrollWarning').classList.add('hidden');
+            }
+        }
+
+        function acceptTermsAndClose() {
+            document.getElementById('regTerms').checked = true;
+            document.getElementById('termsModal').classList.add('hidden');
+        }
 
         async function loadIncentiveConfig() {
             try {
@@ -626,7 +705,7 @@
             const selectedRole = document.getElementById('regCargo').value;
             const termsChecked = document.getElementById('regTerms').checked;
 
-            if (!termsChecked) { alert("Debe aceptar obligatoriamente los términos y políticas."); return; }
+            if (!termsChecked) { alert("Debe leer y aceptar obligatoriamente las políticas y términos generales."); return; }
             if (pass !== passConfirm) { alert("Las contraseñas no coinciden."); return; }
 
             generatedVerificationCode = Math.floor(100000 + Math.random() * 900000).toString();
