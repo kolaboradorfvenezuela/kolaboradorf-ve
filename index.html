@@ -25,7 +25,7 @@
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-slate-950/40 border border-red-500/50 flex items-center justify-center text-white font-black text-lg shadow-inner">K</div>
                 <div>
-                    <h1 class="text-xl font-black tracking-wider uppercase text-white flex items-center gap-2">Kolaboradorf VE <span class="text-[10px] bg-black/40 px-2 py-0.5 rounded border border-red-500/30 font-medium text-red-200">PRO v5.4</span></h1>
+                    <h1 class="text-xl font-black tracking-wider uppercase text-white flex items-center gap-2">Kolaboradorf VE <span class="text-[10px] bg-black/40 px-2 py-0.5 rounded border border-red-500/30 font-medium text-red-200">PRO v5.5</span></h1>
                     <p class="text-[11px] text-red-200 font-medium">Gestión Inteligente Sincronizada en la Nube</p>
                 </div>
             </div>
@@ -250,7 +250,7 @@
                                 <div><label class="block text-[10px] font-bold text-slate-300 uppercase tracking-wider mb-1.5">Pepitos (Snacks)</label><input type="number" id="inputPep" value="0" oninput="calculateRealTime()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-600 shadow-inner"></div>
                             </div>
                         </div>
-                        <button onclick="saveDailyRecord()" class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-xl transition text-xs shadow-lg shadow-red-600/30 uppercase tracking-wider mt-2">Guardar Registro en la Nube</button>
+                        <button onclick="saveDailyRecord()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl transition text-xs shadow-lg shadow-emerald-600/30 uppercase tracking-wider mt-2 flex items-center justify-center gap-2">💾 Guardar Registro más largo</button>
                     </div>
 
                     <!-- Resumen Diario, Histórico del Día y Tarjeta de Efectividad e Incentivo Semanal -->
@@ -276,7 +276,7 @@
                             </div>
                         </div>
 
-                        <!-- TARJETA DE EFECTIVIDAD Y ACUMULADO DE INCENTIVOS DE LA SEMANA (SIN BOTÓN DE REINICIO) -->
+                        <!-- TARJETA DE EFECTIVIDAD Y ACUMULADO DE INCENTIVOS DE LA SEMANA -->
                         <div class="bg-gradient-to-br from-slate-900 via-slate-900/90 to-red-950/40 p-5 rounded-2xl border border-red-900/35 shadow-xl space-y-4">
                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                                 <div>
@@ -369,7 +369,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT PROFESIONAL INTEGRAL V5.4 -->
+    <!-- SCRIPT PROFESIONAL INTEGRAL V5.5 -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBzMXFLJhTuPSPdKGsVqCqQRhP_NiGYBA",
@@ -1071,8 +1071,20 @@
                 renderTodayHistory(cachedUserRecords);
                 updateWeeklyCardFromHistory(cachedUserRecords);
 
-                document.getElementById('inputProductosPendientes').value = '';
+                // LIMPIEZA COMPLETA DE LOS CAMPOS DEL FORMULARIO DE REGISTRO
                 document.getElementById('inputRuta').value = '';
+                document.getElementById('inputProductosPendientes').value = '';
+                document.getElementById('inputHoraEntrada').value = '';
+                document.getElementById('inputHoraSalida').value = '';
+                document.getElementById('inputF1').value = '0';
+                document.getElementById('inputF2').value = '0';
+                document.getElementById('inputG1').value = '0';
+                document.getElementById('inputG2').value = '0';
+                document.getElementById('inputDev').value = '0';
+                document.getElementById('inputPep').value = '0';
+                document.getElementById('noLoadCheck').checked = false;
+                toggleNoLoad();
+                calculateRealTime();
             } catch (error) {
                 alert("Error al guardar el registro en la nube.");
             }
