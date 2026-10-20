@@ -52,13 +52,31 @@
     <!-- CONTENEDOR PRINCIPAL -->
     <main class="flex-grow max-w-7xl w-full mx-auto px-6 py-8 flex flex-col justify-center">
 
-        <!-- Pantalla de Carga Inicial (Splash Screen de 5 segundos) -->
+        <!-- Pantalla de Carga Inicial (Splash Screen de 5 segundos al abrir la app) -->
         <div id="loadingSessionView" class="text-center py-20 space-y-6">
             <div class="inline-block p-6 rounded-3xl bg-slate-900/80 border border-slate-800 shadow-2xl backdrop-blur-xl">
                 <h2 class="text-4xl sm:text-5xl font-bold text-white brand-cursive drop-shadow-lg mb-3">Kolaboradorf VE</h2>
                 <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-red-600 border-t-transparent my-4 shadow-lg shadow-red-600/20"></div>
                 <p class="text-xs text-slate-400 font-semibold tracking-wider uppercase">Cargando sistema logístico y restaurando sesión...</p>
             </div>
+        </div>
+
+        <!-- PANTALLA DE CARGA AL INICIAR SESIÓN (Barra de 3 segundos del 1 al 100) -->
+        <div id="loginProgressView" class="hidden max-w-md mx-auto bg-slate-900/90 backdrop-blur-xl rounded-3xl shadow-2xl p-10 text-center border border-slate-800 mt-6 shadow-red-950/20 space-y-6">
+            <div>
+                <h2 class="text-3xl font-bold text-white brand-cursive drop-shadow mb-2">Kolaboradorf VE</h2>
+                <p class="text-xs text-slate-400 font-medium tracking-wide uppercase">Autenticando credenciales corporativas...</p>
+            </div>
+            <div class="space-y-2">
+                <div class="flex justify-between text-xs font-bold text-slate-300">
+                    <span>Progreso</span>
+                    <span id="loginProgressPercent" class="text-red-400">0%</span>
+                </div>
+                <div class="w-full bg-slate-950 rounded-full h-3 p-0.5 border border-slate-800 shadow-inner overflow-hidden">
+                    <div id="loginProgressBar" class="bg-gradient-to-r from-red-700 to-red-500 h-full rounded-full transition-all duration-75" style="width: 0%"></div>
+                </div>
+            </div>
+            <p class="text-[11px] text-slate-500 italic">Sincronizando con base de datos segura en la nube...</p>
         </div>
 
         <!-- 1. VISTA DE AUTENTICACIÓN -->
@@ -420,7 +438,7 @@
             if (dateInput) dateInput.value = todayStr;
             document.getElementById('todayDateBadge').innerText = todayStr;
 
-            // Pantalla de Splash corporativa garantizada por 5 segundos (5000 ms)
+            // Pantalla de Splash corporativa garantizada por 5 segundos al cargar la app
             setTimeout(() => {
                 document.getElementById('loadingSessionView').classList.add('hidden');
                 
@@ -514,6 +532,7 @@
             } catch (error) { alert("Error al guardar: " + error.message); }
         }
 
+        // FUNCIÓN DE LOGIN CON BARRA DE PROGRESO ANIMADA DE 3 SEGUNDOS
         async function handleLogin(event) {
             event.preventDefault();
             const email = document.getElementById('loginEmail').value.trim().toLowerCase();
@@ -532,44 +551,70 @@
                     role: "Entregador",
                     fechaIngreso: "2021-06-13" 
                 };
-                localStorage.setItem('kolaboradorf_session', JSON.stringify(currentUser));
-                launchAppSession(true);
-                return;
+            } else {
+                try {
+                    const docRef = db.collection("usuarios").doc(email);
+                    const doc = await docRef.get();
+                    
+                    if (!doc.exists) {
+                        alert("El correo electrónico no se encuentra registrado.");
+                        return;
+                    }
+
+                    const userData = doc.data();
+                    if (userData.approved === false) {
+                        alert("Su cuenta aún está pendiente de aprobación por el Administrador Supremo.");
+                        return;
+                    }
+
+                    if (userData.password && userData.password !== pass) {
+                        alert("Contraseña incorrecta. Por favor, verifique sus datos.");
+                        return;
+                    }
+
+                    currentUser = { 
+                        email, 
+                        isAdmin: false, 
+                        approved: true, 
+                        name: userData.name || email, 
+                        role: userData.role || "Ayudante",
+                        fechaIngreso: userData.fechaIngreso || "2026-01-01"
+                    };
+                } catch (error) { 
+                    alert("Error al iniciar sesión: " + error.message); 
+                    return;
+                }
             }
 
-            try {
-                const docRef = db.collection("usuarios").doc(email);
-                const doc = await docRef.get();
-                
-                if (!doc.exists) {
-                    alert("El correo electrónico no se encuentra registrado.");
-                    return;
-                }
+            // Ocultar formulario de autenticación y mostrar barra de progreso de 3 segundos
+            document.getElementById('authView').classList.add('hidden');
+            const progressView = document.getElementById('loginProgressView');
+            const progressBar = document.getElementById('loginProgressBar');
+            const progressPercent = document.getElementById('loginProgressPercent');
+            progressView.classList.remove('hidden');
 
-                const userData = doc.data();
-                if (userData.approved === false) {
-                    alert("Su cuenta aún está pendiente de aprobación por el Administrador Supremo.");
-                    return;
-                }
+            let currentPercent = 0;
+            const totalDuration = 3000; // 3 segundos exactos
+            const intervalTime = 30; // Actualizar cada 30ms
+            const increment = (100 * intervalTime) / totalDuration;
 
-                if (userData.password && userData.password !== pass) {
-                    alert("Contraseña incorrecta. Por favor, verifique sus datos.");
-                    return;
+            const progressInterval = setInterval(() => {
+                currentPercent += increment;
+                if (currentPercent >= 100) {
+                    currentPercent = 100;
+                    clearInterval(progressInterval);
                 }
+                const rounded = Math.floor(currentPercent);
+                progressBar.style.width = rounded + '%';
+                progressPercent.innerText = rounded + '%';
+            }, intervalTime);
 
-                currentUser = { 
-                    email, 
-                    isAdmin: false, 
-                    approved: true, 
-                    name: userData.name || email, 
-                    role: userData.role || "Ayudante",
-                    fechaIngreso: userData.fechaIngreso || "2026-01-01"
-                };
+            // Al cumplirse los 3 segundos, guardar sesión y lanzar el panel principal
+            setTimeout(() => {
+                progressView.classList.add('hidden');
                 localStorage.setItem('kolaboradorf_session', JSON.stringify(currentUser));
-                launchAppSession(false);
-            } catch (error) { 
-                alert("Error al iniciar sesión: " + error.message); 
-            }
+                launchAppSession(currentUser.isAdmin);
+            }, totalDuration);
         }
 
         async function handleRegister(event) {
