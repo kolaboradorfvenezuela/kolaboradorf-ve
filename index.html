@@ -13,7 +13,7 @@
     <!-- EmailJS SDK (Solo para verificación y recuperación) -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playball&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
         body { 
             font-family: 'Inter', sans-serif; 
             background-color: #030712;
@@ -24,9 +24,11 @@
             background-position: center;
             background-attachment: fixed;
         }
-        .brand-cursive {
-            font-family: 'Playball', cursive;
-            letter-spacing: 0.05em;
+        /* Nueva tipografía gruesa, moderna y de alto impacto visual para el Logo */
+        .brand-heavy {
+            font-family: 'Inter', sans-serif;
+            font-weight: 900;
+            letter-spacing: -0.03em;
         }
     </style>
 </head>
@@ -37,8 +39,8 @@
         <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
                 <div>
-                    <h1 class="text-2xl font-bold tracking-wide text-white brand-cursive drop-shadow-md">Kolaboradorf VE</h1>
-                    <p class="text-[11px] text-red-200 font-medium tracking-wide">Gestión Inteligente de Trabajo</p>
+                    <h1 class="text-2xl font-black tracking-tight text-white brand-heavy drop-shadow-md">Kolaboradorf <span class="text-red-300">VE</span></h1>
+                    <p class="text-[11px] text-red-200 font-semibold tracking-wider uppercase">Gestión Inteligente de Trabajo</p>
                 </div>
             </div>
             <!-- Controles de Sesión -->
@@ -54,8 +56,8 @@
 
         <!-- Pantalla de Carga Inicial (Splash Screen de 5 segundos al abrir la app) -->
         <div id="loadingSessionView" class="text-center py-20 space-y-6">
-            <div class="inline-block p-6 rounded-3xl bg-slate-900/80 border border-slate-800 shadow-2xl backdrop-blur-xl">
-                <h2 class="text-4xl sm:text-5xl font-bold text-white brand-cursive drop-shadow-lg mb-3">Kolaboradorf VE</h2>
+            <div class="inline-block p-8 rounded-3xl bg-slate-900/80 border border-slate-800 shadow-2xl backdrop-blur-xl">
+                <h2 class="text-4xl sm:text-5xl font-black text-white brand-heavy tracking-tight drop-shadow-lg mb-3">Kolaboradorf <span class="text-red-500">VE</span></h2>
                 <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-red-600 border-t-transparent my-4 shadow-lg shadow-red-600/20"></div>
                 <p class="text-xs text-slate-400 font-semibold tracking-wider uppercase">Cargando sistema logístico y restaurando sesión...</p>
             </div>
@@ -64,7 +66,7 @@
         <!-- PANTALLA DE CARGA AL INICIAR SESIÓN (Barra de 3 segundos del 1 al 100) -->
         <div id="loginProgressView" class="hidden max-w-md mx-auto bg-slate-900/90 backdrop-blur-xl rounded-3xl shadow-2xl p-10 text-center border border-slate-800 mt-6 shadow-red-950/20 space-y-6">
             <div>
-                <h2 class="text-3xl font-bold text-white brand-cursive drop-shadow mb-2">Kolaboradorf VE</h2>
+                <h2 class="text-3xl font-black text-white brand-heavy tracking-tight drop-shadow mb-2">Kolaboradorf <span class="text-red-500">VE</span></h2>
                 <p class="text-xs text-slate-400 font-medium tracking-wide uppercase">Autenticando credenciales corporativas...</p>
             </div>
             <div class="space-y-2">
