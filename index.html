@@ -25,7 +25,7 @@
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-slate-950/40 border border-red-500/50 flex items-center justify-center text-white font-black text-lg shadow-inner">K</div>
                 <div>
-                    <h1 class="text-xl font-black tracking-wider uppercase text-white flex items-center gap-2">Kolaboradorf VE <span class="text-[10px] bg-black/40 px-2 py-0.5 rounded border border-red-500/30 font-medium text-red-200">PRO v5.3</span></h1>
+                    <h1 class="text-xl font-black tracking-wider uppercase text-white flex items-center gap-2">Kolaboradorf VE <span class="text-[10px] bg-black/40 px-2 py-0.5 rounded border border-red-500/30 font-medium text-red-200">PRO v5.4</span></h1>
                     <p class="text-[11px] text-red-200 font-medium">Gestión Inteligente Sincronizada en la Nube</p>
                 </div>
             </div>
@@ -253,7 +253,7 @@
                         <button onclick="saveDailyRecord()" class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-xl transition text-xs shadow-lg shadow-red-600/30 uppercase tracking-wider mt-2">Guardar Registro en la Nube</button>
                     </div>
 
-                    <!-- Resumen Diario, Histórico del Día y Tarjeta de Efectividad e Incentivo Semanal (Histórico Mensual removido para simplificar) -->
+                    <!-- Resumen Diario, Histórico del Día y Tarjeta de Efectividad e Incentivo Semanal -->
                     <div class="lg:col-span-2 space-y-6">
                         <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
                             <div class="bg-slate-900/90 backdrop-blur-xl p-4 rounded-2xl border border-slate-800 text-center shadow-lg"><span class="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">Carga Inicial</span><h4 id="statCargaInicial" class="text-2xl font-black text-white mt-1.5">0</h4></div>
@@ -276,16 +276,11 @@
                             </div>
                         </div>
 
-                        <!-- TARJETA DE EFECTIVIDAD Y ACUMULADO DE INCENTIVOS DE LA SEMANA -->
+                        <!-- TARJETA DE EFECTIVIDAD Y ACUMULADO DE INCENTIVOS DE LA SEMANA (SIN BOTÓN DE REINICIO) -->
                         <div class="bg-gradient-to-br from-slate-900 via-slate-900/90 to-red-950/40 p-5 rounded-2xl border border-red-900/35 shadow-xl space-y-4">
                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                                 <div>
-                                    <div class="flex items-center gap-3">
-                                        <span class="text-[10px] font-extrabold text-red-400 uppercase tracking-wider">Evolución Semanal Activa</span>
-                                        <button onclick="resetManualWeeklyCycle()" title="Reiniciar ciclo semanal manualmente" class="text-[10px] bg-slate-800 hover:bg-red-600/30 text-slate-300 hover:text-red-300 px-2.5 py-0.5 rounded-lg border border-slate-700 transition flex items-center gap-1 font-semibold shadow">
-                                            🔄 Reiniciar Semana
-                                        </button>
-                                    </div>
+                                    <span class="text-[10px] font-extrabold text-red-400 uppercase tracking-wider">Evolución Semanal Activa</span>
                                     <h4 class="text-sm font-black text-white mt-0.5">Efectividad y Acumulado Semanal</h4>
                                     <p class="text-[11px] text-slate-400 mt-0.5">Promedio de efectividad y suma total de tus incentivos en el ciclo (meta mínima: 97.0%).</p>
                                 </div>
@@ -295,7 +290,7 @@
                                 </div>
                             </div>
 
-                            <!-- NUEVO APARTADO: TOTAL INCENTIVO ACUMULADO EN LA SEMANA -->
+                            <!-- APARTADO: TOTAL INCENTIVO ACUMULADO EN LA SEMANA -->
                             <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex justify-between items-center shadow-inner">
                                 <span class="text-xs font-bold text-slate-300 uppercase tracking-wider">💰 Total Incentivo de la Semana:</span>
                                 <span id="globalIncentivoSemanalBadge" class="text-xl font-black text-emerald-400">$0.00</span>
@@ -374,7 +369,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT PROFESIONAL INTEGRAL V5.3 -->
+    <!-- SCRIPT PROFESIONAL INTEGRAL V5.4 -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBzMXFLJhTuPSPdKGsVqCqQRhP_NiGYBA",
@@ -1017,17 +1012,6 @@
             } else {
                 badge.className = "text-2xl font-black text-red-400";
                 label.innerText = "No Califica (< 97% - Requiere Atención)";
-            }
-        }
-
-        function resetManualWeeklyCycle() {
-            if (!confirm("¿Deseas reiniciar el ciclo semanal para empezar a acumular desde hoy?")) return;
-
-            if (currentUser && currentUser.email) {
-                const todayStr = new Date().toISOString().split('T')[0];
-                localStorage.setItem(`last_reset_date_${currentUser.email}`, todayStr);
-                updateWeeklyCardFromHistory(cachedUserRecords);
-                alert("🔄 ¡Ciclo semanal reiniciado con éxito!");
             }
         }
 
