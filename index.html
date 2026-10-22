@@ -10,7 +10,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-    <!-- EmailJS SDK (Solo para verificación y recuperación) -->
+    <!-- EmailJS SDK -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
@@ -297,7 +297,7 @@
                         <button onclick="saveDailyRecord()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl transition text-xs shadow-lg shadow-emerald-600/30 uppercase tracking-wider mt-2 flex items-center justify-center gap-2">💾 Guardar Registro más largo</button>
                     </div>
 
-                    <!-- Resumen Diario, Histórico del Día (Intacto) y Tarjeta de Acumulado Semanal -->
+                    <!-- Resumen Diario, Histórico del Día e Independencia de Borrados -->
                     <div class="lg:col-span-2 space-y-6">
                         <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
                             <div class="bg-slate-900/90 backdrop-blur-xl p-4 rounded-2xl border border-slate-800 text-center shadow-lg"><span class="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">Carga Inicial</span><h4 id="statCargaInicial" class="text-2xl font-black text-white mt-1.5">0</h4></div>
@@ -306,7 +306,7 @@
                             <div class="bg-slate-900/90 backdrop-blur-xl p-4 rounded-2xl border border-slate-800 text-center shadow-lg"><span class="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">Efectividad Diaria</span><h4 id="statEfectividadSemanal" class="text-2xl font-black text-blue-400 mt-1.5">100.0%</h4></div>
                         </div>
 
-                        <!-- HISTÓRICO DEL DÍA (ORIGINAL / INTACTO) -->
+                        <!-- HISTÓRICO DEL DÍA (CON SU PROPIO BOTÓN DE BORRAR/LIMPIAR) -->
                         <div class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-3 shadow-xl">
                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-800 pb-3 gap-2">
                                 <h4 class="text-sm font-extrabold text-white flex items-center gap-2">📊 Histórico del Día (Registros de Hoy)</h4>
@@ -320,7 +320,7 @@
                             </div>
                         </div>
 
-                        <!-- TARJETA DE EFECTIVIDAD Y ACUMULADO DE INCENTIVOS CON EL BOTÓN "Generar mi pago en bolívares" -->
+                        <!-- TARJETA DE ACUMULADO SEMANAL, BOTÓN DE PAGO Y BOTÓN DE LIMPIAR ACUMULADO -->
                         <div class="bg-gradient-to-br from-slate-900 via-slate-900/90 to-red-950/40 p-5 rounded-2xl border border-red-900/35 shadow-xl space-y-4">
                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                                 <div>
@@ -334,16 +334,19 @@
                                 </div>
                             </div>
 
-                            <!-- APARTADO: TOTAL INCENTIVO + BOTÓN GENERAR PAGO BS -->
+                            <!-- APARTADO: TOTAL INCENTIVO + ACCIONES INDEPENDIENTES DE PAGO Y LIMPIEZA DE ACUMULADO -->
                             <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3 shadow-inner">
                                 <div class="flex justify-between items-center">
                                     <span class="text-xs font-bold text-slate-300 uppercase tracking-wider">💰 Total Incentivo de la Semana:</span>
                                     <span id="globalIncentivoSemanalBadge" class="text-xl font-black text-emerald-400">$0.00</span>
                                 </div>
 
-                                <!-- Botón y apartado para generar el pago en bolívares -->
-                                <div class="pt-3 border-t border-slate-800/80 space-y-2">
-                                    <button onclick="generarPagoBolivares()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-3 rounded-xl transition shadow-lg shadow-emerald-600/30 uppercase tracking-wider flex items-center justify-center gap-2">🇻🇪 Generar mi pago en bolívares</button>
+                                <!-- Botones de Generar Pago y Limpiar Acumulado Separados -->
+                                <div class="pt-3 border-t border-slate-800/80 space-y-2.5">
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                        <button onclick="generarPagoBolivares()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-3 px-4 rounded-xl transition shadow-lg shadow-emerald-600/30 uppercase tracking-wider flex items-center justify-center gap-2">🇻🇪 Generar mi pago en bolívares</button>
+                                        <button onclick="limpiarAcumuladoSemanal()" class="bg-red-600/20 hover:bg-red-600/40 text-red-300 border border-red-500/30 text-xs font-bold py-3 px-4 rounded-xl transition shadow uppercase tracking-wider flex items-center justify-center gap-2">🗑️ Limpiar Acumulado</button>
+                                    </div>
                                     
                                     <!-- Resultado del pago generado -->
                                     <div id="resultadoPagoBsContainer" class="hidden bg-slate-900 p-3.5 rounded-xl border border-emerald-500/40 space-y-1.5 text-xs">
@@ -481,22 +484,17 @@
     <div id="termsModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
         <div class="bg-slate-900 rounded-3xl max-w-2xl w-full p-8 border border-slate-800 space-y-5 shadow-2xl flex flex-col max-h-[85vh]">
             <h3 class="text-base font-black text-white border-b border-slate-800 pb-3">Políticas de Privacidad, Términos y Condiciones Generales de Uso</h3>
-            
             <div id="termsScrollContainer" onscroll="checkTermsScroll()" class="space-y-4 text-xs text-slate-300 leading-relaxed overflow-y-auto pr-2 max-h-[50vh] bg-slate-950 p-4 rounded-xl border border-slate-800 shadow-inner">
-                <p><strong>Última actualización:</strong> 20 de octubre de 2026<br>
-                <strong>Aplicación:</strong> KOLABORADORF VE<br>
-                <strong>Desarrollador / Titular:</strong> DFPfantasy CorVe (DFPFANTASY)<br>
-                <strong>Jurisdicción Base:</strong> República Bolivariana de Venezuela</p>
+                <p><strong>Aplicación:</strong> KOLABORADORF VE<br><strong>Titular:</strong> DFPfantasy CorVe</p>
             </div>
-
             <div class="pt-2 text-center">
-                <p id="scrollWarning" class="text-[10px] text-amber-400 mb-2 font-semibold">↓ Desplace hasta el final del documento para habilitar el botón de aceptación ↓</p>
+                <p id="scrollWarning" class="text-[10px] text-amber-400 mb-2 font-semibold">↓ Desplace hasta el final para habilitar ↓</p>
                 <button id="btnAcceptTerms" disabled onclick="acceptTermsAndClose()" class="w-full bg-slate-800 text-slate-500 font-bold py-3 rounded-xl transition text-xs uppercase tracking-wider cursor-not-allowed shadow">Aceptar Políticas y Términos</button>
             </div>
         </div>
     </div>
 
-    <!-- SCRIPT PROFESIONAL INTEGRAL V6.5 -->
+    <!-- SCRIPT PROFESIONAL INTEGRAL V6.6 -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBzMXFLJhTuPSPdKGsVqCqQRhP_NiGYBA",
@@ -529,7 +527,6 @@
 
             setTimeout(() => {
                 document.getElementById('loadingSessionView').classList.add('hidden');
-                
                 const savedSession = localStorage.getItem('kolaboradorf_session');
                 if (savedSession) {
                     try {
@@ -606,33 +603,18 @@
 
         async function saveBcvTasaAdmin() {
             const nuevaTasa = parseFloat(document.getElementById('inputAdminBcvTasa').value);
-            if (isNaN(nuevaTasa) || nuevaTasa <= 0) {
-                alert("Por favor, ingrese un monto de tasa válido.");
-                return;
-            }
-
+            if (isNaN(nuevaTasa) || nuevaTasa <= 0) { alert("Ingrese una tasa válida."); return; }
             const todayStr = new Date().toISOString().split('T')[0];
-
             try {
-                await db.collection("config").doc("incentivos").set({
-                    tasaBcvActual: nuevaTasa,
-                    tasaBcvFecha: todayStr
-                }, { merge: true });
-
+                await db.collection("config").doc("incentivos").set({ tasaBcvActual: nuevaTasa, tasaBcvFecha: todayStr }, { merge: true });
                 const histRef = db.collection("config").doc("historial_tasas_bcv");
                 const histDoc = await histRef.get();
-                let tasas = [];
-                if (histDoc.exists && histDoc.data().tasas) {
-                    tasas = histDoc.data().tasas.filter(t => t.fecha !== todayStr);
-                }
+                let tasas = histDoc.exists && histDoc.data().tasas ? histDoc.data().tasas.filter(t => t.fecha !== todayStr) : [];
                 tasas.push({ fecha: todayStr, tasa: nuevaTasa });
                 await histRef.set({ tasas }, { merge: true });
-
-                alert("¡Tasa oficial BCV actualizada y guardada en el historial con éxito!");
+                alert("¡Tasa oficial BCV actualizada con éxito!");
                 loadBcvTasaWidget();
-            } catch (error) {
-                alert("Error al guardar la tasa: " + error.message);
-            }
+            } catch (error) { alert("Error al guardar: " + error.message); }
         }
 
         async function getTasaForDate(targetDateStr) {
@@ -643,9 +625,7 @@
                     if (found) return parseFloat(found.tasa);
                 }
                 const mainDoc = await db.collection("config").doc("incentivos").get();
-                if (mainDoc.exists && mainDoc.data().tasaBcvActual) {
-                    return parseFloat(mainDoc.data().tasaBcvActual);
-                }
+                if (mainDoc.exists && mainDoc.data().tasaBcvActual) return parseFloat(mainDoc.data().tasaBcvActual);
             } catch (e) {}
             return 883.40;
         }
@@ -660,12 +640,7 @@
 
         function focusBcvInput() {
             const input = document.getElementById('inputAdminBcvTasa');
-            if (input) {
-                input.focus();
-                input.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                input.classList.add('ring-2', 'ring-amber-400');
-                setTimeout(() => input.classList.remove('ring-2', 'ring-amber-400'), 2000);
-            }
+            if (input) { input.focus(); input.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
         }
 
         function switchAuthMode(mode) {
@@ -675,27 +650,11 @@
             document.getElementById('forgotForm').classList.add('hidden');
             document.getElementById('resetPassForm').classList.add('hidden');
 
-            if (mode === 'login') {
-                document.getElementById('loginForm').classList.remove('hidden');
-                document.getElementById('authTitle').innerText = 'Acceso al Sistema';
-                document.getElementById('authSubtitle').innerText = 'Ingrese sus credenciales corporativas autorizadas';
-            } else if (mode === 'register') {
-                document.getElementById('registerForm').classList.remove('hidden');
-                document.getElementById('authTitle').innerText = 'Registro de Colaborador';
-                document.getElementById('authSubtitle').innerText = 'Acepte términos y complete sus datos';
-            } else if (mode === 'verify') {
-                document.getElementById('verifyCodeForm').classList.remove('hidden');
-                document.getElementById('authTitle').innerText = 'Verificación por Código';
-                document.getElementById('authSubtitle').innerText = 'Confirme su correo mediante EmailJS';
-            } else if (mode === 'forgot') {
-                document.getElementById('forgotForm').classList.remove('hidden');
-                document.getElementById('authTitle').innerText = 'Recuperar Contraseña';
-                document.getElementById('authSubtitle').innerText = 'Reciba su código de restablecimiento seguro';
-            } else if (mode === 'reset') {
-                document.getElementById('resetPassForm').classList.remove('hidden');
-                document.getElementById('authTitle').innerText = 'Restablecer Clave';
-                document.getElementById('authSubtitle').innerText = 'Ingrese su código y nueva clave';
-            }
+            if (mode === 'login') document.getElementById('loginForm').classList.remove('hidden');
+            else if (mode === 'register') document.getElementById('registerForm').classList.remove('hidden');
+            else if (mode === 'verify') document.getElementById('verifyCodeForm').classList.remove('hidden');
+            else if (mode === 'forgot') document.getElementById('forgotForm').classList.remove('hidden');
+            else if (mode === 'reset') document.getElementById('resetPassForm').classList.remove('hidden');
         }
 
         function togglePassword(inputId, eyeId) {
@@ -707,14 +666,7 @@
 
         function openTermsModal(event) {
             if (event) event.preventDefault();
-            const modal = document.getElementById('termsModal');
-            modal.classList.remove('hidden');
-            const container = document.getElementById('termsScrollContainer');
-            container.scrollTop = 0;
-            const btn = document.getElementById('btnAcceptTerms');
-            btn.disabled = true;
-            btn.className = "w-full bg-slate-800 text-slate-500 font-bold py-3 rounded-xl transition text-xs uppercase tracking-wider cursor-not-allowed shadow";
-            document.getElementById('scrollWarning').classList.remove('hidden');
+            document.getElementById('termsModal').classList.remove('hidden');
         }
 
         function checkTermsScroll() {
@@ -722,7 +674,7 @@
             if (container.scrollTop + container.clientHeight >= container.scrollHeight - 5) {
                 const btn = document.getElementById('btnAcceptTerms');
                 btn.disabled = false;
-                btn.className = "w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl transition text-xs shadow-lg shadow-emerald-600/30 uppercase tracking-wider cursor-pointer";
+                btn.className = "w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl transition text-xs shadow-lg uppercase cursor-pointer";
                 document.getElementById('scrollWarning').classList.add('hidden');
             }
         }
@@ -750,11 +702,9 @@
             ['300','400','500','600','700','800','900','1000','1100','1200'].forEach(t => {
                 configData['ent_' + t] = parseFloat(document.getElementById('ent_' + t).value) || 0;
             });
-            try {
-                await db.collection("config").doc("incentivos").set(configData, { merge: true });
-                alert("¡Montos para Entregadores guardados exitosamente!");
-                calculateRealTime();
-            } catch (error) { alert("Error al guardar: " + error.message); }
+            await db.collection("config").doc("incentivos").set(configData, { merge: true });
+            alert("¡Montos Entregadores guardados!");
+            calculateRealTime();
         }
 
         async function saveAyudanteConfig() {
@@ -762,11 +712,9 @@
             ['300','400','500','600','700','800','900','1000','1100','1200'].forEach(t => {
                 configData['ayu_' + t] = parseFloat(document.getElementById('ayu_' + t).value) || 0;
             });
-            try {
-                await db.collection("config").doc("incentivos").set(configData, { merge: true });
-                alert("¡Montos para Ayudantes guardados exitosamente!");
-                calculateRealTime();
-            } catch (error) { alert("Error al guardar: " + error.message); }
+            await db.collection("config").doc("incentivos").set(configData, { merge: true });
+            alert("¡Montos Ayudantes guardados!");
+            calculateRealTime();
         }
 
         async function handleLogin(event) {
@@ -775,47 +723,35 @@
             const pass = document.getElementById('loginPass').value;
             
             if (email === "dhermes73@gmail.com") {
-                if (pass !== "Fernando878" && pass !== "admin123") {
-                    alert("Contraseña incorrecta para el Administrador Supremo.");
-                    return;
-                }
+                if (pass !== "Fernando878" && pass !== "admin123") { alert("Contraseña incorrecta."); return; }
                 currentUser = { email, isAdmin: true, approved: true, name: "DHERMES FERNANDO PEREZ", role: "Entregador", fechaIngreso: "2021-06-13" };
             } else {
                 try {
-                    const docRef = db.collection("usuarios").doc(email);
-                    const doc = await docRef.get();
-                    if (!doc.exists) { alert("El correo electrónico no se encuentra registrado."); return; }
-                    const userData = doc.data();
-                    if (userData.approved === false) { alert("Su cuenta aún está pendiente de aprobación por el Administrador Supremo."); return; }
-                    if (userData.password && userData.password !== pass) { alert("Contraseña incorrecta."); return; }
-                    currentUser = { email, isAdmin: false, approved: true, name: userData.name || email, role: userData.role || "Ayudante", fechaIngreso: userData.fechaIngreso || "2026-01-01" };
-                } catch (error) { alert("Error al iniciar sesión: " + error.message); return; }
+                    const doc = await db.collection("usuarios").doc(email).get();
+                    if (!doc.exists) { alert("Usuario no registrado."); return; }
+                    const data = doc.data();
+                    if (data.approved === false) { alert("Cuenta pendiente de aprobación."); return; }
+                    if (data.password && data.password !== pass) { alert("Contraseña incorrecta."); return; }
+                    currentUser = { email, isAdmin: false, approved: true, name: data.name || email, role: data.role || "Ayudante", fechaIngreso: data.fechaIngreso || "2026-01-01" };
+                } catch (e) { alert("Error de inicio de sesión."); return; }
             }
 
             document.getElementById('authView').classList.add('hidden');
             const progressView = document.getElementById('loginProgressView');
-            const progressBar = document.getElementById('loginProgressBar');
-            const progressPercent = document.getElementById('loginProgressPercent');
             progressView.classList.remove('hidden');
-
             let currentPercent = 0;
-            const totalDuration = 3000;
-            const intervalTime = 30;
-            const increment = (100 * intervalTime) / totalDuration;
-
             const progressInterval = setInterval(() => {
-                currentPercent += increment;
-                if (currentPercent >= 100) { currentPercent = 100; clearInterval(progressInterval); }
-                const rounded = Math.floor(currentPercent);
-                progressBar.style.width = rounded + '%';
-                progressPercent.innerText = rounded + '%';
-            }, intervalTime);
+                currentPercent += 5;
+                if (currentPercent >= 100) clearInterval(progressInterval);
+                document.getElementById('loginProgressBar').style.width = currentPercent + '%';
+                document.getElementById('loginProgressPercent').innerText = currentPercent + '%';
+            }, 60);
 
             setTimeout(() => {
                 progressView.classList.add('hidden');
                 localStorage.setItem('kolaboradorf_session', JSON.stringify(currentUser));
                 launchAppSession(currentUser.isAdmin);
-            }, totalDuration);
+            }, 1500);
         }
 
         async function handleRegister(event) {
@@ -825,94 +761,64 @@
             const email = document.getElementById('regEmail').value.trim();
             const name = document.getElementById('regName').value.trim();
             const selectedRole = document.getElementById('regCargo').value;
-            const termsChecked = document.getElementById('regTerms').checked;
 
-            if (!termsChecked) { alert("Debe aceptar las políticas y términos."); return; }
+            if (!document.getElementById('regTerms').checked) { alert("Acepte los términos."); return; }
             if (pass !== passConfirm) { alert("Las contraseñas no coinciden."); return; }
 
             generatedVerificationCode = Math.floor(100000 + Math.random() * 900000).toString();
             pendingVerificationData = { email, pass, name, role: selectedRole, fechaIngreso: document.getElementById('regFechaIngreso').value };
 
-            const templateParams = {
-                email: email, to_email: email, name: name, colaborador_nombre: name, cargo_colaborador: selectedRole,
-                anos_servicio: "Nuevo", fecha: new Date().toISOString().split('T')[0], nro_ruta: "REGISTRO",
-                total_entregado: `CÓDIGO DE VERIFICACIÓN: ${generatedVerificationCode}`,
-                productos_pendientes: "Ingrese este código para validar su cuenta."
-            };
-
             try {
-                await emailjs.send('service_p63esgd', 'template_dl48xbt', templateParams);
-                alert("¡Código de verificación enviado con éxito!");
+                await emailjs.send('service_p63esgd', 'template_dl48xbt', {
+                    email, to_email: email, name, colaborador_nombre: name, cargo_colaborador: selectedRole,
+                    anos_servicio: "Nuevo", fecha: new Date().toISOString().split('T')[0], nro_ruta: "REGISTRO",
+                    total_entregado: `CÓDIGO: ${generatedVerificationCode}`, productos_pendientes: "Valide su cuenta."
+                });
+                alert("¡Código enviado a su correo!");
                 switchAuthMode('verify');
-            } catch (error) { alert("Error al enviar correo: " + (error.text || error.message)); }
+            } catch (e) { alert("Error al enviar correo."); }
         }
 
         async function handleVerifyCode(event) {
             event.preventDefault();
-            const enteredCode = document.getElementById('inputVerificationCode').value.trim();
-            if (enteredCode !== generatedVerificationCode) { alert("Código incorrecto."); return; }
-
-            try {
-                await db.collection("usuarios").doc(pendingVerificationData.email).set({
-                    name: pendingVerificationData.name, email: pendingVerificationData.email, password: pendingVerificationData.pass,
-                    role: pendingVerificationData.role, fechaIngreso: pendingVerificationData.fechaIngreso, approved: false, createdAt: new Date().toISOString()
-                }, { merge: true });
-
-                alert("¡Cuenta verificada y enviada a aprobación!");
-                document.getElementById('authView').classList.add('hidden');
-                document.getElementById('pendingView').classList.remove('hidden');
-            } catch (error) { alert("Error en verificación."); }
+            if (document.getElementById('inputVerificationCode').value.trim() !== generatedVerificationCode) { alert("Código incorrecto."); return; }
+            await db.collection("usuarios").doc(pendingVerificationData.email).set({ ...pendingVerificationData, approved: false, createdAt: new Date().toISOString() }, { merge: true });
+            alert("¡Verificado con éxito!");
+            document.getElementById('authView').classList.add('hidden');
+            document.getElementById('pendingView').classList.remove('hidden');
         }
 
         async function loadPendingApprovals() {
             const container = document.getElementById('pendingApprovalsList');
-            container.innerHTML = '<p class="text-xs text-slate-400 text-center py-6">Cargando solicitudes...</p>';
-            try {
-                const snapshot = await db.collection("usuarios").where("approved", "==", false).get();
-                if (snapshot.empty) { container.innerHTML = '<p class="text-xs text-slate-400 text-center py-8">No hay solicitudes pendientes.</p>'; return; }
-                container.innerHTML = '';
-                snapshot.forEach(doc => {
-                    const user = doc.data();
-                    const card = document.createElement('div');
-                    card.className = "bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-3 shadow-inner";
-                    card.innerHTML = `
-                        <div><strong class="text-white text-sm font-extrabold">${user.name}</strong><p class="text-[11px] text-slate-400">${user.email} — <span class="text-red-400 uppercase font-bold">${user.role}</span></p></div>
-                        <div class="flex gap-2 w-full sm:w-auto"><button onclick="approveUser('${user.email}')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg">Dar Acceso</button><button onclick="rejectUser('${user.email}')" class="bg-red-600 hover:bg-red-500 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg">Rechazar</button></div>
-                    `;
-                    container.appendChild(card);
-                });
-            } catch (e) { container.innerHTML = '<p class="text-xs text-red-400 text-center py-6">Error al cargar.</p>'; }
+            const snapshot = await db.collection("usuarios").where("approved", "==", false).get();
+            if (snapshot.empty) { container.innerHTML = '<p class="text-xs text-slate-400 text-center py-8">No hay solicitudes pendientes.</p>'; return; }
+            container.innerHTML = '';
+            snapshot.forEach(doc => {
+                const user = doc.data();
+                const card = document.createElement('div');
+                card.className = "bg-slate-950 p-4 rounded-xl border border-slate-800 flex justify-between items-center gap-3";
+                card.innerHTML = `<div><strong class="text-white text-sm">${user.name}</strong><p class="text-[11px] text-slate-400">${user.email}</p></div><div class="flex gap-2"><button onclick="approveUser('${user.email}')" class="bg-emerald-600 text-white text-[11px] px-3 py-1 rounded">Aprobar</button><button onclick="rejectUser('${user.email}')" class="bg-red-600 text-white text-[11px] px-3 py-1 rounded">Rechazar</button></div>`;
+                container.appendChild(card);
+            });
         }
 
-        async function approveUser(email) {
-            await db.collection("usuarios").doc(email).update({ approved: true });
-            alert("¡Acceso concedido!");
-            loadPendingApprovals();
-        }
-
-        async function rejectUser(email) {
-            if (!confirm("¿Rechazar solicitud?")) return;
-            await db.collection("usuarios").doc(email).delete();
-            loadPendingApprovals();
-        }
+        async function approveUser(email) { await db.collection("usuarios").doc(email).update({ approved: true }); loadPendingApprovals(); }
+        async function rejectUser(email) { await db.collection("usuarios").doc(email).delete(); loadPendingApprovals(); }
 
         async function handleForgotRequest(event) {
             event.preventDefault();
-            const email = document.getElementById('forgotEmail').value.trim().toLowerCase();
-            pendingResetEmail = email;
+            pendingResetEmail = document.getElementById('forgotEmail').value.trim().toLowerCase();
             recoveryCode = Math.floor(100000 + Math.random() * 900000).toString();
-            try {
-                await emailjs.send('service_p63esgd', 'template_dl48xbt', { email, to_email: email, name: email, colaborador_nombre: email, cargo_colaborador: "Recuperación", anos_servicio: "N/A", fecha: new Date().toISOString().split('T')[0], nro_ruta: "RECUPERACIÓN", total_entregado: `CÓDIGO: ${recoveryCode}`, productos_pendientes: "Ingrese este código para restablecer su clave." });
-                alert("¡Código de recuperación enviado!");
-                switchAuthMode('reset');
-            } catch (e) { alert("Error al enviar código."); }
+            await emailjs.send('service_p63esgd', 'template_dl48xbt', { email: pendingResetEmail, to_email: pendingResetEmail, name: pendingResetEmail, total_entregado: `CÓDIGO: ${recoveryCode}`, productos_pendientes: "Restablecer clave." });
+            alert("¡Código de recuperación enviado!");
+            switchAuthMode('reset');
         }
 
         async function handleResetPassword(event) {
             event.preventDefault();
             if (document.getElementById('resetCodeInput').value.trim() !== recoveryCode) { alert("Código incorrecto."); return; }
             await db.collection("usuarios").doc(pendingResetEmail).update({ password: document.getElementById('newPasswordInput').value });
-            alert("¡Contraseña actualizada con éxito!");
+            alert("¡Contraseña actualizada!");
             switchAuthMode('login');
         }
 
@@ -921,7 +827,7 @@
             document.getElementById('pendingView').classList.add('hidden');
             document.getElementById('mainAppView').classList.remove('hidden');
             document.getElementById('authHeaderControls').classList.remove('hidden');
-            document.getElementById('userHeaderBadge').innerText = isAdmin ? "ADMINISTRADOR SUPREMO" : `COLABORADOR (${currentUser.role.toUpperCase()})`;
+            document.getElementById('userHeaderBadge').innerText = isAdmin ? "ADMIN" : `COLABORADOR (${currentUser.role.toUpperCase()})`;
             if (isAdmin) { document.getElementById('adminNavTabs').classList.remove('hidden'); document.getElementById('roleSimulatorContainer').classList.remove('hidden'); loadPendingApprovals(); }
             loadBcvTasaWidget();
             await loadIncentiveConfig();
@@ -931,69 +837,47 @@
         }
 
         function changeSimulatedRole(role) {
-            if (!currentUser || !currentUser.isAdmin) return;
+            if (!currentUser?.isAdmin) return;
             currentUser.role = role;
             document.getElementById('activeRoleBadge').innerText = role;
             calculateRealTime();
         }
 
         async function logoutApp() {
-            try { await firebase.auth().signOut(); } catch(e) {}
             localStorage.removeItem('kolaboradorf_session');
             document.getElementById('mainAppView').classList.add('hidden');
             document.getElementById('authHeaderControls').classList.add('hidden');
-            const logoutView = document.getElementById('logoutProgressView');
-            logoutView.classList.remove('hidden');
-            setTimeout(() => { logoutView.classList.add('hidden'); document.getElementById('authView').classList.remove('hidden'); switchAuthMode('login'); }, 5000);
+            document.getElementById('logoutProgressView').classList.remove('hidden');
+            setTimeout(() => { document.getElementById('logoutProgressView').classList.add('hidden'); document.getElementById('authView').classList.remove('hidden'); switchAuthMode('login'); }, 1500);
         }
 
         function switchAppTab(tab) {
-            if (!currentUser || !currentUser.isAdmin) return;
-            const workerSec = document.getElementById('workerSection');
-            const adminSec = document.getElementById('adminSection');
-            if (tab === 'worker') {
-                workerSec.classList.remove('hidden'); adminSec.classList.add('hidden');
-                document.getElementById('btnTabWorker').className = "flex-1 sm:flex-none px-5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-xl transition bg-red-600 text-white shadow-lg shadow-red-600/20";
-                document.getElementById('btnTabAdmin').className = "flex-1 sm:flex-none px-5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-xl transition bg-slate-800 text-slate-300 hover:bg-slate-700";
-            } else {
-                workerSec.classList.add('hidden'); adminSec.classList.remove('hidden');
-                document.getElementById('btnTabAdmin').className = "flex-1 sm:flex-none px-5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-xl transition bg-red-600 text-white shadow-lg shadow-red-600/20";
-                document.getElementById('btnTabWorker').className = "flex-1 sm:flex-none px-5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-xl transition bg-slate-800 text-slate-300 hover:bg-slate-700";
-                loadPendingApprovals(); loadBcvTasaWidget();
-            }
+            if (!currentUser?.isAdmin) return;
+            document.getElementById('workerSection').classList.toggle('hidden', tab !== 'worker');
+            document.getElementById('adminSection').classList.toggle('hidden', tab !== 'admin');
+            if (tab === 'admin') { loadPendingApprovals(); loadBcvTasaWidget(); }
         }
 
         function calculateAntiquity() {
             const ingreso = new Date(currentUser?.fechaIngreso || '2021-06-13');
             const hoy = new Date();
             let anos = hoy.getFullYear() - ingreso.getFullYear();
-            let meses = hoy.getMonth() - ingreso.getMonth();
-            if (meses < 0) { anos--; meses += 12; }
             document.getElementById('workerNameDisplay').innerText = (currentUser?.name || "DHERMES PEREZ").toUpperCase();
-            document.getElementById('workerMetaDisplay').innerText = `${currentUser.role || 'Ayudante'} (${anos} años, ${meses} meses) — ${currentUser.email}`;
+            document.getElementById('workerMetaDisplay').innerText = `${currentUser.role || 'Ayudante'} (${anos} años) — ${currentUser.email}`;
             document.getElementById('activeRoleBadge').innerText = currentUser.role || 'Ayudante';
         }
 
         function toggleVacationMode() {
             isVacation = !isVacation;
-            const btn = document.getElementById('btnVacationToggle');
-            const alertBox = document.getElementById('vacationAlert');
-            const container = document.getElementById('operationalContainer');
-            if (isVacation) {
-                btn.innerText = "🌴 Ya regresé"; btn.className = "bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-5 py-2.5 rounded-xl transition shadow";
-                alertBox.classList.remove('hidden'); container.style.opacity = "0.4"; container.style.pointerEvents = "none";
-            } else {
-                btn.innerText = "🌴 Estoy de vacaciones"; btn.className = "bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold px-5 py-2.5 rounded-xl transition shadow";
-                alertBox.classList.add('hidden'); container.style.opacity = "1"; container.style.pointerEvents = "auto";
-            }
+            document.getElementById('vacationAlert').classList.toggle('hidden', !isVacation);
+            document.getElementById('operationalContainer').style.opacity = isVacation ? "0.4" : "1";
+            document.getElementById('operationalContainer').style.pointerEvents = isVacation ? "none" : "auto";
         }
 
         function toggleNoLoad() {
             const isChecked = document.getElementById('noLoadCheck').checked;
-            const fields = document.getElementById('loadFields');
-            fields.style.opacity = isChecked ? "0.3" : "1";
-            fields.style.pointerEvents = isChecked ? "none" : "auto";
-            if (isChecked) ['inputF1', 'inputF2', 'inputG1', 'inputG2', 'inputDev', 'inputPep'].forEach(id => document.getElementById(id).value = 0);
+            document.getElementById('loadFields').style.opacity = isChecked ? "0.3" : "1";
+            document.getElementById('loadFields').style.pointerEvents = isChecked ? "none" : "auto";
             calculateRealTime();
         }
 
@@ -1015,7 +899,6 @@
         function calculateRealTime() {
             const isNoLoad = document.getElementById('noLoadCheck').checked;
             const userRole = currentUser ? currentUser.role : 'Ayudante';
-            const efElement = document.getElementById('statEfectividadSemanal');
             let cargaInicial = 0, cargaNetaDia = 0, incentivoDiarioUSD = 0, efectividad = 100.0;
 
             if (!isNoLoad) {
@@ -1028,15 +911,15 @@
                 cargaInicial = f1 + f2 + g1 + g2;
                 cargaNetaDia = Math.max(0, cargaInicial - dev - pep);
                 incentivoDiarioUSD = getIncentiveByRole(cargaNetaDia, userRole);
-                const totalEntregadoEfectivo = Math.max(0, cargaNetaDia + pep);
-                efectividad = cargaInicial > 0 ? (totalEntregadoEfectivo / cargaInicial) * 100 : 100.0;
+                efectividad = cargaInicial > 0 ? (Math.max(0, cargaNetaDia + pep) / cargaInicial) * 100 : 100.0;
                 if (efectividad > 100) efectividad = 100.0;
             }
 
             document.getElementById('statCargaInicial').innerText = cargaInicial;
             document.getElementById('statCargaNetaDia').innerText = cargaNetaDia;
             document.getElementById('statIncentivo').innerText = `$${incentivoDiarioUSD.toFixed(2)}`;
-            efElement.innerText = `${efectividad.toFixed(1)}% (${efectividad >= 97 ? 'Califica' : 'No Califica'})`;
+            const efElement = document.getElementById('statEfectividadSemanal');
+            efElement.innerText = `${efectividad.toFixed(1)}%`;
             efElement.className = `text-2xl font-black mt-1.5 ${efectividad >= 97 ? 'text-emerald-400' : 'text-red-400'}`;
             return { cargaInicial, cargaNetaDia, incentivoDiarioUSD, efectividad };
         }
@@ -1064,33 +947,34 @@
 
             todayRecords.forEach(rec => {
                 const card = document.createElement('div');
-                card.className = "bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs space-y-1.5 shadow-inner";
-                card.innerHTML = `
-                    <div class="flex justify-between items-center"><strong class="text-white text-xs">Ruta: ${rec.ruta}</strong><span class="text-[10px] text-slate-400">${rec.fecha}</span></div>
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-slate-300 text-[11px]">
-                        <div>C. Inicial: <strong class="text-white">${rec.cargaInicial}</strong></div>
-                        <div>C. Neta: <strong class="text-white">${rec.cargaNetaDia}</strong></div>
-                        <div>Incentivo: <strong class="text-emerald-400">$${rec.incentivoDiarioUSD}</strong></div>
-                        <div>Efectividad: <strong class="text-blue-400">${rec.efectividad}%</strong></div>
-                    </div>
-                `;
+                card.className = "bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs space-y-1";
+                card.innerHTML = `<div class="flex justify-between"><strong class="text-white">Ruta: ${rec.ruta}</strong><span class="text-slate-400">${rec.fecha}</span></div><div class="grid grid-cols-4 gap-2 text-slate-300"><div>C.Neta: ${rec.cargaNetaDia}</div><div>Incentivo: <span class="text-emerald-400">$${rec.incentivoDiarioUSD}</span></div><div>Ef: ${rec.efectividad}%</div></div>`;
                 todayContainer.appendChild(card);
             });
         }
 
+        // 1. LIMPIAR HISTORIAL DEL DÍA (Independiente)
         async function clearTodayHistory() {
-            if (!confirm("⚠️ ¿Deseas limpiar/eliminar los registros del día de hoy? Esto reiniciará el acumulado semanal.")) return;
+            if (!confirm("⚠️ ¿Deseas limpiar únicamente los registros del día de hoy?")) return;
             const todayStr = new Date().toISOString().split('T')[0];
             const updatedRecords = cachedUserRecords.filter(r => r.fecha !== todayStr);
             try {
                 await db.collection("historial_jornadas").doc(currentUser.email).set({ registros: updatedRecords }, { merge: true });
-                localStorage.setItem(`last_reset_date_${currentUser.email}`, todayStr);
                 cachedUserRecords = updatedRecords;
                 renderTodayHistory(cachedUserRecords);
                 updateWeeklyCardFromHistory(cachedUserRecords);
-                document.getElementById('resultadoPagoBsContainer').classList.add('hidden');
-                alert("🗑️ ¡Historial del día limpiado y acumulado semanal reiniciado con éxito!");
-            } catch (e) { alert("Error al limpiar historial."); }
+                alert("🗑️ ¡Historial del día limpiado con éxito!");
+            } catch (e) { alert("Error al limpiar."); }
+        }
+
+        // 2. LIMPIAR ACUMULADO SEMANAL (Independiente)
+        async function limpiarAcumuladoSemanal() {
+            if (!confirm("⚠️ ¿Deseas limpiar y reiniciar todo el acumulado semanal de incentivos?")) return;
+            const todayStr = new Date().toISOString().split('T')[0];
+            localStorage.setItem(`last_reset_date_${currentUser.email}`, todayStr);
+            updateWeeklyCardFromHistory(cachedUserRecords);
+            document.getElementById('resultadoPagoBsContainer').classList.add('hidden');
+            alert("🗑️ ¡Acumulado semanal limpiado con éxito!");
         }
 
         function updateWeeklyCardFromHistory(records) {
@@ -1102,7 +986,7 @@
             const activeWeekRecords = records.filter(r => r.fecha >= lastResetDate);
 
             if (activeWeekRecords.length === 0) {
-                badge.innerText = "100.0%_"; badge.className = "text-2xl font-black text-slate-400";
+                badge.innerText = "100.0%"; badge.className = "text-2xl font-black text-slate-400";
                 label.innerText = "Ciclo semanal reiniciado (Listo)"; incBadge.innerText = "$0.00";
                 return;
             }
@@ -1116,20 +1000,16 @@
             badge.innerText = `${promedioSemanal.toFixed(1)}%`;
             incBadge.innerText = `$${totalIncentivoSemana.toFixed(2)}`;
             badge.className = `text-2xl font-black ${promedioSemanal >= 97.0 ? 'text-emerald-400' : 'text-red-400'}`;
-            label.innerText = promedioSemanal >= 97.0 ? "¡Califica Óptimo para Cobrar! (>= 97%)" : "No Califica (< 97%)";
+            label.innerText = promedioSemanal >= 97.0 ? "¡Califica Óptimo! (>= 97%)" : "No Califica (< 97%)";
         }
 
-        // FUNCIONALIDAD DEL NUEVO BOTÓN "Generar mi pago en bolívares"
         async function generarPagoBolivares() {
             if (!currentUser?.email) return;
             const resetKey = `last_reset_date_${currentUser.email}`;
             const lastResetDate = localStorage.getItem(resetKey) || "2000-01-01";
             const activeWeekRecords = cachedUserRecords.filter(r => r.fecha >= lastResetDate);
 
-            if (activeWeekRecords.length === 0) {
-                alert("No hay registros acumulados en esta semana para generar el pago.");
-                return;
-            }
+            if (activeWeekRecords.length === 0) { alert("No hay registros acumulados."); return; }
 
             let sumaEf = 0, totalIncentivoSemana = 0;
             activeWeekRecords.forEach(r => {
@@ -1138,35 +1018,29 @@
             });
             const promedioSemanal = sumaEf / activeWeekRecords.length;
 
-            // Obtener tasa del viernes
             const viernesDateStr = getLastFridayDate();
             const tasaViernes = await getTasaForDate(viernesDateStr);
             const montoBolivares = totalIncentivoSemana * tasaViernes;
 
             const container = document.getElementById('resultadoPagoBsContainer');
-            const fechaTasaEl = document.getElementById('resultadoFechaTasa');
-            const montoBsEl = document.getElementById('resultadoMontoBs');
-            const efectividadAvisoEl = document.getElementById('resultadoEfectividadAviso');
-
             container.classList.remove('hidden');
-            fechaTasaEl.innerText = `Tasa cierre Viernes (${viernesDateStr}): Bs. ${tasaViernes.toFixed(2)}`;
-            montoBsEl.innerText = `Monto a cobrar: Bs. ${montoBolivares.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            document.getElementById('resultadoFechaTasa').innerText = `Tasa Viernes (${viernesDateStr}): Bs. ${tasaViernes.toFixed(2)}`;
+            document.getElementById('resultadoMontoBs').innerText = `Monto a cobrar: Bs. ${montoBolivares.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
+            const aviso = document.getElementById('resultadoEfectividadAviso');
             if (promedioSemanal >= 97.0) {
-                efectividadAvisoEl.innerText = `✅ Efectividad de ${promedioSemanal.toFixed(1)}%: ¡Aplica al pago de incentivo! (Cobro el próximo jueves)`;
-                efectividadAvisoEl.className = "text-emerald-400 font-bold mt-1";
+                aviso.innerText = `✅ Efectividad de ${promedioSemanal.toFixed(1)}%: ¡Aplica al pago! (Cobro el próximo jueves)`;
+                aviso.className = "text-emerald-400 font-bold mt-1";
             } else {
-                efectividadAvisoEl.innerText = `❌ Efectividad de ${promedioSemanal.toFixed(1)}%: No aplicas a la efectividad requerida (Mínimo 97%).`;
-                efectividadAvisoEl.className = "text-red-400 font-bold mt-1";
+                aviso.innerText = `❌ Efectividad de ${promedioSemanal.toFixed(1)}%: No aplicas a la efectividad requerida (Mínimo 97%).`;
+                aviso.className = "text-red-400 font-bold mt-1";
             }
         }
 
         async function saveDailyRecord() {
             const rutaInput = document.getElementById('inputRuta').value.trim();
             const f1Input = document.getElementById('inputF1').value.trim();
-            if (!document.getElementById('noLoadCheck').checked && (!rutaInput || f1Input === "")) {
-                alert("⚠️ Número de Ruta y F1 son obligatorios."); return;
-            }
+            if (!document.getElementById('noLoadCheck').checked && (!rutaInput || f1Input === "")) { alert("⚠️ Número de Ruta y F1 obligatorios."); return; }
 
             const metrics = calculateRealTime();
             const newRecord = {
@@ -1178,30 +1052,28 @@
                 timestamp: new Date().toISOString()
             };
 
-            try {
-                const docRef = db.collection("historial_jornadas").doc(currentUser.email);
-                const doc = await docRef.get();
-                let registros = doc.exists && doc.data().registros ? doc.data().registros : [];
-                registros.unshift(newRecord);
-                await docRef.set({ registros }, { merge: true });
+            const docRef = db.collection("historial_jornadas").doc(currentUser.email);
+            const doc = await docRef.get();
+            let registros = doc.exists && doc.data().registros ? doc.data().registros : [];
+            registros.unshift(newRecord);
+            await docRef.set({ registros }, { merge: true });
 
-                alert("¡Registro guardado exitosamente!");
-                cachedUserRecords = registros;
-                renderTodayHistory(cachedUserRecords);
-                updateWeeklyCardFromHistory(cachedUserRecords);
-                document.getElementById('resultadoPagoBsContainer').classList.add('hidden');
-
-                document.getElementById('inputRuta').value = '';
-                document.getElementById('inputF1').value = '0';
-                calculateRealTime();
-            } catch (error) { alert("Error al guardar en la nube."); }
+            alert("¡Guardado con éxito!");
+            cachedUserRecords = registros;
+            renderTodayHistory(cachedUserRecords);
+            updateWeeklyCardFromHistory(cachedUserRecords);
+            document.getElementById('resultadoPagoBsContainer').classList.add('hidden');
+            document.getElementById('inputRuta').value = '';
+            document.getElementById('inputF1').value = '0';
+            calculateRealTime();
         }
 
         async function confirmDeleteAccount() {
-            if (!confirm("⚠️ ¿Estás seguro de eliminar tu cuenta?")) return;
+            if (!confirm("⚠️ ¿Eliminar cuenta?")) return;
             if (currentUser?.email) await db.collection("usuarios").doc(currentUser.email).delete().catch(()=>{});
             logoutApp();
         }
     </script>
 </body>
+</html>
 </html>
