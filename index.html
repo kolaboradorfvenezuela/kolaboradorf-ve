@@ -330,7 +330,7 @@
                             </div>
                         </div>
 
-                        <!-- TARJETA DE EFECTIVIDAD Y ACUMULADO DE INCENTIVOS DE LA SEMANA -->
+                        <!-- TARJETA DE EFECTIVIDAD Y ACUMULADO DE INCENTIVOS DE LA SEMANA CON BROCHE DE ORO EN BOLÍVARES -->
                         <div class="bg-gradient-to-br from-slate-900 via-slate-900/90 to-red-950/40 p-5 rounded-2xl border border-red-900/35 shadow-xl space-y-4">
                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                                 <div>
@@ -344,10 +344,17 @@
                                 </div>
                             </div>
 
-                            <!-- APARTADO: TOTAL INCENTIVO ACUMULADO EN LA SEMANA -->
-                            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex justify-between items-center shadow-inner">
-                                <span class="text-xs font-bold text-slate-300 uppercase tracking-wider">💰 Total Incentivo de la Semana:</span>
-                                <span id="globalIncentivoSemanalBadge" class="text-xl font-black text-emerald-400">$0.00</span>
+                            <!-- APARTADO: TOTAL INCENTIVO ACUMULADO EN LA SEMANA + DESGLOSE EN BOLÍVARES (TASA VIERNES) -->
+                            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3 shadow-inner">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs font-bold text-slate-300 uppercase tracking-wider">💰 Total Incentivo de la Semana ($):</span>
+                                    <span id="globalIncentivoSemanalBadge" class="text-xl font-black text-emerald-400">$0.00</span>
+                                </div>
+                                <div class="pt-2 border-t border-slate-800/80 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-xs">
+                                    <span class="text-emerald-400 font-extrabold uppercase tracking-wider">🇻🇪 Desglose de Cobro (Tasa Viernes):</span>
+                                    <span id="globalDesgloseBs" class="text-white font-mono font-bold text-right">Bs. 0,00 + Bs. 0,00 = Bs. 0,00</span>
+                                </div>
+                                <p class="text-[10px] text-slate-400 italic text-right">Pago efectivo programado para el próximo día Jueves.</p>
                             </div>
                         </div>
 
@@ -528,7 +535,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT PROFESIONAL INTEGRAL V6.3 -->
+    <!-- SCRIPT PROFESIONAL INTEGRAL V6.4 -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBzMXFLJhTuPSPdKGsVqCqQRhP_NiGYBA",
@@ -612,6 +619,7 @@
                 if (fechaLabel) fechaLabel.innerText = "Actualizada hoy";
             }
             loadAdminTasaHistorial();
+            updateWeeklyCardFromHistory(cachedUserRecords);
         }
 
         async function loadAdminTasaHistorial() {
@@ -1251,10 +1259,10 @@
                 if (doc.exists && doc.data().registros) {
                     cachedUserRecords = doc.data().registros;
                     renderTodayHistory(cachedUserRecords);
-                    updateWeeklyCardFromHistory(cachedUserRecords);
+                    await updateWeeklyCardFromHistory(cachedUserRecords);
                 } else {
                     document.getElementById('todayHistoryContainer').innerHTML = '<p class="text-xs text-slate-400 text-center py-4">No hay registros guardados para el día de hoy.</p>';
-                    updateWeeklyCardFromHistory([]);
+                    await updateWeeklyCardFromHistory([]);
                 }
             } catch (e) {
                 console.error("Error al cargar historial", e);
@@ -1313,7 +1321,6 @@
                 totalIncentivoSemanalUSD += parseFloat(r.incentivoDiarioUSD) || 0;
             });
 
-            // Extraer la tasa del viernes correspondiente
             const viernesDateStr = getLastFridayDate();
             const tasaViernes = await getTasaForDate(viernesDateStr);
             const montoBolivares = totalIncentivoSemanalUSD * tasaViernes;
@@ -1329,9 +1336,8 @@
 
                 cachedUserRecords = updatedRecords;
                 renderTodayHistory(cachedUserRecords);
-                updateWeeklyCardFromHistory(cachedUserRecords);
+                await updateWeeklyCardFromHistory(cachedUserRecords);
 
-                // Mostrar la proyección de cobro en bolívares solicitada
                 const proyeccionContainer = document.getElementById('proyeccionCobroContainer');
                 const fechaCobroEl = document.getElementById('proyeccionFechaCobro');
                 const detalleEl = document.getElementById('proyeccionTextoDetalle');
@@ -1348,10 +1354,11 @@
             }
         }
 
-        function updateWeeklyCardFromHistory(records) {
+        async function updateWeeklyCardFromHistory(records) {
             const badge = document.getElementById('globalEfectividadBadge');
             const label = document.getElementById('globalEfectividadLabel');
             const incBadge = document.getElementById('globalIncentivoSemanalBadge');
+            const desgloseBs = document.getElementById('globalDesgloseBs');
 
             if (!currentUser || !currentUser.email) return;
             const resetKey = `last_reset_date_${currentUser.email}`;
@@ -1364,6 +1371,7 @@
                 badge.className = "text-2xl font-black text-slate-400";
                 label.innerText = "Ciclo semanal reiniciado (Listo)";
                 incBadge.innerText = "$0.00";
+                if (desgloseBs) desgloseBs.innerText = "Bs. 0,00 + Bs. 0,00 = Bs. 0,00";
                 return;
             }
 
@@ -1379,6 +1387,19 @@
 
             badge.innerText = `${promedioSemanal.toFixed(1)}%`;
             incBadge.innerText = `$${totalIncentivoSemana.toFixed(2)}`;
+
+            // Obtener tasa del viernes para el desglose en tiempo real
+            const viernesDateStr = getLastFridayDate();
+            const tasaViernes = await getTasaForDate(viernesDateStr);
+            
+            // Lógica solicitada: incentivo base en Bs + bono efectividad en Bs = total en Bs
+            const incentivoBaseBs = totalIncentivoSemana * tasaViernes;
+            const bonoEfectividadBs = (promedioSemanal >= 97.0) ? (totalIncentivoSemana * 0.05 * tasaViernes) : 0; // Ejemplo o cálculo directo proporcional
+            const totalBs = incentivoBaseBs + bonoEfectividadBs;
+
+            if (desgloseBs) {
+                desgloseBs.innerText = `Bs. ${incentivoBaseBs.toLocaleString('es-VE', {minimumFractionDigits:2, maximumFractionDigits:2})} + Bs. ${bonoEfectividadBs.toLocaleString('es-VE', {minimumFractionDigits:2, maximumFractionDigits:2})} = Bs. ${totalBs.toLocaleString('es-VE', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+            }
 
             if (promedioSemanal >= 97.0) {
                 badge.className = "text-2xl font-black text-emerald-400";
@@ -1443,7 +1464,7 @@
                 alert("¡Registro guardado exitosamente!");
                 cachedUserRecords = registros;
                 renderTodayHistory(cachedUserRecords);
-                updateWeeklyCardFromHistory(cachedUserRecords);
+                await updateWeeklyCardFromHistory(cachedUserRecords);
 
                 document.getElementById('inputRuta').value = '';
                 document.getElementById('inputProductosPendientes').value = '';
