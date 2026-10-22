@@ -221,7 +221,7 @@
             <button onclick="logoutApp()" class="bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold px-6 py-3 rounded-xl transition border border-slate-700 shadow-lg uppercase tracking-wider">Cerrar Sesión</button>
         </section>
 
-        <!-- 3. INTERFAZ PRINCIPAL -->
+        <!-- 3. INTERFAZ PRINCIPAL (SOLO AQUÍ APARECE LA TASA BCV) -->
         <div id="mainAppView" class="hidden space-y-6">
             <!-- Navegación Admin / Simulador de Roles -->
             <div id="adminNavTabs" class="hidden bg-slate-900/90 backdrop-blur-xl p-3 rounded-2xl border border-slate-800 flex flex-col sm:flex-row gap-3 justify-between items-center shadow-lg">
@@ -428,37 +428,36 @@
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- WIDGET DE TASA BCV OFICIAL FIJO (NO FLOTANTE, SE MUEVE CON LA PÁGINA) -->
-        <div class="mt-8 mb-4 max-w-xs">
-            <a href="https://www.bcv.org.ve" target="_blank" rel="noopener noreferrer" 
-               class="flex items-center gap-3 bg-slate-900/95 hover:bg-slate-800 backdrop-blur-xl border border-red-500/30 px-4 py-2.5 rounded-2xl shadow-xl transition group cursor-pointer">
-                <div class="w-9 h-9 rounded-xl bg-red-600/10 border border-red-500/30 flex items-center justify-center text-red-400 font-black text-xs shadow-inner group-hover:scale-105 transition">🇻🇪</div>
-                <div>
-                    <div class="flex items-center gap-2">
-                        <span class="text-[10px] font-black text-white uppercase tracking-wider">Tasa BCV:</span>
-                        <span id="bcvTasaValor" class="text-xs font-black text-emerald-400">Bs. 883,40</span>
+            <!-- WIDGET DE TASA BCV OFICIAL DENTRO DE LA SESIÓN (FIJO, SE MUEVE CON EL CONTENIDO) -->
+            <div class="mt-8 mb-4 max-w-xs">
+                <a href="https://www.bcv.org.ve" target="_blank" rel="noopener noreferrer" 
+                   class="flex items-center gap-3 bg-slate-900/95 hover:bg-slate-800 backdrop-blur-xl border border-red-500/30 px-4 py-2.5 rounded-2xl shadow-xl transition group cursor-pointer">
+                    <div class="w-9 h-9 rounded-xl bg-red-600/10 border border-red-500/30 flex items-center justify-center text-red-400 font-black text-xs shadow-inner group-hover:scale-105 transition">🇻🇪</div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] font-black text-white uppercase tracking-wider">Tasa BCV:</span>
+                            <span id="bcvTasaValor" class="text-xs font-black text-emerald-400">Bs. 883,40</span>
+                        </div>
+                        <div class="flex items-center gap-1.5 mt-0.5">
+                            <span id="bcvTasaFechaLabel" class="text-[9px] text-slate-400 group-hover:text-slate-300 transition">Actualizada hoy</span>
+                        </div>
                     </div>
-                    <div class="flex items-center gap-1.5 mt-0.5">
-                        <span id="bcvTasaFechaLabel" class="text-[9px] text-slate-400 group-hover:text-slate-300 transition">Actualizada hoy</span>
-                    </div>
-                </div>
-            </a>
+                </a>
+            </div>
         </div>
     </main>
 
     <!-- PIE DE PÁGINA INSTITUCIONAL -->
     <footer class="bg-slate-950/80 border-t border-slate-900 py-4 text-center text-xs text-slate-400 backdrop-blur-md mt-auto">
-        <p>DFPfantasy CorVe, C.A Copyright ©2026 Kolaboradorf VE. Todos los derechos reservados.</p>
+        <p>© 2026 Kolaboradorf VE. Todos los derechos reservados.</p>
     </footer>
 
-    <!-- MODAL DE POLÍTICAS Y TÉRMINOS (Con barra de desplazamiento y texto íntegro) -->
+    <!-- MODAL DE POLÍTICAS Y TÉRMINOS -->
     <div id="termsModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
         <div class="bg-slate-900 rounded-3xl max-w-2xl w-full p-8 border border-slate-800 space-y-5 shadow-2xl flex flex-col max-h-[85vh]">
             <h3 class="text-base font-black text-white border-b border-slate-800 pb-3">Políticas de Privacidad, Términos y Condiciones Generales de Uso</h3>
             
-            <!-- Contenedor con barra lateral (Scroll) con todo el texto íntegro proporcionado -->
             <div id="termsScrollContainer" onscroll="checkTermsScroll()" class="space-y-4 text-xs text-slate-300 leading-relaxed overflow-y-auto pr-2 max-h-[50vh] bg-slate-950 p-4 rounded-xl border border-slate-800 shadow-inner">
                 <p><strong>Última actualización:</strong> 20 de octubre de 2026<br>
                 <strong>Aplicación:</strong> KOLABORADORF VE<br>
@@ -505,7 +504,6 @@
                 <p>Este contrato se rige íntegramente por las leyes de la República Bolivariana de Venezuela (Constitución, Ley Orgánica de Telecomunicaciones, Ley Contra los Delitos Informáticos y Código Civil) y los estándares internacionales de comercio electrónico. Para cualquier controversia, las partes se someten expresamente a la jurisdicción de los Tribunales Ordinarios de la República Bolivariana de Venezuela.</p>
             </div>
 
-            <!-- Botón de Aceptar (Habilitado solo al llegar al final del scroll) -->
             <div class="pt-2 text-center">
                 <p id="scrollWarning" class="text-[10px] text-amber-400 mb-2 font-semibold">↓ Desplace hasta el final del documento para habilitar el botón de aceptación ↓</p>
                 <button id="btnAcceptTerms" disabled onclick="acceptTermsAndClose()" class="w-full bg-slate-800 text-slate-500 font-bold py-3 rounded-xl transition text-xs uppercase tracking-wider cursor-not-allowed shadow">Aceptar Políticas y Términos</button>
@@ -513,7 +511,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT PROFESIONAL INTEGRAL V6.1 -->
+    <!-- SCRIPT PROFESIONAL INTEGRAL V6.2 -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBzMXFLJhTuPSPdKGsVqCqQRhP_NiGYBA",
@@ -543,8 +541,6 @@
             const dateInput = document.getElementById('inputFechaJornada');
             if (dateInput) dateInput.value = todayStr;
             document.getElementById('todayDateBadge').innerText = todayStr;
-
-            loadBcvTasaWidget();
 
             setTimeout(() => {
                 document.getElementById('loadingSessionView').classList.add('hidden');
@@ -580,23 +576,23 @@
                     if (data.tasaBcvFecha) fechaActualizacion = data.tasaBcvFecha;
                 }
 
-                tasaEl.innerText = `Bs. ${tasaActual.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                if (tasaEl) tasaEl.innerText = `Bs. ${tasaActual.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
                 if (inputAdminTasa) inputAdminTasa.value = tasaActual.toFixed(2);
 
                 const todayStr = new Date().toISOString().split('T')[0];
                 if (fechaActualizacion === todayStr) {
-                    fechaLabel.innerText = "Actualizada hoy";
+                    if (fechaLabel) fechaLabel.innerText = "Actualizada hoy";
                     if (alertBanner) alertBanner.classList.add('hidden');
                 } else {
-                    fechaLabel.innerText = `Última: ${fechaActualizacion}`;
+                    if (fechaLabel) fechaLabel.innerText = `Última: ${fechaActualizacion}`;
                     if (alertBanner && currentUser && currentUser.isAdmin) {
                         alertBanner.classList.remove('hidden');
                         alertText.innerText = `⚠️ Atención: La tasa oficial data del ${fechaActualizacion} y aún no se ha actualizado para el día de hoy (${todayStr}).`;
                     }
                 }
             } catch (e) {
-                tasaEl.innerText = "Bs. 883,40";
-                fechaLabel.innerText = "Actualizada hoy";
+                if (tasaEl) tasaEl.innerText = "Bs. 883,40";
+                if (fechaLabel) fechaLabel.innerText = "Actualizada hoy";
             }
         }
 
@@ -995,11 +991,11 @@
                 adminNavTabs.classList.remove('hidden');
                 roleSimulatorContainer.classList.remove('hidden');
                 loadPendingApprovals();
-                loadBcvTasaWidget();
             } else {
                 adminNavTabs.classList.add('hidden');
             }
 
+            loadBcvTasaWidget(); // Cargar la tasa oficial únicamente al entrar a la sesión
             await loadIncentiveConfig();
             calculateAntiquity();
             await loadUserHistory();
@@ -1013,20 +1009,16 @@
             calculateRealTime();
         }
 
-        // FUNCIÓN DE CIERRE DE SESIÓN CON BANNER CREATIVO DE 5 SEGUNDOS
         async function logoutApp() {
             try { await firebase.auth().signOut(); } catch(e) {}
             localStorage.removeItem('kolaboradorf_session');
 
-            // Ocultar vistas principales y cabecera de sesión
             document.getElementById('mainAppView').classList.add('hidden');
             document.getElementById('authHeaderControls').classList.add('hidden');
 
-            // Mostrar banner creativo de cierre de sesión
             const logoutView = document.getElementById('logoutProgressView');
             logoutView.classList.remove('hidden');
 
-            // Mantener el banner creativo visible exactamente 5 segundos (igual que el splash inicial)
             setTimeout(() => {
                 logoutView.classList.add('hidden');
                 document.getElementById('authView').classList.remove('hidden');
