@@ -395,7 +395,7 @@
         </div>
     </main>
 
-    <!-- WIDGET FLOTANTE DE TASA BCV CORREGIDO (ESQUINA INFERIOR IZQUIERDA) -->
+    <!-- WIDGET FLOTANTE DE TASA BCV OFICIAL ACTUALIZADO (ESQUINA INFERIOR IZQUIERDA) -->
     <aside aria-label="Indicador de Tasa BCV" class="fixed bottom-4 left-4 z-50">
         <a href="https://www.bcv.org.ve" target="_blank" rel="noopener noreferrer" 
            class="flex items-center gap-3 bg-slate-900/95 hover:bg-slate-800 backdrop-blur-xl border border-red-500/30 px-4 py-2.5 rounded-2xl shadow-2xl transition group cursor-pointer">
@@ -403,8 +403,8 @@
             <div>
                 <div class="flex items-center gap-2">
                     <span class="text-[10px] font-black text-white uppercase tracking-wider">Tasa BCV:</span>
-                    <!-- Mostrando claramente la tasa en bolívares con formato estricto de dos dígitos decimales -->
-                    <span id="bcvTasaValor" class="text-xs font-black text-emerald-400">Bs. 36,50</span>
+                    <!-- Tasa oficial correcta y exacta con dos decimales -->
+                    <span id="bcvTasaValor" class="text-xs font-black text-emerald-400">Bs. 883,40</span>
                 </div>
                 <div class="flex items-center gap-1.5 mt-0.5">
                     <span class="text-[9px] text-slate-400 group-hover:text-slate-300 transition">Banco Central de Venezuela</span>
@@ -447,7 +447,7 @@
 
                 <p><strong>Artículo 2.2 — Inconsistencias en Nómina, Pagos o Comisiones</strong><br>
                 La Aplicación ejecuta cálculos automatizados basados únicamente en la información ingresada directamente por el Usuario.<br>
-                1. Falta de Valor Legal: Los reportes, sumatorias, contabilidad interna o métricas generadas por KOLABORADORF VE no constituyen comprobantes de nómina, recibos de pago ni documentos probatorios con validez mercantil o laboral frente a terceros.<br>
+                1. Falta de Valor Legal: Los reportes, sumatorias, contabilidad interna o métricas generadas por KOLABORADORF VE não constituyen comprobantes de nómina, recibos de pago ni documentos probatorios con validez mercantil o laboral frente a terceros.<br>
                 2. Procedimiento ante Discrepancias: En caso de que el Usuario observe diferencias o inconsistencias entre los datos calculados por la Aplicación y sus pagos reales, cómputos de nómina o liquidaciones, el Usuario se compromete de manera expresa a no presentar reclamos ni demandas contra la Aplicación ni sus desarrolladores. Debe dirigir cualquier aclaratoria directamente al supervisor, gerencia de operaciones o departamento de Recursos Humanos de su empresa contratante.</p>
 
                 <h4 class="font-bold text-white uppercase mt-3">CAPÍTULO III: ORIGEN DE LOS DATOS Y RESPONSABILIDAD DE CARGA</h4>
@@ -478,7 +478,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT PROFESIONAL INTEGRAL V5.8 -->
+    <!-- SCRIPT PROFESIONAL INTEGRAL V5.9 -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBzMXFLJhTuPSPdKGsVqCqQRhP_NiGYBA",
@@ -509,7 +509,7 @@
             if (dateInput) dateInput.value = todayStr;
             document.getElementById('todayDateBadge').innerText = todayStr;
 
-            // Cargar y dar formato estricto de dos decimales a la tasa BCV
+            // Cargar y dar formato estricto de dos decimales a la tasa BCV oficial
             loadBcvTasaWidget();
 
             // Pantalla de Splash corporativa garantizada por 5 segundos al cargar la app
@@ -529,19 +529,18 @@
             }, 5000);
         });
 
-        // Función para gestionar y mostrar con formato estricto de dos decimales la tasa BCV
+        // Función para gestionar y mostrar con formato estricto de dos decimales la tasa oficial BCV
         async function loadBcvTasaWidget() {
             const tasaEl = document.getElementById('bcvTasaValor');
             try {
                 const doc = await db.collection("config").doc("incentivos").get();
-                let tasaActual = 36.50; // Valor predeterminado seguro con dos decimales
+                let tasaActual = 883.40; // Tasa oficial BCV correcta actual
                 if (doc.exists && doc.data().tasaBcvActual) {
                     tasaActual = parseFloat(doc.data().tasaBcvActual);
                 }
-                // Formato exacto de dos decimales con coma separadora y punto para miles si aplica
                 tasaEl.innerText = `Bs. ${tasaActual.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             } catch (e) {
-                tasaEl.innerText = "Bs. 36,50";
+                tasaEl.innerText = "Bs. 883,40";
             }
         }
 
