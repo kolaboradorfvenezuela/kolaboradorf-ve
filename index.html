@@ -395,7 +395,7 @@
         </div>
     </main>
 
-    <!-- WIDGET FLOTANTE DE TASA BCV ACTUALIZADO (ESQUINA INFERIOR IZQUIERDA) -->
+    <!-- WIDGET FLOTANTE DE TASA BCV CORREGIDO (ESQUINA INFERIOR IZQUIERDA) -->
     <aside aria-label="Indicador de Tasa BCV" class="fixed bottom-4 left-4 z-50">
         <a href="https://www.bcv.org.ve" target="_blank" rel="noopener noreferrer" 
            class="flex items-center gap-3 bg-slate-900/95 hover:bg-slate-800 backdrop-blur-xl border border-red-500/30 px-4 py-2.5 rounded-2xl shadow-2xl transition group cursor-pointer">
@@ -403,7 +403,8 @@
             <div>
                 <div class="flex items-center gap-2">
                     <span class="text-[10px] font-black text-white uppercase tracking-wider">Tasa BCV:</span>
-                    <span id="bcvTasaValor" class="text-xs font-black text-emerald-400">Cargando...</span>
+                    <!-- Mostrando claramente la tasa en bolívares con formato estricto de dos dígitos decimales -->
+                    <span id="bcvTasaValor" class="text-xs font-black text-emerald-400">Bs. 36,50</span>
                 </div>
                 <div class="flex items-center gap-1.5 mt-0.5">
                     <span class="text-[9px] text-slate-400 group-hover:text-slate-300 transition">Banco Central de Venezuela</span>
@@ -451,7 +452,7 @@
 
                 <h4 class="font-bold text-white uppercase mt-3">CAPÍTULO III: ORIGEN DE LOS DATOS Y RESPONSABILIDAD DE CARGA</h4>
                 <p><strong>Artículo 3.1 — Insumo de Información por el Usuario</strong><br>
-                KOLABORADORF VE es una plataforma que se alimenta de la información suministrada voluntaria e independientemente por el Usuario. La Aplicación não almacena por cuenta propia, no verifica, no audita ni valida la veracidad, exactitud o legalidad de los datos introducidos (tales como cantidad de cajas, tarifas, rutas, montos recopilados o nombres de clientes).</p>
+                KOLABORADORF VE es una plataforma que se alimenta de la información suministrada voluntaria e independientemente por el Usuario. La Aplicación no almacena por cuenta propia, no verifica, no audita ni valida la veracidad, exactitud o legalidad de los datos introducidos (tales como cantidad de cajas, tarifas, rutas, montos recopilados o nombres de clientes).</p>
 
                 <p><strong>Artículo 3.2 — Uso Inadecuado de Marcas, Imagen y Propiedad Intelectual</strong><br>
                 Queda estrictamente prohibido al Usuario ingresar imágenes, logotipos, registros fotográficos o información confidencial de terceros o empresas sin contar con la autorización correspondiente. DFPfantasy CorVe no responderá bajo ningún concepto por demandas, sanciones o reclamos derivados del uso indebido de imagen, marcas registradas o secretos comerciales ingresados por los usuarios en la plataforma.</p>
@@ -477,7 +478,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT PROFESIONAL INTEGRAL V5.7 -->
+    <!-- SCRIPT PROFESIONAL INTEGRAL V5.8 -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBzMXFLJhTuPSPdKGsVqCqQRhP_NiGYBA",
@@ -508,7 +509,7 @@
             if (dateInput) dateInput.value = todayStr;
             document.getElementById('todayDateBadge').innerText = todayStr;
 
-            // Cargar o inicializar la tasa BCV en el widget inferior izquierdo
+            // Cargar y dar formato estricto de dos decimales a la tasa BCV
             loadBcvTasaWidget();
 
             // Pantalla de Splash corporativa garantizada por 5 segundos al cargar la app
@@ -528,19 +529,19 @@
             }, 5000);
         });
 
-        // Función para gestionar la tasa BCV en el widget inferior izquierdo
+        // Función para gestionar y mostrar con formato estricto de dos decimales la tasa BCV
         async function loadBcvTasaWidget() {
             const tasaEl = document.getElementById('bcvTasaValor');
             try {
-                // Buscamos si hay una tasa configurada en Firestore o mantenemos una referencia segura
                 const doc = await db.collection("config").doc("incentivos").get();
-                let tasaActual = "36.50"; // Valor referencial inicial por defecto si no está en Firestore
+                let tasaActual = 36.50; // Valor predeterminado seguro con dos decimales
                 if (doc.exists && doc.data().tasaBcvActual) {
-                    tasaActual = doc.data().tasaBcvActual;
+                    tasaActual = parseFloat(doc.data().tasaBcvActual);
                 }
-                tasaEl.innerText = `Bs. ${parseFloat(tasaActual).toFixed(2)}`;
+                // Formato exacto de dos decimales con coma separadora y punto para miles si aplica
+                tasaEl.innerText = `Bs. ${tasaActual.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             } catch (e) {
-                tasaEl.innerText = "Bs. 36.50";
+                tasaEl.innerText = "Bs. 36,50";
             }
         }
 
