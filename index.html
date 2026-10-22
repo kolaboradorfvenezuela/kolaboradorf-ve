@@ -24,7 +24,6 @@
             background-position: center;
             background-attachment: fixed;
         }
-        /* Tipografía gruesa, moderna y de alto impacto visual para el Logo */
         .brand-heavy {
             font-family: 'Inter', sans-serif;
             font-weight: 900;
@@ -54,7 +53,7 @@
     <!-- CONTENEDOR PRINCIPAL -->
     <main class="flex-grow max-w-7xl w-full mx-auto px-6 py-8 flex flex-col justify-center">
 
-        <!-- Pantalla de Carga Inicial (Splash Screen de 5 segundos al abrir la app) -->
+        <!-- Pantalla de Carga Inicial -->
         <div id="loadingSessionView" class="text-center py-20 space-y-6">
             <div class="inline-block p-8 rounded-3xl bg-slate-900/80 border border-slate-800 shadow-2xl backdrop-blur-xl">
                 <h2 class="text-4xl sm:text-5xl font-black text-white brand-heavy tracking-tight drop-shadow-lg mb-3">Kolaboradorf <span class="text-red-500">VE</span></h2>
@@ -73,7 +72,7 @@
             </div>
         </div>
 
-        <!-- PANTALLA DE CARGA AL INICIAR SESIÓN (Barra de 3 segundos del 1 al 100) -->
+        <!-- PANTALLA DE CARGA AL INICIAR SESIÓN -->
         <div id="loginProgressView" class="hidden max-w-md mx-auto bg-slate-900/90 backdrop-blur-xl rounded-3xl shadow-2xl p-10 text-center border border-slate-800 mt-6 shadow-red-950/20 space-y-6">
             <div>
                 <h2 class="text-3xl font-black text-white brand-heavy tracking-tight drop-shadow mb-2">Kolaboradorf <span class="text-red-500">VE</span></h2>
@@ -298,7 +297,7 @@
                         <button onclick="saveDailyRecord()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl transition text-xs shadow-lg shadow-emerald-600/30 uppercase tracking-wider mt-2 flex items-center justify-center gap-2">💾 Guardar Registro más largo</button>
                     </div>
 
-                    <!-- Resumen Diario, Histórico del Día y Tarjeta de Efectividad e Incentivo Semanal -->
+                    <!-- Resumen Diario, Histórico del Día (Intacto) y Tarjeta de Acumulado Semanal -->
                     <div class="lg:col-span-2 space-y-6">
                         <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
                             <div class="bg-slate-900/90 backdrop-blur-xl p-4 rounded-2xl border border-slate-800 text-center shadow-lg"><span class="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">Carga Inicial</span><h4 id="statCargaInicial" class="text-2xl font-black text-white mt-1.5">0</h4></div>
@@ -307,30 +306,21 @@
                             <div class="bg-slate-900/90 backdrop-blur-xl p-4 rounded-2xl border border-slate-800 text-center shadow-lg"><span class="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">Efectividad Diaria</span><h4 id="statEfectividadSemanal" class="text-2xl font-black text-blue-400 mt-1.5">100.0%</h4></div>
                         </div>
 
-                        <!-- HISTÓRICO DEL DÍA CON BOTÓN PARA LIMPIAR Y PROYECCIÓN DE COBRO EN BOLÍVARES -->
-                        <div class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-4 shadow-xl">
+                        <!-- HISTÓRICO DEL DÍA (ORIGINAL / INTACTO) -->
+                        <div class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-3 shadow-xl">
                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-800 pb-3 gap-2">
                                 <h4 class="text-sm font-extrabold text-white flex items-center gap-2">📊 Histórico del Día (Registros de Hoy)</h4>
                                 <div class="flex items-center gap-3">
                                     <span class="text-[10px] text-slate-400" id="todayDateBadge">Fecha actual</span>
-                                    <button onclick="clearTodayHistory()" class="text-[10px] bg-red-600/20 hover:bg-red-600/40 text-red-300 px-3 py-1.5 rounded-lg border border-red-500/30 font-semibold transition shadow flex items-center gap-1.5">🗑️ Limpiar Historial & Calcular Cobro (Bs.)</button>
+                                    <button onclick="clearTodayHistory()" class="text-[10px] bg-red-600/20 hover:bg-red-600/40 text-red-300 px-3 py-1 rounded-lg border border-red-500/30 font-semibold transition shadow">🗑️ Limpiar Historial del Día</button>
                                 </div>
                             </div>
                             <div id="todayHistoryContainer" class="space-y-2 max-h-48 overflow-y-auto pr-1">
                                 <p class="text-xs text-slate-400 text-center py-4">No hay registros guardados para el día de hoy.</p>
                             </div>
-
-                            <!-- Panel de Proyección de Cobro en Bolívares (Vinculado al botón de limpieza) -->
-                            <div id="proyeccionCobroContainer" class="hidden bg-slate-950 p-4 rounded-xl border border-emerald-500/40 space-y-2 shadow-inner">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-xs font-black text-emerald-400 uppercase tracking-wider">🇻🇪 Proyección de Cobro (Jueves próximo)</span>
-                                    <span id="proyeccionFechaCobro" class="text-[10px] text-slate-400 font-bold"></span>
-                                </div>
-                                <p id="proyeccionTextoDetalle" class="text-xs text-slate-300 leading-relaxed"></p>
-                            </div>
                         </div>
 
-                        <!-- TARJETA DE EFECTIVIDAD Y ACUMULADO DE INCENTIVOS DE LA SEMANA CON BROCHE DE ORO EN BOLÍVARES -->
+                        <!-- TARJETA DE EFECTIVIDAD Y ACUMULADO DE INCENTIVOS CON EL BOTÓN "Generar mi pago en bolívares" -->
                         <div class="bg-gradient-to-br from-slate-900 via-slate-900/90 to-red-950/40 p-5 rounded-2xl border border-red-900/35 shadow-xl space-y-4">
                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                                 <div>
@@ -344,17 +334,27 @@
                                 </div>
                             </div>
 
-                            <!-- APARTADO: TOTAL INCENTIVO ACUMULADO EN LA SEMANA + DESGLOSE EN BOLÍVARES (TASA VIERNES) -->
+                            <!-- APARTADO: TOTAL INCENTIVO + BOTÓN GENERAR PAGO BS -->
                             <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3 shadow-inner">
                                 <div class="flex justify-between items-center">
-                                    <span class="text-xs font-bold text-slate-300 uppercase tracking-wider">💰 Total Incentivo de la Semana ($):</span>
+                                    <span class="text-xs font-bold text-slate-300 uppercase tracking-wider">💰 Total Incentivo de la Semana:</span>
                                     <span id="globalIncentivoSemanalBadge" class="text-xl font-black text-emerald-400">$0.00</span>
                                 </div>
-                                <div class="pt-2 border-t border-slate-800/80 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-xs">
-                                    <span class="text-emerald-400 font-extrabold uppercase tracking-wider">🇻🇪 Desglose de Cobro (Tasa Viernes):</span>
-                                    <span id="globalDesgloseBs" class="text-white font-mono font-bold text-right">Bs. 0,00 + Bs. 0,00 = Bs. 0,00</span>
+
+                                <!-- Botón y apartado para generar el pago en bolívares -->
+                                <div class="pt-3 border-t border-slate-800/80 space-y-2">
+                                    <button onclick="generarPagoBolivares()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-3 rounded-xl transition shadow-lg shadow-emerald-600/30 uppercase tracking-wider flex items-center justify-center gap-2">🇻🇪 Generar mi pago en bolívares</button>
+                                    
+                                    <!-- Resultado del pago generado -->
+                                    <div id="resultadoPagoBsContainer" class="hidden bg-slate-900 p-3.5 rounded-xl border border-emerald-500/40 space-y-1.5 text-xs">
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-emerald-400 font-bold uppercase tracking-wider text-[10px]">Resultado del Cálculo:</span>
+                                            <span id="resultadoFechaTasa" class="text-slate-400 text-[10px]"></span>
+                                        </div>
+                                        <p id="resultadoMontoBs" class="text-white font-bold text-sm"></p>
+                                        <p id="resultadoEfectividadAviso" class="font-bold"></p>
+                                    </div>
                                 </div>
-                                <p class="text-[10px] text-slate-400 italic text-right">Pago efectivo programado para el próximo día Jueves.</p>
                             </div>
                         </div>
 
@@ -372,7 +372,7 @@
                     <p class="text-xs text-red-200/80 mt-1">Panel exclusivo de supervisión, aprobación de cuentas y configuración independiente de montos en dólares.</p>
                 </div>
 
-                <!-- ALERTA VIGÍA INTELIGENTE PARA EL ADMINISTRADOR (Si la tasa no es de hoy) -->
+                <!-- ALERTA VIGÍA INTELIGENTE PARA EL ADMINISTRADOR -->
                 <div id="bcvAlertBanner" class="hidden bg-amber-500/15 border border-amber-500/40 p-4 rounded-2xl flex flex-col sm:flex-row justify-between items-center gap-4 shadow-xl">
                     <div class="flex items-center gap-3">
                         <span class="text-2xl">⚠️</span>
@@ -397,7 +397,7 @@
                         </div>
                     </div>
 
-                    <!-- HISTORIAL DE TASAS GUARDADAS (Correlatividad por fecha) -->
+                    <!-- HISTORIAL DE TASAS GUARDADAS -->
                     <div class="mt-4 pt-4 border-t border-slate-800 space-y-3">
                         <h5 class="text-xs font-bold text-slate-300 uppercase tracking-wider">📋 Historial de Tasas Oficiales Registradas</h5>
                         <div id="adminTasaHistorialList" class="space-y-2 max-h-40 overflow-y-auto pr-1">
@@ -453,7 +453,7 @@
                 </div>
             </div>
 
-            <!-- WIDGET DE TASA BCV OFICIAL DENTRO DE LA SESIÓN -->
+            <!-- WIDGET DE TASA BCV OFICIAL -->
             <div class="mt-8 mb-4 max-w-xs">
                 <a href="https://www.bcv.org.ve" target="_blank" rel="noopener noreferrer" 
                    class="flex items-center gap-3 bg-slate-900/95 hover:bg-slate-800 backdrop-blur-xl border border-red-500/30 px-4 py-2.5 rounded-2xl shadow-xl transition group cursor-pointer">
@@ -472,7 +472,7 @@
         </div>
     </main>
 
-    <!-- PIE DE PÁGINA INSTITUCIONAL -->
+    <!-- PIE DE PÁGINA -->
     <footer class="bg-slate-950/80 border-t border-slate-900 py-4 text-center text-xs text-slate-400 backdrop-blur-md mt-auto">
         <p>DFPfantasy CorVe, C.A Copyright ©2026 Kolaboradorf VE. Todos los derechos reservados.</p>
     </footer>
@@ -486,46 +486,7 @@
                 <p><strong>Última actualización:</strong> 20 de octubre de 2026<br>
                 <strong>Aplicación:</strong> KOLABORADORF VE<br>
                 <strong>Desarrollador / Titular:</strong> DFPfantasy CorVe (DFPFANTASY)<br>
-                <strong>Jurisdicción Base:</strong> República Bolivariana de Venezuela<br>
-                <strong>Contacto Legal y Soporte:</strong> DFPfantasyvnzla@gmail.com</p>
-
-                <h4 class="font-bold text-white uppercase mt-3">CAPÍTULO I: MARCO GENERAL Y RECONOCIMIENTO DEL SERVICIO</h4>
-                <p><strong>Artículo 1.1 — Definiciones y Naturaleza Jurídica</strong><br>
-                El presente instrumento legal constituye un contrato de adhesión vinculante conforme a la legislación de la República Bolivariana de Venezuela y a los principios generales de derecho internacional para aplicaciones digitales.<br>
-                - La Aplicación: KOLABORADORF VE, desarrollada y operada bajo la denominación comercial DFPfantasy CorVe (DFPFANTASY).<br>
-                - El Usuario: Toda persona natural que descargue, instale, acceda o utilice el software para llevar un control personal, diario o logístico de sus actividades de reparto o transporte.<br>
-                - Terceros / Empresas de Reparto: Entidades mercantiles, franquicias, distribuidores o empleadores para los cuales el Usuario preste servicios de manera directa, indirecta o independiente.</p>
-
-                <p><strong>Artículo 1.2 — Carácter Autónomo e Independencia Corporativa</strong><br>
-                KOLABORADORF VE y DFPfantasy CorVe son entidades tecnológicas totalmente independientes. No existe ningún vínculo de afiliación, asociación, sociedad, agencia, franquicia ni relación de dependencia o representación comercial entre la Aplicación y ninguna empresa, marca o patrono para el cual el Usuario trabaje o preste servicios de reparto.</p>
-
-                <h4 class="font-bold text-white uppercase mt-3">CAPÍTULO II: EXONERACIÓN TOTAL DE RESPONSABILIDAD LABORAL Y PATRIMONIAL</h4>
-                <p><strong>Artículo 2.1 — Inexistencia de Relación Laboral</strong><br>
-                El uso de KOLABORADORF VE no crea ni sugiere una relación de trabajo entre DFPfantasy CorVe y el Usuario, ni entre DFPfantasy CorVe y las empresas empleadoras del Usuario. La Aplicación es única y exclusivamente una herramienta digital auxiliar de uso personal.</p>
-
-                <p><strong>Artículo 2.2 — Inconsistencias en Nómina, Pagos o Comisiones</strong><br>
-                La Aplicación ejecuta cálculos automatizados basados únicamente en la información ingresada directamente por el Usuario.<br>
-                1. Falta de Valor Legal: Los reportes, sumatorias, contabilidad interna o métricas generadas por KOLABORADORF VE no constituyen comprobantes de nómina, recibos de pago ni documentos probatorios con validez mercantil o laboral frente a terceros.<br>
-                2. Procedimiento ante Discrepancias: En caso de que el Usuario observe diferencias o inconsistencias entre los datos calculados por la Aplicación y sus pagos reales, cómputos de nómina o liquidaciones, el Usuario se compromete de manera expresa a no presentar reclamos ni demandas contra la Aplicación ni sus desarrolladores. Debe dirigir cualquier aclaratoria directamente al supervisor, gerencia de operaciones o departamento de Recursos Humanos de su empresa contratante.</p>
-
-                <h4 class="font-bold text-white uppercase mt-3">CAPÍTULO III: ORIGEN DE LOS DATOS Y RESPONSABILIDAD DE CARGA</h4>
-                <p><strong>Artículo 3.1 — Insumo de Información por el Usuario</strong><br>
-                KOLABORADORF VE es una plataforma que se alimenta de la información suministrada voluntaria e independientemente por el Usuario. La Aplicación no almacena por cuenta propia, no verifica, no audita ni valida la veracidad, exactitud o legalidad de los datos introducidos (tales como cantidad de cajas, tarifas, rutas, montos recopilados o nombres de clientes).</p>
-
-                <p><strong>Artículo 3.2 — Uso Inadecuado de Marcas, Imagen y Propiedad Intelectual</strong><br>
-                Queda estrictamente prohibido al Usuario ingresar imágenes, logotipos, registros fotográficos o información confidencial de terceros o empresas sin contar con la autorización correspondiente. DFPfantasy CorVe no responderá bajo ningún concepto por demandas, sanciones o reclamos derivados del uso indebido de imagen, marcas registradas o secretos comerciales ingresados por los usuarios en la plataforma.</p>
-
-                <h4 class="font-bold text-white uppercase mt-3">CAPÍTULO IV: INFRAESTRUCTURA TÉCNICA, GRATUIDAD Y ACTUALIZACIONES</h4>
-                <p><strong>Artículo 4.1 — Modelo de Servicio Gratuito y Modificaciones</strong><br>
-                KOLABORADORF VE se distribuye bajo la modalidad de software gratuito (freeware). DFPfantasy CorVe se reserva el derecho inalienable de:<br>
-                - Modificar, reestructurar o actualizar la interfaz, algoritmos o funcionalidades de la Aplicación en cualquier momento y sin previo aviso.<br>
-                - Suspender o discontinuar el servicio temporal o definitivamente sin que ello genere derecho a indemnización alguna a favor del Usuario.</p>
-
-                <p><strong>Artículo 4.2 — Almacenamiento en Base de Datos Segura</strong><br>
-                La plataforma utiliza soluciones de almacenamiento e infraestructura de bases de datos respaldadas en tecnologías de Google (tales como Firebase / Google Cloud Platform / Feedback Data), garantizando altos estándares internacionales de encriptación y seguridad digital. La Aplicación no recopila ni comercializa información sensible para fines de perfilamiento publicitario sin consentimiento.</p>
-
-                <h4 class="font-bold text-white uppercase mt-3">CAPÍTULO V: JURISDICCIÓN Y MARCO LEGAL APLICABLE</h4>
-                <p>Este contrato se rige íntegramente por las leyes de la República Bolivariana de Venezuela (Constitución, Ley Orgánica de Telecomunicaciones, Ley Contra los Delitos Informáticos y Código Civil) y los estándares internacionales de comercio electrónico. Para cualquier controversia, las partes se someten expresamente a la jurisdicción de los Tribunales Ordinarios de la República Bolivariana de Venezuela.</p>
+                <strong>Jurisdicción Base:</strong> República Bolivariana de Venezuela</p>
             </div>
 
             <div class="pt-2 text-center">
@@ -535,7 +496,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT PROFESIONAL INTEGRAL V6.4 -->
+    <!-- SCRIPT PROFESIONAL INTEGRAL V6.5 -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBzMXFLJhTuPSPdKGsVqCqQRhP_NiGYBA",
@@ -619,7 +580,6 @@
                 if (fechaLabel) fechaLabel.innerText = "Actualizada hoy";
             }
             loadAdminTasaHistorial();
-            updateWeeklyCardFromHistory(cachedUserRecords);
         }
 
         async function loadAdminTasaHistorial() {
@@ -698,14 +658,6 @@
             return d.toISOString().split('T')[0];
         }
 
-        function getNextThursdayDate() {
-            const d = new Date();
-            const day = d.getDay();
-            const diff = (4 - day + 7) % 7 || 7;
-            d.setDate(d.getDate() + diff);
-            return d.toLocaleDateString('es-VE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-        }
-
         function focusBcvInput() {
             const input = document.getElementById('inputAdminBcvTasa');
             if (input) {
@@ -757,7 +709,6 @@
             if (event) event.preventDefault();
             const modal = document.getElementById('termsModal');
             modal.classList.remove('hidden');
-            
             const container = document.getElementById('termsScrollContainer');
             container.scrollTop = 0;
             const btn = document.getElementById('btnAcceptTerms');
@@ -828,47 +779,17 @@
                     alert("Contraseña incorrecta para el Administrador Supremo.");
                     return;
                 }
-                currentUser = { 
-                    email, 
-                    isAdmin: true, 
-                    approved: true, 
-                    name: "DHERMES FERNANDO PEREZ", 
-                    role: "Entregador",
-                    fechaIngreso: "2021-06-13" 
-                };
+                currentUser = { email, isAdmin: true, approved: true, name: "DHERMES FERNANDO PEREZ", role: "Entregador", fechaIngreso: "2021-06-13" };
             } else {
                 try {
                     const docRef = db.collection("usuarios").doc(email);
                     const doc = await docRef.get();
-                    
-                    if (!doc.exists) {
-                        alert("El correo electrónico no se encuentra registrado.");
-                        return;
-                    }
-
+                    if (!doc.exists) { alert("El correo electrónico no se encuentra registrado."); return; }
                     const userData = doc.data();
-                    if (userData.approved === false) {
-                        alert("Su cuenta aún está pendiente de aprobación por el Administrador Supremo.");
-                        return;
-                    }
-
-                    if (userData.password && userData.password !== pass) {
-                        alert("Contraseña incorrecta. Por favor, verifique sus datos.");
-                        return;
-                    }
-
-                    currentUser = { 
-                        email, 
-                        isAdmin: false, 
-                        approved: true, 
-                        name: userData.name || email, 
-                        role: userData.role || "Ayudante",
-                        fechaIngreso: userData.fechaIngreso || "2026-01-01"
-                    };
-                } catch (error) { 
-                    alert("Error al iniciar sesión: " + error.message); 
-                    return;
-                }
+                    if (userData.approved === false) { alert("Su cuenta aún está pendiente de aprobación por el Administrador Supremo."); return; }
+                    if (userData.password && userData.password !== pass) { alert("Contraseña incorrecta."); return; }
+                    currentUser = { email, isAdmin: false, approved: true, name: userData.name || email, role: userData.role || "Ayudante", fechaIngreso: userData.fechaIngreso || "2026-01-01" };
+                } catch (error) { alert("Error al iniciar sesión: " + error.message); return; }
             }
 
             document.getElementById('authView').classList.add('hidden');
@@ -884,10 +805,7 @@
 
             const progressInterval = setInterval(() => {
                 currentPercent += increment;
-                if (currentPercent >= 100) {
-                    currentPercent = 100;
-                    clearInterval(progressInterval);
-                }
+                if (currentPercent >= 100) { currentPercent = 100; clearInterval(progressInterval); }
                 const rounded = Math.floor(currentPercent);
                 progressBar.style.width = rounded + '%';
                 progressPercent.innerText = rounded + '%';
@@ -909,32 +827,24 @@
             const selectedRole = document.getElementById('regCargo').value;
             const termsChecked = document.getElementById('regTerms').checked;
 
-            if (!termsChecked) { alert("Debe leer y aceptar obligatoriamente las políticas y términos generales."); return; }
+            if (!termsChecked) { alert("Debe aceptar las políticas y términos."); return; }
             if (pass !== passConfirm) { alert("Las contraseñas no coinciden."); return; }
 
             generatedVerificationCode = Math.floor(100000 + Math.random() * 900000).toString();
             pendingVerificationData = { email, pass, name, role: selectedRole, fechaIngreso: document.getElementById('regFechaIngreso').value };
 
             const templateParams = {
-                email: email,
-                to_email: email,
-                name: name,
-                colaborador_nombre: name,
-                cargo_colaborador: selectedRole,
-                anos_servicio: "Nuevo",
-                fecha: new Date().toISOString().split('T')[0],
-                nro_ruta: "REGISTRO",
+                email: email, to_email: email, name: name, colaborador_nombre: name, cargo_colaborador: selectedRole,
+                anos_servicio: "Nuevo", fecha: new Date().toISOString().split('T')[0], nro_ruta: "REGISTRO",
                 total_entregado: `CÓDIGO DE VERIFICACIÓN: ${generatedVerificationCode}`,
-                productos_pendientes: "Ingrese este código de 6 dígitos para validar su cuenta corporativa."
+                productos_pendientes: "Ingrese este código para validar su cuenta."
             };
 
             try {
                 await emailjs.send('service_p63esgd', 'template_dl48xbt', templateParams);
-                alert("¡Código de verificación enviado con éxito a su correo!");
+                alert("¡Código de verificación enviado con éxito!");
                 switchAuthMode('verify');
-            } catch (error) {
-                alert("Error al enviar correo con EmailJS: " + (error.text || error.message || JSON.stringify(error)));
-            }
+            } catch (error) { alert("Error al enviar correo: " + (error.text || error.message)); }
         }
 
         async function handleVerifyCode(event) {
@@ -944,125 +854,66 @@
 
             try {
                 await db.collection("usuarios").doc(pendingVerificationData.email).set({
-                    name: pendingVerificationData.name,
-                    email: pendingVerificationData.email,
-                    password: pendingVerificationData.pass,
-                    role: pendingVerificationData.role,
-                    fechaIngreso: pendingVerificationData.fechaIngreso,
-                    approved: false,
-                    createdAt: new Date().toISOString()
+                    name: pendingVerificationData.name, email: pendingVerificationData.email, password: pendingVerificationData.pass,
+                    role: pendingVerificationData.role, fechaIngreso: pendingVerificationData.fechaIngreso, approved: false, createdAt: new Date().toISOString()
                 }, { merge: true });
 
-                alert("¡Cuenta verificada y enviada a aprobación del Administrador!");
+                alert("¡Cuenta verificada y enviada a aprobación!");
                 document.getElementById('authView').classList.add('hidden');
                 document.getElementById('pendingView').classList.remove('hidden');
-            } catch (error) {
-                alert("¡Cuenta verificada con éxito!");
-                document.getElementById('authView').classList.add('hidden');
-                document.getElementById('pendingView').classList.remove('hidden');
-            }
+            } catch (error) { alert("Error en verificación."); }
         }
 
         async function loadPendingApprovals() {
             const container = document.getElementById('pendingApprovalsList');
             container.innerHTML = '<p class="text-xs text-slate-400 text-center py-6">Cargando solicitudes...</p>';
-
             try {
                 const snapshot = await db.collection("usuarios").where("approved", "==", false).get();
-                if (snapshot.empty) {
-                    container.innerHTML = '<p class="text-xs text-slate-400 text-center py-8">No hay solicitudes de acceso pendientes.</p>';
-                    return;
-                }
-
+                if (snapshot.empty) { container.innerHTML = '<p class="text-xs text-slate-400 text-center py-8">No hay solicitudes pendientes.</p>'; return; }
                 container.innerHTML = '';
                 snapshot.forEach(doc => {
                     const user = doc.data();
                     const card = document.createElement('div');
-                    card.className = "bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 shadow-inner";
+                    card.className = "bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-3 shadow-inner";
                     card.innerHTML = `
-                        <div>
-                            <strong class="text-white text-sm font-extrabold">${user.name}</strong>
-                            <p class="text-[11px] text-slate-400">${user.email} — <span class="text-red-400 uppercase font-bold">${user.role}</span></p>
-                        </div>
-                        <div class="flex gap-2 w-full sm:w-auto">
-                            <button onclick="approveUser('${user.email}')" class="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg transition shadow">Dar Acceso</button>
-                            <button onclick="rejectUser('${user.email}')" class="flex-1 sm:flex-none bg-red-600 hover:bg-red-500 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg transition shadow">Rechazar</button>
-                        </div>
+                        <div><strong class="text-white text-sm font-extrabold">${user.name}</strong><p class="text-[11px] text-slate-400">${user.email} — <span class="text-red-400 uppercase font-bold">${user.role}</span></p></div>
+                        <div class="flex gap-2 w-full sm:w-auto"><button onclick="approveUser('${user.email}')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg">Dar Acceso</button><button onclick="rejectUser('${user.email}')" class="bg-red-600 hover:bg-red-500 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg">Rechazar</button></div>
                     `;
                     container.appendChild(card);
                 });
-            } catch (e) {
-                container.innerHTML = '<p class="text-xs text-red-400 text-center py-6">Error al cargar solicitudes de la nube.</p>';
-            }
+            } catch (e) { container.innerHTML = '<p class="text-xs text-red-400 text-center py-6">Error al cargar.</p>'; }
         }
 
         async function approveUser(email) {
-            try {
-                await db.collection("usuarios").doc(email).update({ approved: true });
-                alert("¡Acceso concedido exitosamente a " + email + "!");
-                loadPendingApprovals();
-            } catch (e) { alert("Error al aprobar: " + e.message); }
+            await db.collection("usuarios").doc(email).update({ approved: true });
+            alert("¡Acceso concedido!");
+            loadPendingApprovals();
         }
 
         async function rejectUser(email) {
-            if (!confirm("¿Deseas rechazar y eliminar esta solicitud?")) return;
-            try {
-                await db.collection("usuarios").doc(email).delete();
-                alert("Solicitud rechazada.");
-                loadPendingApprovals();
-            } catch (e) { alert("Error al rechazar: " + e.message); }
+            if (!confirm("¿Rechazar solicitud?")) return;
+            await db.collection("usuarios").doc(email).delete();
+            loadPendingApprovals();
         }
 
         async function handleForgotRequest(event) {
             event.preventDefault();
             const email = document.getElementById('forgotEmail').value.trim().toLowerCase();
-            if (!email) { alert("Ingrese su correo."); return; }
-
             pendingResetEmail = email;
             recoveryCode = Math.floor(100000 + Math.random() * 900000).toString();
-
-            const templateParams = {
-                email: email,
-                to_email: email,
-                name: email,
-                colaborador_nombre: email,
-                cargo_colaborador: "Recuperación de Contraseña",
-                anos_servicio: "N/A",
-                fecha: new Date().toISOString().split('T')[0],
-                nro_ruta: "RECUPERACIÓN",
-                total_entregado: `CÓDIGO DE RECUPERACIÓN: ${recoveryCode}`,
-                productos_pendientes: "Ingrese este código en la aplicación para establecer su nueva contraseña."
-            };
-
             try {
-                await emailjs.send('service_p63esgd', 'template_dl48xbt', templateParams);
-                alert("¡Código de recuperación enviado con éxito a " + email + "!");
+                await emailjs.send('service_p63esgd', 'template_dl48xbt', { email, to_email: email, name: email, colaborador_nombre: email, cargo_colaborador: "Recuperación", anos_servicio: "N/A", fecha: new Date().toISOString().split('T')[0], nro_ruta: "RECUPERACIÓN", total_entregado: `CÓDIGO: ${recoveryCode}`, productos_pendientes: "Ingrese este código para restablecer su clave." });
+                alert("¡Código de recuperación enviado!");
                 switchAuthMode('reset');
-            } catch (error) {
-                alert("Error al enviar el correo de recuperación: " + (error.text || error.message || JSON.stringify(error)));
-            }
+            } catch (e) { alert("Error al enviar código."); }
         }
 
         async function handleResetPassword(event) {
             event.preventDefault();
-            const codeEntered = document.getElementById('resetCodeInput').value.trim();
-            const newPass = document.getElementById('newPasswordInput').value;
-
-            if (codeEntered !== recoveryCode) {
-                alert("El código de recuperación es incorrecto.");
-                return;
-            }
-
-            try {
-                await db.collection("usuarios").doc(pendingResetEmail).update({ password: newPass });
-                alert("¡Contraseña actualizada con éxito para " + pendingResetEmail + "! Ya puede iniciar sesión con su nueva clave.");
-                document.getElementById('forgotEmail').value = '';
-                document.getElementById('resetCodeInput').value = '';
-                document.getElementById('newPasswordInput').value = '';
-                switchAuthMode('login');
-            } catch (error) {
-                alert("Error al actualizar contraseña: " + error.message);
-            }
+            if (document.getElementById('resetCodeInput').value.trim() !== recoveryCode) { alert("Código incorrecto."); return; }
+            await db.collection("usuarios").doc(pendingResetEmail).update({ password: document.getElementById('newPasswordInput').value });
+            alert("¡Contraseña actualizada con éxito!");
+            switchAuthMode('login');
         }
 
         async function launchAppSession(isAdmin) {
@@ -1071,18 +922,7 @@
             document.getElementById('mainAppView').classList.remove('hidden');
             document.getElementById('authHeaderControls').classList.remove('hidden');
             document.getElementById('userHeaderBadge').innerText = isAdmin ? "ADMINISTRADOR SUPREMO" : `COLABORADOR (${currentUser.role.toUpperCase()})`;
-            
-            const adminNavTabs = document.getElementById('adminNavTabs');
-            const roleSimulatorContainer = document.getElementById('roleSimulatorContainer');
-
-            if (isAdmin) {
-                adminNavTabs.classList.remove('hidden');
-                roleSimulatorContainer.classList.remove('hidden');
-                loadPendingApprovals();
-            } else {
-                adminNavTabs.classList.add('hidden');
-            }
-
+            if (isAdmin) { document.getElementById('adminNavTabs').classList.remove('hidden'); document.getElementById('roleSimulatorContainer').classList.remove('hidden'); loadPendingApprovals(); }
             loadBcvTasaWidget();
             await loadIncentiveConfig();
             calculateAntiquity();
@@ -1100,54 +940,36 @@
         async function logoutApp() {
             try { await firebase.auth().signOut(); } catch(e) {}
             localStorage.removeItem('kolaboradorf_session');
-
             document.getElementById('mainAppView').classList.add('hidden');
             document.getElementById('authHeaderControls').classList.add('hidden');
-
             const logoutView = document.getElementById('logoutProgressView');
             logoutView.classList.remove('hidden');
-
-            setTimeout(() => {
-                logoutView.classList.add('hidden');
-                document.getElementById('authView').classList.remove('hidden');
-                switchAuthMode('login');
-            }, 5000);
+            setTimeout(() => { logoutView.classList.add('hidden'); document.getElementById('authView').classList.remove('hidden'); switchAuthMode('login'); }, 5000);
         }
 
         function switchAppTab(tab) {
             if (!currentUser || !currentUser.isAdmin) return;
             const workerSec = document.getElementById('workerSection');
             const adminSec = document.getElementById('adminSection');
-            const btnWorker = document.getElementById('btnTabWorker');
-            const btnAdmin = document.getElementById('btnTabAdmin');
-
             if (tab === 'worker') {
-                workerSec.classList.remove('hidden');
-                adminSec.classList.add('hidden');
-                btnWorker.className = "flex-1 sm:flex-none px-5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-xl transition bg-red-600 text-white shadow-lg shadow-red-600/20";
-                btnAdmin.className = "flex-1 sm:flex-none px-5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-xl transition bg-slate-800 text-slate-300 hover:bg-slate-700";
+                workerSec.classList.remove('hidden'); adminSec.classList.add('hidden');
+                document.getElementById('btnTabWorker').className = "flex-1 sm:flex-none px-5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-xl transition bg-red-600 text-white shadow-lg shadow-red-600/20";
+                document.getElementById('btnTabAdmin').className = "flex-1 sm:flex-none px-5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-xl transition bg-slate-800 text-slate-300 hover:bg-slate-700";
             } else {
-                workerSec.classList.add('hidden');
-                adminSec.classList.remove('hidden');
-                btnAdmin.className = "flex-1 sm:flex-none px-5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-xl transition bg-red-600 text-white shadow-lg shadow-red-600/20";
-                btnWorker.className = "flex-1 sm:flex-none px-5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-xl transition bg-slate-800 text-slate-300 hover:bg-slate-700";
-                loadPendingApprovals();
-                loadBcvTasaWidget();
+                workerSec.classList.add('hidden'); adminSec.classList.remove('hidden');
+                document.getElementById('btnTabAdmin').className = "flex-1 sm:flex-none px-5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-xl transition bg-red-600 text-white shadow-lg shadow-red-600/20";
+                document.getElementById('btnTabWorker').className = "flex-1 sm:flex-none px-5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-xl transition bg-slate-800 text-slate-300 hover:bg-slate-700";
+                loadPendingApprovals(); loadBcvTasaWidget();
             }
         }
 
         function calculateAntiquity() {
-            const fechaIngresoStr = (currentUser && currentUser.fechaIngreso) ? currentUser.fechaIngreso : '2021-06-13';
-            const ingreso = new Date(fechaIngresoStr);
+            const ingreso = new Date(currentUser?.fechaIngreso || '2021-06-13');
             const hoy = new Date();
             let anos = hoy.getFullYear() - ingreso.getFullYear();
             let meses = hoy.getMonth() - ingreso.getMonth();
-            let dias = hoy.getDate() - ingreso.getDate();
-            if (dias < 0) { meses--; dias += new Date(hoy.getFullYear(), hoy.getMonth(), 0).getDate(); }
             if (meses < 0) { anos--; meses += 12; }
-
-            const nombreColaborador = (currentUser && currentUser.name) ? currentUser.name : "DHERMES FERNANDO PEREZ";
-            document.getElementById('workerNameDisplay').innerText = nombreColaborador.toUpperCase();
+            document.getElementById('workerNameDisplay').innerText = (currentUser?.name || "DHERMES PEREZ").toUpperCase();
             document.getElementById('workerMetaDisplay').innerText = `${currentUser.role || 'Ayudante'} (${anos} años, ${meses} meses) — ${currentUser.email}`;
             document.getElementById('activeRoleBadge').innerText = currentUser.role || 'Ayudante';
         }
@@ -1157,33 +979,21 @@
             const btn = document.getElementById('btnVacationToggle');
             const alertBox = document.getElementById('vacationAlert');
             const container = document.getElementById('operationalContainer');
-
             if (isVacation) {
-                btn.innerText = "🌴 Ya regresé";
-                btn.className = "bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-5 py-2.5 rounded-xl transition shadow-lg shadow-emerald-600/20 uppercase tracking-wider";
-                alertBox.classList.remove('hidden');
-                container.style.opacity = "0.4";
-                container.style.pointerEvents = "none";
+                btn.innerText = "🌴 Ya regresé"; btn.className = "bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-5 py-2.5 rounded-xl transition shadow";
+                alertBox.classList.remove('hidden'); container.style.opacity = "0.4"; container.style.pointerEvents = "none";
             } else {
-                btn.innerText = "🌴 Estoy de vacaciones";
-                btn.className = "bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold px-5 py-2.5 rounded-xl transition shadow-lg shadow-amber-600/20 uppercase tracking-wider";
-                alertBox.classList.add('hidden');
-                container.style.opacity = "1";
-                container.style.pointerEvents = "auto";
+                btn.innerText = "🌴 Estoy de vacaciones"; btn.className = "bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold px-5 py-2.5 rounded-xl transition shadow";
+                alertBox.classList.add('hidden'); container.style.opacity = "1"; container.style.pointerEvents = "auto";
             }
         }
 
         function toggleNoLoad() {
             const isChecked = document.getElementById('noLoadCheck').checked;
             const fields = document.getElementById('loadFields');
-            if (isChecked) {
-                fields.style.opacity = "0.3";
-                fields.style.pointerEvents = "none";
-                ['inputF1', 'inputF2', 'inputG1', 'inputG2', 'inputDev', 'inputPep'].forEach(id => document.getElementById(id).value = 0);
-            } else {
-                fields.style.opacity = "1";
-                fields.style.pointerEvents = "auto";
-            }
+            fields.style.opacity = isChecked ? "0.3" : "1";
+            fields.style.pointerEvents = isChecked ? "none" : "auto";
+            if (isChecked) ['inputF1', 'inputF2', 'inputG1', 'inputG2', 'inputDev', 'inputPep'].forEach(id => document.getElementById(id).value = 0);
             calculateRealTime();
         }
 
@@ -1206,11 +1016,7 @@
             const isNoLoad = document.getElementById('noLoadCheck').checked;
             const userRole = currentUser ? currentUser.role : 'Ayudante';
             const efElement = document.getElementById('statEfectividadSemanal');
-
-            let cargaInicial = 0;
-            let cargaNetaDia = 0;
-            let incentivoDiarioUSD = 0;
-            let efectividad = 100.0;
+            let cargaInicial = 0, cargaNetaDia = 0, incentivoDiarioUSD = 0, efectividad = 100.0;
 
             if (!isNoLoad) {
                 const f1 = parseInt(document.getElementById('inputF1').value) || 0;
@@ -1219,60 +1025,35 @@
                 const g2 = parseInt(document.getElementById('inputG2').value) || 0;
                 const dev = parseInt(document.getElementById('inputDev').value) || 0;
                 const pep = parseInt(document.getElementById('inputPep').value) || 0;
-                
-                const cajasBrutas = f1 + f2 + g1 + g2;
-                cargaInicial = cajasBrutas;
+                cargaInicial = f1 + f2 + g1 + g2;
                 cargaNetaDia = Math.max(0, cargaInicial - dev - pep);
-                
                 incentivoDiarioUSD = getIncentiveByRole(cargaNetaDia, userRole);
-
-                const totalProgramado = cargaInicial;
                 const totalEntregadoEfectivo = Math.max(0, cargaNetaDia + pep);
-                
-                efectividad = totalProgramado > 0 ? (totalEntregadoEfectivo / totalProgramado) * 100 : 100.0;
-                if (efectividad < 0) efectividad = 0.0;
+                efectividad = cargaInicial > 0 ? (totalEntregadoEfectivo / cargaInicial) * 100 : 100.0;
                 if (efectividad > 100) efectividad = 100.0;
             }
 
             document.getElementById('statCargaInicial').innerText = cargaInicial;
             document.getElementById('statCargaNetaDia').innerText = cargaNetaDia;
             document.getElementById('statIncentivo').innerText = `$${incentivoDiarioUSD.toFixed(2)}`;
-            
-            if (efectividad >= 97) {
-                efElement.innerText = `${efectividad.toFixed(1)}% (Califica)`;
-                efElement.className = "text-2xl font-black text-emerald-400 mt-1.5";
-            } else {
-                efElement.innerText = `${efectividad.toFixed(1)}% (No Califica)`;
-                efElement.className = "text-2xl font-black text-red-400 mt-1.5";
-            }
-
+            efElement.innerText = `${efectividad.toFixed(1)}% (${efectividad >= 97 ? 'Califica' : 'No Califica'})`;
+            efElement.className = `text-2xl font-black mt-1.5 ${efectividad >= 97 ? 'text-emerald-400' : 'text-red-400'}`;
             return { cargaInicial, cargaNetaDia, incentivoDiarioUSD, efectividad };
         }
 
         async function loadUserHistory() {
-            if (!currentUser || !currentUser.email) return;
+            if (!currentUser?.email) return;
             try {
-                const docRef = db.collection("historial_jornadas").doc(currentUser.email);
-                const doc = await docRef.get();
-                cachedUserRecords = [];
-
-                if (doc.exists && doc.data().registros) {
-                    cachedUserRecords = doc.data().registros;
-                    renderTodayHistory(cachedUserRecords);
-                    await updateWeeklyCardFromHistory(cachedUserRecords);
-                } else {
-                    document.getElementById('todayHistoryContainer').innerHTML = '<p class="text-xs text-slate-400 text-center py-4">No hay registros guardados para el día de hoy.</p>';
-                    await updateWeeklyCardFromHistory([]);
-                }
-            } catch (e) {
-                console.error("Error al cargar historial", e);
-            }
+                const doc = await db.collection("historial_jornadas").doc(currentUser.email).get();
+                cachedUserRecords = doc.exists && doc.data().registros ? doc.data().registros : [];
+                renderTodayHistory(cachedUserRecords);
+                updateWeeklyCardFromHistory(cachedUserRecords);
+            } catch (e) {}
         }
 
         function renderTodayHistory(records) {
             const todayContainer = document.getElementById('todayHistoryContainer');
             todayContainer.innerHTML = '';
-
             const todayStr = new Date().toISOString().split('T')[0];
             const todayRecords = records.filter(r => r.fecha === todayStr);
 
@@ -1284,215 +1065,141 @@
             todayRecords.forEach(rec => {
                 const card = document.createElement('div');
                 card.className = "bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs space-y-1.5 shadow-inner";
-                
-                const pendientesHtml = rec.productosPendientes ? `
-                    <div class="bg-amber-500/10 border border-amber-500/30 p-2 rounded-lg text-amber-300 text-[11px] font-medium">
-                        📦 <strong>Pendientes:</strong> ${rec.productosPendientes}
-                    </div>
-                ` : '';
-
                 card.innerHTML = `
-                    <div class="flex justify-between items-center">
-                        <strong class="text-white text-xs">Ruta: ${rec.ruta}</strong>
-                        <span class="text-[10px] text-slate-400">${rec.fecha}</span>
-                    </div>
+                    <div class="flex justify-between items-center"><strong class="text-white text-xs">Ruta: ${rec.ruta}</strong><span class="text-[10px] text-slate-400">${rec.fecha}</span></div>
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-slate-300 text-[11px]">
                         <div>C. Inicial: <strong class="text-white">${rec.cargaInicial}</strong></div>
                         <div>C. Neta: <strong class="text-white">${rec.cargaNetaDia}</strong></div>
                         <div>Incentivo: <strong class="text-emerald-400">$${rec.incentivoDiarioUSD}</strong></div>
                         <div>Efectividad: <strong class="text-blue-400">${rec.efectividad}%</strong></div>
                     </div>
-                    ${pendientesHtml}
                 `;
                 todayContainer.appendChild(card);
             });
         }
 
         async function clearTodayHistory() {
-            if (!confirm("⚠️ ¿Deseas limpiar/eliminar los registros y calcular tu cobro en bolívares basado en la tasa histórica del viernes?")) return;
-
+            if (!confirm("⚠️ ¿Deseas limpiar/eliminar los registros del día de hoy? Esto reiniciará el acumulado semanal.")) return;
             const todayStr = new Date().toISOString().split('T')[0];
-            const resetKey = `last_reset_date_${currentUser.email}`;
-            const lastResetDate = localStorage.getItem(resetKey) || "2000-01-01";
-            const activeWeekRecords = cachedUserRecords.filter(r => r.fecha >= lastResetDate);
-
-            let totalIncentivoSemanalUSD = 0;
-            activeWeekRecords.forEach(r => {
-                totalIncentivoSemanalUSD += parseFloat(r.incentivoDiarioUSD) || 0;
-            });
-
-            const viernesDateStr = getLastFridayDate();
-            const tasaViernes = await getTasaForDate(viernesDateStr);
-            const montoBolivares = totalIncentivoSemanalUSD * tasaViernes;
-            const fechaCobroJueves = getNextThursdayDate();
-
             const updatedRecords = cachedUserRecords.filter(r => r.fecha !== todayStr);
-
             try {
-                const docRef = db.collection("historial_jornadas").doc(currentUser.email);
-                await docRef.set({ registros: updatedRecords }, { merge: true });
-
-                localStorage.setItem(resetKey, todayStr);
-
+                await db.collection("historial_jornadas").doc(currentUser.email).set({ registros: updatedRecords }, { merge: true });
+                localStorage.setItem(`last_reset_date_${currentUser.email}`, todayStr);
                 cachedUserRecords = updatedRecords;
                 renderTodayHistory(cachedUserRecords);
-                await updateWeeklyCardFromHistory(cachedUserRecords);
-
-                const proyeccionContainer = document.getElementById('proyeccionCobroContainer');
-                const fechaCobroEl = document.getElementById('proyeccionFechaCobro');
-                const detalleEl = document.getElementById('proyeccionTextoDetalle');
-
-                if (proyeccionContainer && fechaCobroEl && detalleEl) {
-                    proyeccionContainer.classList.remove('hidden');
-                    fechaCobroEl.innerText = `Cobro estimado: ${fechaCobroJueves}`;
-                    detalleEl.innerHTML = `Vas a cobrar un total de <strong class="text-emerald-400 font-black text-sm">Bs. ${montoBolivares.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> correspondientes a tu incentivo acumulado de <strong>$${totalIncentivoSemanalUSD.toFixed(2)}</strong>, calculado con la tasa oficial BCV del cierre del viernes (${viernesDateStr}) de <strong>Bs. ${tasaViernes.toFixed(2)}</strong>.`;
-                }
-
-                alert("🗑️ ¡Historial limpiado y cálculo de cobro en bolívares generado con éxito!");
-            } catch (error) {
-                alert("Error al limpiar el historial en la nube.");
-            }
+                updateWeeklyCardFromHistory(cachedUserRecords);
+                document.getElementById('resultadoPagoBsContainer').classList.add('hidden');
+                alert("🗑️ ¡Historial del día limpiado y acumulado semanal reiniciado con éxito!");
+            } catch (e) { alert("Error al limpiar historial."); }
         }
 
-        async function updateWeeklyCardFromHistory(records) {
+        function updateWeeklyCardFromHistory(records) {
             const badge = document.getElementById('globalEfectividadBadge');
             const label = document.getElementById('globalEfectividadLabel');
             const incBadge = document.getElementById('globalIncentivoSemanalBadge');
-            const desgloseBs = document.getElementById('globalDesgloseBs');
-
-            if (!currentUser || !currentUser.email) return;
             const resetKey = `last_reset_date_${currentUser.email}`;
             const lastResetDate = localStorage.getItem(resetKey) || "2000-01-01";
-
             const activeWeekRecords = records.filter(r => r.fecha >= lastResetDate);
 
             if (activeWeekRecords.length === 0) {
-                badge.innerText = "100.0%";
-                badge.className = "text-2xl font-black text-slate-400";
-                label.innerText = "Ciclo semanal reiniciado (Listo)";
-                incBadge.innerText = "$0.00";
-                if (desgloseBs) desgloseBs.innerText = "Bs. 0,00 + Bs. 0,00 = Bs. 0,00";
+                badge.innerText = "100.0%_"; badge.className = "text-2xl font-black text-slate-400";
+                label.innerText = "Ciclo semanal reiniciado (Listo)"; incBadge.innerText = "$0.00";
                 return;
             }
 
-            let sumaEf = 0;
-            let totalIncentivoSemana = 0;
-
+            let sumaEf = 0, totalIncentivoSemana = 0;
             activeWeekRecords.forEach(r => {
                 sumaEf += parseFloat(r.efectividad) || 0;
                 totalIncentivoSemana += parseFloat(r.incentivoDiarioUSD) || 0;
             });
-
             const promedioSemanal = sumaEf / activeWeekRecords.length;
-
             badge.innerText = `${promedioSemanal.toFixed(1)}%`;
             incBadge.innerText = `$${totalIncentivoSemana.toFixed(2)}`;
+            badge.className = `text-2xl font-black ${promedioSemanal >= 97.0 ? 'text-emerald-400' : 'text-red-400'}`;
+            label.innerText = promedioSemanal >= 97.0 ? "¡Califica Óptimo para Cobrar! (>= 97%)" : "No Califica (< 97%)";
+        }
 
-            // Obtener tasa del viernes para el desglose en tiempo real
-            const viernesDateStr = getLastFridayDate();
-            const tasaViernes = await getTasaForDate(viernesDateStr);
-            
-            // Lógica solicitada: incentivo base en Bs + bono efectividad en Bs = total en Bs
-            const incentivoBaseBs = totalIncentivoSemana * tasaViernes;
-            const bonoEfectividadBs = (promedioSemanal >= 97.0) ? (totalIncentivoSemana * 0.05 * tasaViernes) : 0; // Ejemplo o cálculo directo proporcional
-            const totalBs = incentivoBaseBs + bonoEfectividadBs;
+        // FUNCIONALIDAD DEL NUEVO BOTÓN "Generar mi pago en bolívares"
+        async function generarPagoBolivares() {
+            if (!currentUser?.email) return;
+            const resetKey = `last_reset_date_${currentUser.email}`;
+            const lastResetDate = localStorage.getItem(resetKey) || "2000-01-01";
+            const activeWeekRecords = cachedUserRecords.filter(r => r.fecha >= lastResetDate);
 
-            if (desgloseBs) {
-                desgloseBs.innerText = `Bs. ${incentivoBaseBs.toLocaleString('es-VE', {minimumFractionDigits:2, maximumFractionDigits:2})} + Bs. ${bonoEfectividadBs.toLocaleString('es-VE', {minimumFractionDigits:2, maximumFractionDigits:2})} = Bs. ${totalBs.toLocaleString('es-VE', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+            if (activeWeekRecords.length === 0) {
+                alert("No hay registros acumulados en esta semana para generar el pago.");
+                return;
             }
 
+            let sumaEf = 0, totalIncentivoSemana = 0;
+            activeWeekRecords.forEach(r => {
+                sumaEf += parseFloat(r.efectividad) || 0;
+                totalIncentivoSemana += parseFloat(r.incentivoDiarioUSD) || 0;
+            });
+            const promedioSemanal = sumaEf / activeWeekRecords.length;
+
+            // Obtener tasa del viernes
+            const viernesDateStr = getLastFridayDate();
+            const tasaViernes = await getTasaForDate(viernesDateStr);
+            const montoBolivares = totalIncentivoSemana * tasaViernes;
+
+            const container = document.getElementById('resultadoPagoBsContainer');
+            const fechaTasaEl = document.getElementById('resultadoFechaTasa');
+            const montoBsEl = document.getElementById('resultadoMontoBs');
+            const efectividadAvisoEl = document.getElementById('resultadoEfectividadAviso');
+
+            container.classList.remove('hidden');
+            fechaTasaEl.innerText = `Tasa cierre Viernes (${viernesDateStr}): Bs. ${tasaViernes.toFixed(2)}`;
+            montoBsEl.innerText = `Monto a cobrar: Bs. ${montoBolivares.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
             if (promedioSemanal >= 97.0) {
-                badge.className = "text-2xl font-black text-emerald-400";
-                label.innerText = "¡Califica Óptimo para Cobrar! (>= 97%)";
+                efectividadAvisoEl.innerText = `✅ Efectividad de ${promedioSemanal.toFixed(1)}%: ¡Aplica al pago de incentivo! (Cobro el próximo jueves)`;
+                efectividadAvisoEl.className = "text-emerald-400 font-bold mt-1";
             } else {
-                badge.className = "text-2xl font-black text-red-400";
-                label.innerText = "No Califica (< 97% - Requiere Atención)";
+                efectividadAvisoEl.innerText = `❌ Efectividad de ${promedioSemanal.toFixed(1)}%: No aplicas a la efectividad requerida (Mínimo 97%).`;
+                efectividadAvisoEl.className = "text-red-400 font-bold mt-1";
             }
         }
 
         async function saveDailyRecord() {
             const rutaInput = document.getElementById('inputRuta').value.trim();
             const f1Input = document.getElementById('inputF1').value.trim();
-            const isNoLoad = document.getElementById('noLoadCheck').checked;
-
-            if (!isNoLoad) {
-                if (!rutaInput) {
-                    alert("⚠️ El Número de Ruta es obligatorio para guardar el registro.");
-                    document.getElementById('inputRuta').focus();
-                    return;
-                }
-                if (f1Input === "" || isNaN(f1Input)) {
-                    alert("⚠️ El campo F1 (Principal) es obligatorio.");
-                    document.getElementById('inputF1').focus();
-                    return;
-                }
+            if (!document.getElementById('noLoadCheck').checked && (!rutaInput || f1Input === "")) {
+                alert("⚠️ Número de Ruta y F1 son obligatorios."); return;
             }
 
             const metrics = calculateRealTime();
-            const ruta = rutaInput || 'Sin Ruta';
-            const fecha = document.getElementById('inputFechaJornada').value || new Date().toISOString().split('T')[0];
-            const productosPendientes = document.getElementById('inputProductosPendientes').value.trim();
-            const userRole = currentUser ? currentUser.role : 'Ayudante';
-            const isQualified = metrics.efectividad >= 97;
-            const colaboradorNombre = currentUser ? currentUser.name : 'Colaborador';
-
             const newRecord = {
-                ruta,
-                fecha,
-                productosPendientes,
-                userRole,
-                cargaInicial: metrics.cargaInicial,
-                cargaNetaDia: metrics.cargaNetaDia,
-                incentivoDiarioUSD: metrics.incentivoDiarioUSD.toFixed(2),
-                efectividad: metrics.efectividad.toFixed(1),
-                isQualified,
-                colaboradorNombre,
+                ruta: rutaInput || 'Sin Ruta',
+                fecha: document.getElementById('inputFechaJornada').value || new Date().toISOString().split('T')[0],
+                userRole: currentUser ? currentUser.role : 'Ayudante',
+                cargaInicial: metrics.cargaInicial, cargaNetaDia: metrics.cargaNetaDia,
+                incentivoDiarioUSD: metrics.incentivoDiarioUSD.toFixed(2), efectividad: metrics.efectividad.toFixed(1),
                 timestamp: new Date().toISOString()
             };
 
             try {
                 const docRef = db.collection("historial_jornadas").doc(currentUser.email);
                 const doc = await docRef.get();
-                let registros = [];
-                if (doc.exists && doc.data().registros) {
-                    registros = doc.data().registros;
-                }
+                let registros = doc.exists && doc.data().registros ? doc.data().registros : [];
                 registros.unshift(newRecord);
-
                 await docRef.set({ registros }, { merge: true });
 
                 alert("¡Registro guardado exitosamente!");
                 cachedUserRecords = registros;
                 renderTodayHistory(cachedUserRecords);
-                await updateWeeklyCardFromHistory(cachedUserRecords);
+                updateWeeklyCardFromHistory(cachedUserRecords);
+                document.getElementById('resultadoPagoBsContainer').classList.add('hidden');
 
                 document.getElementById('inputRuta').value = '';
-                document.getElementById('inputProductosPendientes').value = '';
-                document.getElementById('inputHoraEntrada').value = '';
-                document.getElementById('inputHoraSalida').value = '';
                 document.getElementById('inputF1').value = '0';
-                document.getElementById('inputF2').value = '0';
-                document.getElementById('inputG1').value = '0';
-                document.getElementById('inputG2').value = '0';
-                document.getElementById('inputDev').value = '0';
-                document.getElementById('inputPep').value = '0';
-                document.getElementById('noLoadCheck').checked = false;
-                toggleNoLoad();
                 calculateRealTime();
-            } catch (error) {
-                alert("Error al guardar el registro en la nube.");
-            }
+            } catch (error) { alert("Error al guardar en la nube."); }
         }
 
         async function confirmDeleteAccount() {
-            if (!confirm("⚠️ ¿Estás seguro de que deseas eliminar permanentemente tu cuenta? Esta acción borrará tus datos de acceso.")) return;
-            
-            if (currentUser && currentUser.email) {
-                try {
-                    await db.collection("usuarios").doc(currentUser.email).delete();
-                    alert("Cuenta eliminada correctamente.");
-                } catch (e) {}
-            }
+            if (!confirm("⚠️ ¿Estás seguro de eliminar tu cuenta?")) return;
+            if (currentUser?.email) await db.collection("usuarios").doc(currentUser.email).delete().catch(()=>{});
             logoutApp();
         }
     </script>
