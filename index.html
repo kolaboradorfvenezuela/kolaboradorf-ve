@@ -36,11 +36,11 @@
 
     <!-- HEADER INSTITUCIONAL PROFESIONAL -->
     <header class="bg-gradient-to-r from-red-900 via-red-700 to-red-900 shadow-2xl border-b border-red-800/80 sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-3">
+        <div class="max-w-7xl mx-auto px-6 py-3 flex flex-col sm:flex-row justify-between items-center gap-3">
+            <div class="flex items-center gap-3 text-center sm:text-left">
                 <div>
-                    <h1 class="text-2xl font-black tracking-tight text-white brand-heavy drop-shadow-md">Kolaboradorf <span class="text-red-300">VE</span></h1>
-                    <p class="text-[11px] text-red-200 font-semibold tracking-wider uppercase">Gestión Inteligente de Trabajo</p>
+                    <h1 class="text-2xl font-black tracking-tight text-white brand-heavy drop-shadow-md leading-none">Kolaboradorf <span class="text-red-300">VE</span></h1>
+                    <p class="text-[10px] text-red-200 font-bold tracking-widest uppercase mt-1">DFPfantasy CorVe C.A ®</p>
                 </div>
             </div>
             <!-- Controles de Sesión -->
@@ -63,13 +63,13 @@
             </div>
         </div>
 
-        <!-- PANTALLA DE CIERRE DE SESIÓN (Banner creativo idéntico al splash de 5 segundos) -->
+        <!-- PANTALLA DE CIERRE DE SESIÓN -->
         <div id="logoutProgressView" class="hidden text-center py-20 space-y-6">
             <div class="inline-block p-8 rounded-3xl bg-slate-900/90 border border-red-900/40 shadow-2xl backdrop-blur-xl max-w-lg w-full mx-auto shadow-red-950/30">
-                <h2 class="text-3xl sm:text-4xl font-black text-white brand-heavy tracking-tight drop-shadow-lg mb-2">Kolaboradorf <span class="text-red-500">VE</span></h2>
-                <p class="text-xs text-red-300 font-bold tracking-widest uppercase mb-4">DFPfantasy CorVe C.A ® cerrando sesión.</p>
-                <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-red-600 border-t-transparent my-3 shadow-lg shadow-red-600/20"></div>
-                <p class="text-[11px] text-slate-400 font-medium tracking-wide">Guardando configuraciones y cerrando entorno seguro...</p>
+                <h2 class="text-3xl sm:text-4xl font-black text-white brand-heavy tracking-tight drop-shadow-lg leading-none mb-1.5">Kolaboradorf <span class="text-red-500">VE</span></h2>
+                <p class="text-[10px] text-red-300 font-extrabold tracking-widest uppercase mb-4">DFPfantasy CorVe C.A ®</p>
+                <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-red-600 border-t-transparent my-2 shadow-lg shadow-red-600/20"></div>
+                <p class="text-xs text-slate-400 font-medium tracking-wide mt-2">Guardando configuraciones y cerrando entorno seguro...</p>
             </div>
         </div>
 
@@ -221,7 +221,7 @@
             <button onclick="logoutApp()" class="bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold px-6 py-3 rounded-xl transition border border-slate-700 shadow-lg uppercase tracking-wider">Cerrar Sesión</button>
         </section>
 
-        <!-- 3. INTERFAZ PRINCIPAL (SOLO AQUÍ APARECE LA TASA BCV) -->
+        <!-- 3. INTERFAZ PRINCIPAL -->
         <div id="mainAppView" class="hidden space-y-6">
             <!-- Navegación Admin / Simulador de Roles -->
             <div id="adminNavTabs" class="hidden bg-slate-900/90 backdrop-blur-xl p-3 rounded-2xl border border-slate-800 flex flex-col sm:flex-row gap-3 justify-between items-center shadow-lg">
@@ -429,7 +429,7 @@
                 </div>
             </div>
 
-            <!-- WIDGET DE TASA BCV OFICIAL DENTRO DE LA SESIÓN (FIJO, SE MUEVE CON EL CONTENIDO) -->
+            <!-- WIDGET DE TASA BCV OFICIAL DENTRO DE LA SESIÓN -->
             <div class="mt-8 mb-4 max-w-xs">
                 <a href="https://www.bcv.org.ve" target="_blank" rel="noopener noreferrer" 
                    class="flex items-center gap-3 bg-slate-900/95 hover:bg-slate-800 backdrop-blur-xl border border-red-500/30 px-4 py-2.5 rounded-2xl shadow-xl transition group cursor-pointer">
@@ -995,7 +995,7 @@
                 adminNavTabs.classList.add('hidden');
             }
 
-            loadBcvTasaWidget(); // Cargar la tasa oficial únicamente al entrar a la sesión
+            loadBcvTasaWidget();
             await loadIncentiveConfig();
             calculateAntiquity();
             await loadUserHistory();
