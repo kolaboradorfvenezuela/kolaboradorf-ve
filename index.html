@@ -63,6 +63,16 @@
             </div>
         </div>
 
+        <!-- PANTALLA DE CIERRE DE SESIÓN (Banner creativo idéntico al splash de 5 segundos) -->
+        <div id="logoutProgressView" class="hidden text-center py-20 space-y-6">
+            <div class="inline-block p-8 rounded-3xl bg-slate-900/90 border border-red-900/40 shadow-2xl backdrop-blur-xl max-w-lg w-full mx-auto shadow-red-950/30">
+                <h2 class="text-3xl sm:text-4xl font-black text-white brand-heavy tracking-tight drop-shadow-lg mb-2">Kolaboradorf <span class="text-red-500">VE</span></h2>
+                <p class="text-xs text-red-300 font-bold tracking-widest uppercase mb-4">DFPfantasy CorVe C.A ® cerrando sesión.</p>
+                <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-red-600 border-t-transparent my-3 shadow-lg shadow-red-600/20"></div>
+                <p class="text-[11px] text-slate-400 font-medium tracking-wide">Guardando configuraciones y cerrando entorno seguro...</p>
+            </div>
+        </div>
+
         <!-- PANTALLA DE CARGA AL INICIAR SESIÓN (Barra de 3 segundos del 1 al 100) -->
         <div id="loginProgressView" class="hidden max-w-md mx-auto bg-slate-900/90 backdrop-blur-xl rounded-3xl shadow-2xl p-10 text-center border border-slate-800 mt-6 shadow-red-950/20 space-y-6">
             <div>
@@ -419,24 +429,24 @@
                 </div>
             </div>
         </div>
-    </main>
 
-    <!-- WIDGET FLOTANTE DE TASA BCV OFICIAL (ESQUINA INFERIOR IZQUIERDA) -->
-    <aside aria-label="Indicador de Tasa BCV" class="fixed bottom-4 left-4 z-50">
-        <a href="https://www.bcv.org.ve" target="_blank" rel="noopener noreferrer" 
-           class="flex items-center gap-3 bg-slate-900/95 hover:bg-slate-800 backdrop-blur-xl border border-red-500/30 px-4 py-2.5 rounded-2xl shadow-2xl transition group cursor-pointer">
-            <div class="w-9 h-9 rounded-xl bg-red-600/10 border border-red-500/30 flex items-center justify-center text-red-400 font-black text-xs shadow-inner group-hover:scale-105 transition">🇻🇪</div>
-            <div>
-                <div class="flex items-center gap-2">
-                    <span class="text-[10px] font-black text-white uppercase tracking-wider">Tasa BCV:</span>
-                    <span id="bcvTasaValor" class="text-xs font-black text-emerald-400">Bs. 883,40</span>
+        <!-- WIDGET DE TASA BCV OFICIAL FIJO (NO FLOTANTE, SE MUEVE CON LA PÁGINA) -->
+        <div class="mt-8 mb-4 max-w-xs">
+            <a href="https://www.bcv.org.ve" target="_blank" rel="noopener noreferrer" 
+               class="flex items-center gap-3 bg-slate-900/95 hover:bg-slate-800 backdrop-blur-xl border border-red-500/30 px-4 py-2.5 rounded-2xl shadow-xl transition group cursor-pointer">
+                <div class="w-9 h-9 rounded-xl bg-red-600/10 border border-red-500/30 flex items-center justify-center text-red-400 font-black text-xs shadow-inner group-hover:scale-105 transition">🇻🇪</div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-[10px] font-black text-white uppercase tracking-wider">Tasa BCV:</span>
+                        <span id="bcvTasaValor" class="text-xs font-black text-emerald-400">Bs. 883,40</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 mt-0.5">
+                        <span id="bcvTasaFechaLabel" class="text-[9px] text-slate-400 group-hover:text-slate-300 transition">Actualizada hoy</span>
+                    </div>
                 </div>
-                <div class="flex items-center gap-1.5 mt-0.5">
-                    <span id="bcvTasaFechaLabel" class="text-[9px] text-slate-400 group-hover:text-slate-300 transition">Actualizada hoy</span>
-                </div>
-            </div>
-        </a>
-    </aside>
+            </a>
+        </div>
+    </main>
 
     <!-- PIE DE PÁGINA INSTITUCIONAL -->
     <footer class="bg-slate-950/80 border-t border-slate-900 py-4 text-center text-xs text-slate-400 backdrop-blur-md mt-auto">
@@ -503,7 +513,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT PROFESIONAL INTEGRAL V6.0 -->
+    <!-- SCRIPT PROFESIONAL INTEGRAL V6.1 -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBzMXFLJhTuPSPdKGsVqCqQRhP_NiGYBA",
@@ -534,10 +544,8 @@
             if (dateInput) dateInput.value = todayStr;
             document.getElementById('todayDateBadge').innerText = todayStr;
 
-            // Cargar tasa BCV y verificar alerta de administrador
             loadBcvTasaWidget();
 
-            // Pantalla de Splash corporativa garantizada por 5 segundos al cargar la app
             setTimeout(() => {
                 document.getElementById('loadingSessionView').classList.add('hidden');
                 
@@ -554,7 +562,6 @@
             }, 5000);
         });
 
-        // Función para gestionar y mostrar la tasa BCV y el vigía de fecha
         async function loadBcvTasaWidget() {
             const tasaEl = document.getElementById('bcvTasaValor');
             const fechaLabel = document.getElementById('bcvTasaFechaLabel');
@@ -593,7 +600,6 @@
             }
         }
 
-        // Guardar la tasa desde el panel de Administrador
         async function saveBcvTasaAdmin() {
             const nuevaTasa = parseFloat(document.getElementById('inputAdminBcvTasa').value);
             if (isNaN(nuevaTasa) || nuevaTasa <= 0) {
@@ -663,7 +669,6 @@
             else { input.type = 'password'; eye.innerText = '👁️'; }
         }
 
-        // FUNCIONES DE TÉRMINOS Y CONDICIONES CON SCROLL OBLIGATORIO
         function openTermsModal(event) {
             if (event) event.preventDefault();
             const modal = document.getElementById('termsModal');
@@ -729,7 +734,6 @@
             } catch (error) { alert("Error al guardar: " + error.message); }
         }
 
-        // FUNCIÓN DE LOGIN CON BARRA DE PROGRESO ANIMADA DE 3 SEGUNDOS
         async function handleLogin(event) {
             event.preventDefault();
             const email = document.getElementById('loginEmail').value.trim().toLowerCase();
@@ -991,7 +995,7 @@
                 adminNavTabs.classList.remove('hidden');
                 roleSimulatorContainer.classList.remove('hidden');
                 loadPendingApprovals();
-                loadBcvTasaWidget(); // Comprobar alerta al entrar al admin
+                loadBcvTasaWidget();
             } else {
                 adminNavTabs.classList.add('hidden');
             }
@@ -1009,13 +1013,25 @@
             calculateRealTime();
         }
 
+        // FUNCIÓN DE CIERRE DE SESIÓN CON BANNER CREATIVO DE 5 SEGUNDOS
         async function logoutApp() {
             try { await firebase.auth().signOut(); } catch(e) {}
             localStorage.removeItem('kolaboradorf_session');
+
+            // Ocultar vistas principales y cabecera de sesión
             document.getElementById('mainAppView').classList.add('hidden');
             document.getElementById('authHeaderControls').classList.add('hidden');
-            document.getElementById('authView').classList.remove('hidden');
-            switchAuthMode('login');
+
+            // Mostrar banner creativo de cierre de sesión
+            const logoutView = document.getElementById('logoutProgressView');
+            logoutView.classList.remove('hidden');
+
+            // Mantener el banner creativo visible exactamente 5 segundos (igual que el splash inicial)
+            setTimeout(() => {
+                logoutView.classList.add('hidden');
+                document.getElementById('authView').classList.remove('hidden');
+                switchAuthMode('login');
+            }, 5000);
         }
 
         function switchAppTab(tab) {
