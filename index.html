@@ -346,6 +346,32 @@
                     <p class="text-xs text-red-200/80 mt-1">Panel exclusivo de supervisión, aprobación de cuentas y configuración independiente de montos en dólares.</p>
                 </div>
 
+                <!-- ALERTA VIGÍA INTELIGENTE PARA EL ADMINISTRADOR (Si la tasa no es de hoy) -->
+                <div id="bcvAlertBanner" class="hidden bg-amber-500/15 border border-amber-500/40 p-4 rounded-2xl flex flex-col sm:flex-row justify-between items-center gap-4 shadow-xl">
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl">⚠️</span>
+                        <div>
+                            <h4 class="text-xs font-bold text-amber-300 uppercase tracking-wider">Aviso de Actualización Cambiaria</h4>
+                            <p id="bcvAlertText" class="text-[11px] text-amber-200/90 mt-0.5">La tasa oficial BCV no se ha actualizado para el día de hoy.</p>
+                        </div>
+                    </div>
+                    <button onclick="focusBcvInput()" class="bg-amber-600 hover:bg-amber-500 text-white text-[11px] font-bold px-4 py-2 rounded-xl transition shadow uppercase tracking-wider shrink-0">Actualizar Tasa Ahora</button>
+                </div>
+
+                <!-- GESTIÓN RÁPIDA DE LA TASA BCV DESDE EL ADMIN -->
+                <div class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-4 shadow-xl">
+                    <h4 class="text-sm font-extrabold text-emerald-400 border-b border-slate-800 pb-3 flex items-center gap-2">🇻🇪 Actualización Diaria de Tasa Oficial BCV</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center bg-slate-950 p-4 rounded-xl border border-slate-800 shadow-inner">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-300 uppercase tracking-wider mb-1">Tasa Oficial Actual (Bs. por USD)</label>
+                            <input type="number" step="0.01" id="inputAdminBcvTasa" value="883.40" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white font-bold focus:outline-none focus:border-red-600">
+                        </div>
+                        <div class="pt-2 sm:pt-5">
+                            <button onclick="saveBcvTasaAdmin()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-3 rounded-xl transition shadow-lg shadow-emerald-600/30 uppercase tracking-wider">💾 Guardar Tasa Oficial</button>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <!-- Solicitudes Pendientes -->
                     <div class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-4 shadow-xl">
@@ -395,7 +421,7 @@
         </div>
     </main>
 
-    <!-- WIDGET FLOTANTE DE TASA BCV OFICIAL ACTUALIZADO (ESQUINA INFERIOR IZQUIERDA) -->
+    <!-- WIDGET FLOTANTE DE TASA BCV OFICIAL (ESQUINA INFERIOR IZQUIERDA) -->
     <aside aria-label="Indicador de Tasa BCV" class="fixed bottom-4 left-4 z-50">
         <a href="https://www.bcv.org.ve" target="_blank" rel="noopener noreferrer" 
            class="flex items-center gap-3 bg-slate-900/95 hover:bg-slate-800 backdrop-blur-xl border border-red-500/30 px-4 py-2.5 rounded-2xl shadow-2xl transition group cursor-pointer">
@@ -403,11 +429,10 @@
             <div>
                 <div class="flex items-center gap-2">
                     <span class="text-[10px] font-black text-white uppercase tracking-wider">Tasa BCV:</span>
-                    <!-- Tasa oficial correcta y exacta con dos decimales -->
                     <span id="bcvTasaValor" class="text-xs font-black text-emerald-400">Bs. 883,40</span>
                 </div>
                 <div class="flex items-center gap-1.5 mt-0.5">
-                    <span class="text-[9px] text-slate-400 group-hover:text-slate-300 transition">Banco Central de Venezuela</span>
+                    <span id="bcvTasaFechaLabel" class="text-[9px] text-slate-400 group-hover:text-slate-300 transition">Actualizada hoy</span>
                 </div>
             </div>
         </a>
@@ -447,7 +472,7 @@
 
                 <p><strong>Artículo 2.2 — Inconsistencias en Nómina, Pagos o Comisiones</strong><br>
                 La Aplicación ejecuta cálculos automatizados basados únicamente en la información ingresada directamente por el Usuario.<br>
-                1. Falta de Valor Legal: Los reportes, sumatorias, contabilidad interna o métricas generadas por KOLABORADORF VE não constituyen comprobantes de nómina, recibos de pago ni documentos probatorios con validez mercantil o laboral frente a terceros.<br>
+                1. Falta de Valor Legal: Los reportes, sumatorias, contabilidad interna o métricas generadas por KOLABORADORF VE no constituyen comprobantes de nómina, recibos de pago ni documentos probatorios con validez mercantil o laboral frente a terceros.<br>
                 2. Procedimiento ante Discrepancias: En caso de que el Usuario observe diferencias o inconsistencias entre los datos calculados por la Aplicación y sus pagos reales, cómputos de nómina o liquidaciones, el Usuario se compromete de manera expresa a no presentar reclamos ni demandas contra la Aplicación ni sus desarrolladores. Debe dirigir cualquier aclaratoria directamente al supervisor, gerencia de operaciones o departamento de Recursos Humanos de su empresa contratante.</p>
 
                 <h4 class="font-bold text-white uppercase mt-3">CAPÍTULO III: ORIGEN DE LOS DATOS Y RESPONSABILIDAD DE CARGA</h4>
@@ -478,7 +503,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT PROFESIONAL INTEGRAL V5.9 -->
+    <!-- SCRIPT PROFESIONAL INTEGRAL V6.0 -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBzMXFLJhTuPSPdKGsVqCqQRhP_NiGYBA",
@@ -509,7 +534,7 @@
             if (dateInput) dateInput.value = todayStr;
             document.getElementById('todayDateBadge').innerText = todayStr;
 
-            // Cargar y dar formato estricto de dos decimales a la tasa BCV oficial
+            // Cargar tasa BCV y verificar alerta de administrador
             loadBcvTasaWidget();
 
             // Pantalla de Splash corporativa garantizada por 5 segundos al cargar la app
@@ -529,18 +554,75 @@
             }, 5000);
         });
 
-        // Función para gestionar y mostrar con formato estricto de dos decimales la tasa oficial BCV
+        // Función para gestionar y mostrar la tasa BCV y el vigía de fecha
         async function loadBcvTasaWidget() {
             const tasaEl = document.getElementById('bcvTasaValor');
+            const fechaLabel = document.getElementById('bcvTasaFechaLabel');
+            const alertBanner = document.getElementById('bcvAlertBanner');
+            const alertText = document.getElementById('bcvAlertText');
+            const inputAdminTasa = document.getElementById('inputAdminBcvTasa');
+
             try {
                 const doc = await db.collection("config").doc("incentivos").get();
-                let tasaActual = 883.40; // Tasa oficial BCV correcta actual
-                if (doc.exists && doc.data().tasaBcvActual) {
-                    tasaActual = parseFloat(doc.data().tasaBcvActual);
+                let tasaActual = 883.40;
+                let fechaActualizacion = new Date().toISOString().split('T')[0];
+
+                if (doc.exists) {
+                    const data = doc.data();
+                    if (data.tasaBcvActual) tasaActual = parseFloat(data.tasaBcvActual);
+                    if (data.tasaBcvFecha) fechaActualizacion = data.tasaBcvFecha;
                 }
+
                 tasaEl.innerText = `Bs. ${tasaActual.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                if (inputAdminTasa) inputAdminTasa.value = tasaActual.toFixed(2);
+
+                const todayStr = new Date().toISOString().split('T')[0];
+                if (fechaActualizacion === todayStr) {
+                    fechaLabel.innerText = "Actualizada hoy";
+                    if (alertBanner) alertBanner.classList.add('hidden');
+                } else {
+                    fechaLabel.innerText = `Última: ${fechaActualizacion}`;
+                    if (alertBanner && currentUser && currentUser.isAdmin) {
+                        alertBanner.classList.remove('hidden');
+                        alertText.innerText = `⚠️ Atención: La tasa oficial data del ${fechaActualizacion} y aún no se ha actualizado para el día de hoy (${todayStr}).`;
+                    }
+                }
             } catch (e) {
                 tasaEl.innerText = "Bs. 883,40";
+                fechaLabel.innerText = "Actualizada hoy";
+            }
+        }
+
+        // Guardar la tasa desde el panel de Administrador
+        async function saveBcvTasaAdmin() {
+            const nuevaTasa = parseFloat(document.getElementById('inputAdminBcvTasa').value);
+            if (isNaN(nuevaTasa) || nuevaTasa <= 0) {
+                alert("Por favor, ingrese un monto de tasa válido.");
+                return;
+            }
+
+            const todayStr = new Date().toISOString().split('T')[0];
+
+            try {
+                await db.collection("config").doc("incentivos").set({
+                    tasaBcvActual: nuevaTasa,
+                    tasaBcvFecha: todayStr
+                }, { merge: true });
+
+                alert("¡Tasa oficial BCV actualizada y guardada con éxito!");
+                loadBcvTasaWidget();
+            } catch (error) {
+                alert("Error al guardar la tasa: " + error.message);
+            }
+        }
+
+        function focusBcvInput() {
+            const input = document.getElementById('inputAdminBcvTasa');
+            if (input) {
+                input.focus();
+                input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                input.classList.add('ring-2', 'ring-amber-400');
+                setTimeout(() => input.classList.remove('ring-2', 'ring-amber-400'), 2000);
             }
         }
 
@@ -587,7 +669,6 @@
             const modal = document.getElementById('termsModal');
             modal.classList.remove('hidden');
             
-            // Reiniciar estado del scroll y botón al abrir
             const container = document.getElementById('termsScrollContainer');
             container.scrollTop = 0;
             const btn = document.getElementById('btnAcceptTerms');
@@ -598,7 +679,6 @@
 
         function checkTermsScroll() {
             const container = document.getElementById('termsScrollContainer');
-            // Verificar si el usuario llegó al final (con un margen de tolerancia de 5px)
             if (container.scrollTop + container.clientHeight >= container.scrollHeight - 5) {
                 const btn = document.getElementById('btnAcceptTerms');
                 btn.disabled = false;
@@ -703,7 +783,6 @@
                 }
             }
 
-            // Ocultar formulario de autenticación y mostrar barra de progreso de 3 segundos
             document.getElementById('authView').classList.add('hidden');
             const progressView = document.getElementById('loginProgressView');
             const progressBar = document.getElementById('loginProgressBar');
@@ -711,8 +790,8 @@
             progressView.classList.remove('hidden');
 
             let currentPercent = 0;
-            const totalDuration = 3000; // 3 segundos exactos
-            const intervalTime = 30; // Actualizar cada 30ms
+            const totalDuration = 3000;
+            const intervalTime = 30;
             const increment = (100 * intervalTime) / totalDuration;
 
             const progressInterval = setInterval(() => {
@@ -726,7 +805,6 @@
                 progressPercent.innerText = rounded + '%';
             }, intervalTime);
 
-            // Al cumplirse los 3 segundos, guardar sesión y lanzar el panel principal
             setTimeout(() => {
                 progressView.classList.add('hidden');
                 localStorage.setItem('kolaboradorf_session', JSON.stringify(currentUser));
@@ -913,6 +991,7 @@
                 adminNavTabs.classList.remove('hidden');
                 roleSimulatorContainer.classList.remove('hidden');
                 loadPendingApprovals();
+                loadBcvTasaWidget(); // Comprobar alerta al entrar al admin
             } else {
                 adminNavTabs.classList.add('hidden');
             }
@@ -957,6 +1036,7 @@
                 btnAdmin.className = "flex-1 sm:flex-none px-5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-xl transition bg-red-600 text-white shadow-lg shadow-red-600/20";
                 btnWorker.className = "flex-1 sm:flex-none px-5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-xl transition bg-slate-800 text-slate-300 hover:bg-slate-700";
                 loadPendingApprovals();
+                loadBcvTasaWidget();
             }
         }
 
@@ -1093,7 +1173,6 @@
             }
         }
 
-        // RENDERIZADO DEL HISTÓRICO DEL DÍA
         function renderTodayHistory(records) {
             const todayContainer = document.getElementById('todayHistoryContainer');
             todayContainer.innerHTML = '';
@@ -1133,7 +1212,6 @@
             });
         }
 
-        // LIMPIAR HISTORIAL DEL DÍA
         async function clearTodayHistory() {
             if (!confirm("⚠️ ¿Deseas limpiar/eliminar los registros del día de hoy? Esto también reiniciará automáticamente el acumulado semanal.")) return;
 
@@ -1158,7 +1236,6 @@
             }
         }
 
-        // CÁLCULO DE LA TARJETA SEMANAL Y TOTAL DE INCENTIVO ACUMULADO
         function updateWeeklyCardFromHistory(records) {
             const badge = document.getElementById('globalEfectividadBadge');
             const label = document.getElementById('globalEfectividadLabel');
@@ -1256,7 +1333,6 @@
                 renderTodayHistory(cachedUserRecords);
                 updateWeeklyCardFromHistory(cachedUserRecords);
 
-                // LIMPIEZA COMPLETA DE LOS CAMPOS DEL FORMULARIO DE REGISTRO
                 document.getElementById('inputRuta').value = '';
                 document.getElementById('inputProductosPendientes').value = '';
                 document.getElementById('inputHoraEntrada').value = '';
