@@ -307,17 +307,26 @@
                             <div class="bg-slate-900/90 backdrop-blur-xl p-4 rounded-2xl border border-slate-800 text-center shadow-lg"><span class="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">Efectividad Diaria</span><h4 id="statEfectividadSemanal" class="text-2xl font-black text-blue-400 mt-1.5">100.0%</h4></div>
                         </div>
 
-                        <!-- HISTÓRICO DEL DÍA CON BOTÓN PARA LIMPIAR -->
-                        <div class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-3 shadow-xl">
+                        <!-- HISTÓRICO DEL DÍA CON BOTÓN PARA LIMPIAR Y PROYECCIÓN DE COBRO EN BOLÍVARES -->
+                        <div class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-4 shadow-xl">
                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-800 pb-3 gap-2">
                                 <h4 class="text-sm font-extrabold text-white flex items-center gap-2">📊 Histórico del Día (Registros de Hoy)</h4>
                                 <div class="flex items-center gap-3">
                                     <span class="text-[10px] text-slate-400" id="todayDateBadge">Fecha actual</span>
-                                    <button onclick="clearTodayHistory()" class="text-[10px] bg-red-600/20 hover:bg-red-600/40 text-red-300 px-3 py-1 rounded-lg border border-red-500/30 font-semibold transition shadow">🗑️ Limpiar Historial del Día</button>
+                                    <button onclick="clearTodayHistory()" class="text-[10px] bg-red-600/20 hover:bg-red-600/40 text-red-300 px-3 py-1.5 rounded-lg border border-red-500/30 font-semibold transition shadow flex items-center gap-1.5">🗑️ Limpiar Historial & Calcular Cobro (Bs.)</button>
                                 </div>
                             </div>
                             <div id="todayHistoryContainer" class="space-y-2 max-h-48 overflow-y-auto pr-1">
                                 <p class="text-xs text-slate-400 text-center py-4">No hay registros guardados para el día de hoy.</p>
+                            </div>
+
+                            <!-- Panel de Proyección de Cobro en Bolívares (Vinculado al botón de limpieza) -->
+                            <div id="proyeccionCobroContainer" class="hidden bg-slate-950 p-4 rounded-xl border border-emerald-500/40 space-y-2 shadow-inner">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-black text-emerald-400 uppercase tracking-wider">🇻🇪 Proyección de Cobro (Jueves próximo)</span>
+                                    <span id="proyeccionFechaCobro" class="text-[10px] text-slate-400 font-bold"></span>
+                                </div>
+                                <p id="proyeccionTextoDetalle" class="text-xs text-slate-300 leading-relaxed"></p>
                             </div>
                         </div>
 
@@ -378,6 +387,14 @@
                         </div>
                         <div class="pt-2 sm:pt-5">
                             <button onclick="saveBcvTasaAdmin()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-3 rounded-xl transition shadow-lg shadow-emerald-600/30 uppercase tracking-wider">💾 Guardar Tasa Oficial</button>
+                        </div>
+                    </div>
+
+                    <!-- HISTORIAL DE TASAS GUARDADAS (Correlatividad por fecha) -->
+                    <div class="mt-4 pt-4 border-t border-slate-800 space-y-3">
+                        <h5 class="text-xs font-bold text-slate-300 uppercase tracking-wider">📋 Historial de Tasas Oficiales Registradas</h5>
+                        <div id="adminTasaHistorialList" class="space-y-2 max-h-40 overflow-y-auto pr-1">
+                            <p class="text-[11px] text-slate-400 text-center py-2">Cargando historial de tasas...</p>
                         </div>
                     </div>
                 </div>
@@ -511,7 +528,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT PROFESIONAL INTEGRAL V6.2 -->
+    <!-- SCRIPT PROFESIONAL INTEGRAL V6.3 -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBzMXFLJhTuPSPdKGsVqCqQRhP_NiGYBA",
@@ -594,6 +611,29 @@
                 if (tasaEl) tasaEl.innerText = "Bs. 883,40";
                 if (fechaLabel) fechaLabel.innerText = "Actualizada hoy";
             }
+            loadAdminTasaHistorial();
+        }
+
+        async function loadAdminTasaHistorial() {
+            const container = document.getElementById('adminTasaHistorialList');
+            if (!container) return;
+            try {
+                const doc = await db.collection("config").doc("historial_tasas_bcv").get();
+                if (!doc.exists || !doc.data().tasas || doc.data().tasas.length === 0) {
+                    container.innerHTML = '<p class="text-[11px] text-slate-400 text-center py-2">No hay tasas registradas en el historial aún.</p>';
+                    return;
+                }
+                const tasas = doc.data().tasas;
+                container.innerHTML = '';
+                tasas.sort((a,b) => b.fecha.localeCompare(a.fecha)).forEach(t => {
+                    const item = document.createElement('div');
+                    item.className = "flex justify-between items-center bg-slate-900 px-3 py-2 rounded-lg border border-slate-800 text-[11px]";
+                    item.innerHTML = `<span>📅 <strong>${t.fecha}</strong></span> <span class="text-emerald-400 font-bold">Bs. ${parseFloat(t.tasa).toFixed(2)}</span>`;
+                    container.appendChild(item);
+                });
+            } catch (e) {
+                container.innerHTML = '<p class="text-[11px] text-red-400 text-center py-2">Error al cargar historial de tasas.</p>';
+            }
         }
 
         async function saveBcvTasaAdmin() {
@@ -611,11 +651,51 @@
                     tasaBcvFecha: todayStr
                 }, { merge: true });
 
-                alert("¡Tasa oficial BCV actualizada y guardada con éxito!");
+                const histRef = db.collection("config").doc("historial_tasas_bcv");
+                const histDoc = await histRef.get();
+                let tasas = [];
+                if (histDoc.exists && histDoc.data().tasas) {
+                    tasas = histDoc.data().tasas.filter(t => t.fecha !== todayStr);
+                }
+                tasas.push({ fecha: todayStr, tasa: nuevaTasa });
+                await histRef.set({ tasas }, { merge: true });
+
+                alert("¡Tasa oficial BCV actualizada y guardada en el historial con éxito!");
                 loadBcvTasaWidget();
             } catch (error) {
                 alert("Error al guardar la tasa: " + error.message);
             }
+        }
+
+        async function getTasaForDate(targetDateStr) {
+            try {
+                const doc = await db.collection("config").doc("historial_tasas_bcv").get();
+                if (doc.exists && doc.data().tasas) {
+                    const found = doc.data().tasas.find(t => t.fecha === targetDateStr);
+                    if (found) return parseFloat(found.tasa);
+                }
+                const mainDoc = await db.collection("config").doc("incentivos").get();
+                if (mainDoc.exists && mainDoc.data().tasaBcvActual) {
+                    return parseFloat(mainDoc.data().tasaBcvActual);
+                }
+            } catch (e) {}
+            return 883.40;
+        }
+
+        function getLastFridayDate() {
+            const d = new Date();
+            const day = d.getDay();
+            const diff = (day <= 5) ? (day + 2) : (day - 5);
+            d.setDate(d.getDate() - diff);
+            return d.toISOString().split('T')[0];
+        }
+
+        function getNextThursdayDate() {
+            const d = new Date();
+            const day = d.getDay();
+            const diff = (4 - day + 7) % 7 || 7;
+            d.setDate(d.getDate() + diff);
+            return d.toLocaleDateString('es-VE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
         }
 
         function focusBcvInput() {
@@ -1221,24 +1301,48 @@
         }
 
         async function clearTodayHistory() {
-            if (!confirm("⚠️ ¿Deseas limpiar/eliminar los registros del día de hoy? Esto también reiniciará automáticamente el acumulado semanal.")) return;
+            if (!confirm("⚠️ ¿Deseas limpiar/eliminar los registros y calcular tu cobro en bolívares basado en la tasa histórica del viernes?")) return;
 
             const todayStr = new Date().toISOString().split('T')[0];
+            const resetKey = `last_reset_date_${currentUser.email}`;
+            const lastResetDate = localStorage.getItem(resetKey) || "2000-01-01";
+            const activeWeekRecords = cachedUserRecords.filter(r => r.fecha >= lastResetDate);
+
+            let totalIncentivoSemanalUSD = 0;
+            activeWeekRecords.forEach(r => {
+                totalIncentivoSemanalUSD += parseFloat(r.incentivoDiarioUSD) || 0;
+            });
+
+            // Extraer la tasa del viernes correspondiente
+            const viernesDateStr = getLastFridayDate();
+            const tasaViernes = await getTasaForDate(viernesDateStr);
+            const montoBolivares = totalIncentivoSemanalUSD * tasaViernes;
+            const fechaCobroJueves = getNextThursdayDate();
+
             const updatedRecords = cachedUserRecords.filter(r => r.fecha !== todayStr);
 
             try {
                 const docRef = db.collection("historial_jornadas").doc(currentUser.email);
                 await docRef.set({ registros: updatedRecords }, { merge: true });
 
-                if (currentUser && currentUser.email) {
-                    localStorage.setItem(`last_reset_date_${currentUser.email}`, todayStr);
-                }
+                localStorage.setItem(resetKey, todayStr);
 
                 cachedUserRecords = updatedRecords;
                 renderTodayHistory(cachedUserRecords);
                 updateWeeklyCardFromHistory(cachedUserRecords);
 
-                alert("🗑️ ¡Historial del día limpiado y acumulado semanal reiniciado con éxito!");
+                // Mostrar la proyección de cobro en bolívares solicitada
+                const proyeccionContainer = document.getElementById('proyeccionCobroContainer');
+                const fechaCobroEl = document.getElementById('proyeccionFechaCobro');
+                const detalleEl = document.getElementById('proyeccionTextoDetalle');
+
+                if (proyeccionContainer && fechaCobroEl && detalleEl) {
+                    proyeccionContainer.classList.remove('hidden');
+                    fechaCobroEl.innerText = `Cobro estimado: ${fechaCobroJueves}`;
+                    detalleEl.innerHTML = `Vas a cobrar un total de <strong class="text-emerald-400 font-black text-sm">Bs. ${montoBolivares.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> correspondientes a tu incentivo acumulado de <strong>$${totalIncentivoSemanalUSD.toFixed(2)}</strong>, calculado con la tasa oficial BCV del cierre del viernes (${viernesDateStr}) de <strong>Bs. ${tasaViernes.toFixed(2)}</strong>.`;
+                }
+
+                alert("🗑️ ¡Historial limpiado y cálculo de cobro en bolívares generado con éxito!");
             } catch (error) {
                 alert("Error al limpiar el historial en la nube.");
             }
