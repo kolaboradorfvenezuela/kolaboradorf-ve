@@ -306,7 +306,7 @@
                             <div class="bg-slate-900/90 backdrop-blur-xl p-4 rounded-2xl border border-slate-800 text-center shadow-lg"><span class="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">Efectividad Diaria</span><h4 id="statEfectividadSemanal" class="text-2xl font-black text-blue-400 mt-1.5">100.0%</h4></div>
                         </div>
 
-                        <!-- HISTÓRICO DEL DÍA (CON SU PROPIO BOTÓN DE BORRAR/LIMPIAR) -->
+                        <!-- HISTÓRICO DEL DÍA (CON SU PROPIO BOTÓN DE BORRAR/LIMPIAR INDEPENDIENTE) -->
                         <div class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-3 shadow-xl">
                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-800 pb-3 gap-2">
                                 <h4 class="text-sm font-extrabold text-white flex items-center gap-2">📊 Histórico del Día (Registros de Hoy)</h4>
@@ -494,7 +494,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT PROFESIONAL INTEGRAL V6.6 -->
+    <!-- SCRIPT PROFESIONAL INTEGRAL V6.7 -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBzMXFLJhTuPSPdKGsVqCqQRhP_NiGYBA",
@@ -953,7 +953,7 @@
             });
         }
 
-        // 1. LIMPIAR HISTORIAL DEL DÍA (Independiente)
+        // 1. LIMPIAR HISTORIAL DEL DÍA (SOLO BORRA EL HISTORIAL DE REGISTROS DE HOY, SIN TOCAR EL ACUMULADO)
         async function clearTodayHistory() {
             if (!confirm("⚠️ ¿Deseas limpiar únicamente los registros del día de hoy?")) return;
             const todayStr = new Date().toISOString().split('T')[0];
@@ -962,12 +962,11 @@
                 await db.collection("historial_jornadas").doc(currentUser.email).set({ registros: updatedRecords }, { merge: true });
                 cachedUserRecords = updatedRecords;
                 renderTodayHistory(cachedUserRecords);
-                updateWeeklyCardFromHistory(cachedUserRecords);
                 alert("🗑️ ¡Historial del día limpiado con éxito!");
             } catch (e) { alert("Error al limpiar."); }
         }
 
-        // 2. LIMPIAR ACUMULADO SEMANAL (Independiente)
+        // 2. LIMPIAR ACUMULADO SEMANAL (SOLO BORRA EL ACUMULADO DE LA SEMANA Y EL CÁLCULO DE BOLÍVARES)
         async function limpiarAcumuladoSemanal() {
             if (!confirm("⚠️ ¿Deseas limpiar y reiniciar todo el acumulado semanal de incentivos?")) return;
             const todayStr = new Date().toISOString().split('T')[0];
@@ -1075,5 +1074,4 @@
         }
     </script>
 </body>
-</html>
 </html>
