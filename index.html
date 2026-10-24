@@ -32,6 +32,10 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
     <!-- EmailJS SDK (Solo para verificación y recuperación) -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <!-- jsPDF y html2canvas para la generación de reportes PDF Corporativos -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
         body { 
@@ -315,10 +319,10 @@
                                 <div><label class="block text-[10px] font-bold text-slate-300 uppercase tracking-wider mb-1.5">Pepitos (Snacks)</label><input type="number" id="inputPep" value="0" oninput="calculateRealTime()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-600 shadow-inner"></div>
                             </div>
                         </div>
-                        <button onclick="saveDailyRecord()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl transition text-xs shadow-lg shadow-emerald-600/30 uppercase tracking-wider mt-2 flex items-center justify-center gap-2">💾 Guardar Registro más largo</button>
+                        <button onclick="saveDailyRecord()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl transition text-xs shadow-lg shadow-emerald-600/30 uppercase tracking-wider mt-2 flex items-center justify-center gap-2">💾 Guardar Registro</button>
                     </div>
 
-                    <!-- Resumen Diario, Histórico del Día y Tarjeta de Efectividad e Incentivo Semanal -->
+                    <!-- Resumen Diario, Histórico del Día, Botón PDF y Tarjeta de Efectividad e Incentivo Semanal -->
                     <div class="lg:col-span-2 space-y-6">
                         <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
                             <div class="bg-slate-900/90 backdrop-blur-xl p-4 rounded-2xl border border-slate-800 text-center shadow-lg"><span class="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">Carga Inicial</span><h4 id="statCargaInicial" class="text-2xl font-black text-white mt-1.5">0</h4></div>
@@ -327,13 +331,14 @@
                             <div class="bg-slate-900/90 backdrop-blur-xl p-4 rounded-2xl border border-slate-800 text-center shadow-lg"><span class="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">Efectividad Diaria</span><h4 id="statEfectividadSemanal" class="text-2xl font-black text-blue-400 mt-1.5">100.0%</h4></div>
                         </div>
 
-                        <!-- HISTÓRICO DEL DÍA CON BOTÓN PARA LIMPIAR -->
+                        <!-- HISTÓRICO DEL DÍA CON BOTÓN PARA LIMPIAR Y EXPORTAR A PDF -->
                         <div class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-3 shadow-xl">
                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-800 pb-3 gap-2">
                                 <h4 class="text-sm font-extrabold text-white flex items-center gap-2">📊 Histórico del Día (Registros de Hoy)</h4>
-                                <div class="flex items-center gap-3">
+                                <div class="flex items-center gap-2 flex-wrap">
                                     <span class="text-[10px] text-slate-400" id="todayDateBadge">Fecha actual</span>
-                                    <button onclick="clearTodayHistory()" class="text-[10px] bg-red-600/20 hover:bg-red-600/40 text-red-300 px-3 py-1 rounded-lg border border-red-500/30 font-semibold transition shadow">🗑️ Limpiar Historial del Día</button>
+                                    <button onclick="exportWeeklyReportPDF()" class="text-[10px] bg-red-600 hover:bg-red-500 text-white px-3 py-1 rounded-lg font-bold transition shadow flex items-center gap-1">📄 Exportar Reporte PDF</button>
+                                    <button onclick="clearTodayHistory()" class="text-[10px] bg-red-600/20 hover:bg-red-600/40 text-red-300 px-3 py-1 rounded-lg border border-red-500/30 font-semibold transition shadow">🗑️ Limpiar</button>
                                 </div>
                             </div>
                             <div id="todayHistoryContainer" class="space-y-2 max-h-48 overflow-y-auto pr-1">
@@ -488,7 +493,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT PROFESIONAL INTEGRAL V6.3 -->
+    <!-- SCRIPT PROFESIONAL INTEGRAL V6.4 (Con Exportación PDF Corporativa) -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBzMXFLJhTuPSPdKGsVqCqQRhP_NiGYBA",
@@ -1274,6 +1279,129 @@
                 } catch (e) {}
             }
             logoutApp();
+        }
+
+        // FUNCIÓN DE EXPORTACIÓN A PDF CORPORATIVO CON RESUMEN GRÁFICO Y CINTILLO INSTITUCIONAL
+        async function exportWeeklyReportPDF() {
+            if (!cachedUserRecords || cachedUserRecords.length === 0) {
+                alert("No hay registros en el historial para exportar.");
+                return;
+            }
+
+            // Crear un contenedor temporal oculto con diseño corporativo impecable para el PDF
+            const reportDiv = document.createElement('div');
+            reportDiv.style.position = 'absolute';
+            reportDiv.style.left = '-9999px';
+            reportDiv.style.top = '0';
+            reportDiv.style.width = '800px';
+            reportDiv.style.backgroundColor = '#ffffff';
+            reportDiv.style.color = '#111827';
+            reportDiv.style.fontFamily = 'Inter, sans-serif';
+            reportDiv.style.padding = '40px';
+            reportDiv.style.boxSizing = 'border-box';
+
+            const userName = currentUser ? currentUser.name : 'DHERMES FERNANDO PEREZ';
+            const userEmail = currentUser ? currentUser.email : 'dhermes73@gmail.com';
+            const userRole = currentUser ? currentUser.role : 'Entregador';
+            const currentDate = new Date().toLocaleDateString('es-VE');
+
+            // Construir filas de la tabla
+            let tableRowsHTML = '';
+            cachedUserRecords.slice(0, 15).forEach(r => {
+                tableRowsHTML += `
+                    <tr style="border-bottom: 1px solid #e5e7eb;">
+                        <td style="padding: 10px; font-size: 11px; font-weight: bold; color: #111827;">${r.ruta}</td>
+                        <td style="padding: 10px; font-size: 11px; color: #4b5563;">${r.fecha}</td>
+                        <td style="padding: 10px; font-size: 11px; color: #111827;">${r.cargaInicial}</td>
+                        <td style="padding: 10px; font-size: 11px; font-weight: bold; color: #16a34a;">${r.cargaNetaDia}</td>
+                        <td style="padding: 10px; font-size: 11px; color: #2563eb;">${r.efectividad}%</td>
+                        <td style="padding: 10px; font-size: 11px; font-weight: bold; color: #111827;">$${r.incentivoDiarioUSD}</td>
+                    </tr>
+                `;
+            });
+
+            // Construir gráfico de barras visual integrado en el PDF
+            let barsHTML = '';
+            cachedUserRecords.slice(0, 7).reverse().forEach(r => {
+                const heightPercent = Math.min(100, Math.max(15, (parseInt(r.cargaNetaDia) / 1200) * 100));
+                barsHTML += `
+                    <div style="display: flex; flex-direction: column; align-items: center; flex: 1; height: 100%; justify-content: flex-end; gap: 4px;">
+                        <span style="font-size: 9px; font-weight: bold; color: #374151;">${r.cargaNetaDia}</span>
+                        <div style="width: 100%; max-width: 32px; background: linear-gradient(to top, #dc2626, #f87171); border-radius: 4px 4px 0 0; height: ${heightPercent}%;"></div>
+                        <span style="font-size: 9px; color: #6b7280; white-space: nowrap;">R-${r.ruta}</span>
+                    </div>
+                `;
+            });
+
+            reportDiv.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #dc2626; padding-bottom: 20px; margin-bottom: 25px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="width: 50px; height: 50px; background-color: #dc2626; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 28px; font-weight: 900;">K</div>
+                        <div>
+                            <h2 style="font-size: 20px; font-weight: 900; color: #111827; margin: 0; letter-spacing: -0.02em;">KOLABORADORF <span style="color: #dc2626;">VE</span></h2>
+                            <p style="font-size: 10px; font-weight: bold; color: #dc2626; margin: 2px 0 0 0; text-transform: uppercase; letter-spacing: 0.05em;">DFPfantasy CorVe C.A ®</p>
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <h3 style="font-size: 14px; font-weight: 800; color: #111827; margin: 0;">REPORTE OFICIAL DE JORNADAS</h3>
+                        <p style="font-size: 11px; color: #4b5563; margin: 4px 0 0 0;"><strong>Colaborador:</strong> ${userName}</p>
+                        <p style="font-size: 11px; color: #4b5563; margin: 2px 0 0 0;"><strong>Cargo:</strong> ${userRole} | ${userEmail}</p>
+                        <p style="font-size: 11px; color: #4b5563; margin: 2px 0 0 0;"><strong>Fecha de Emisión:</strong> ${currentDate}</p>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 25px;">
+                    <h4 style="font-size: 12px; font-weight: 800; color: #111827; text-transform: uppercase; margin-bottom: 10px; border-left: 4px solid #dc2626; padding-left: 8px;">Detalle de Rutas y Rendimiento Operativo</h4>
+                    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                        <thead>
+                            <tr style="background-color: #f3f4f6; border-bottom: 2px solid #d1d5db;">
+                                <th style="padding: 10px; font-size: 10px; font-weight: 800; color: #374151; text-transform: uppercase;">Nº Ruta</th>
+                                <th style="padding: 10px; font-size: 10px; font-weight: 800; color: #374151; text-transform: uppercase;">Fecha</th>
+                                <th style="padding: 10px; font-size: 10px; font-weight: 800; color: #374151; text-transform: uppercase;">C. Inicial</th>
+                                <th style="padding: 10px; font-size: 10px; font-weight: 800; color: #374151; text-transform: uppercase;">C. Neta</th>
+                                <th style="padding: 10px; font-size: 10px; font-weight: 800; color: #374151; text-transform: uppercase;">Efectividad</th>
+                                <th style="padding: 10px; font-size: 10px; font-weight: 800; color: #374151; text-transform: uppercase;">Incentivo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${tableRowsHTML}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div style="margin-bottom: 30px; background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px;">
+                    <h4 style="font-size: 12px; font-weight: 800; color: #111827; text-transform: uppercase; margin: 0 0 15px 0;">Resumen Gráfico: Carga Neta por Ruta Reciente</h4>
+                    <div style="display: flex; align-items: flex-end; height: 140px; gap: 12px; padding-top: 10px; border-bottom: 2px solid #d1d5db;">
+                        ${barsHTML}
+                    </div>
+                </div>
+
+                <div style="margin-top: 40px; border-top: 1px solid #e5e7eb; padding-top: 15px; display: flex; justify-content: space-between; align-items: center; font-size: 10px; color: #6b7280;">
+                    <span>DFPfantasy CorVe, C.A Copyright ©2026 Kolaboradorf VE. Todos los derechos reservados.</span>
+                    <span>Página 1 de 1</span>
+                </div>
+            `;
+
+            document.body.appendChild(reportDiv);
+
+            try {
+                const canvas = await html2canvas(reportDiv, { scale: 2, useCORS: true });
+                const imgData = canvas.toDataURL('image/png');
+                
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+                pdf.addImage(imgData, 'PNG', 0, 10, pdfWidth, pdfHeight);
+                pdf.save(`Reporte_Kolaboradorf_VE_${new Date().toISOString().split('T')[0]}.pdf`);
+                
+                document.body.removeChild(reportDiv);
+                alert("📄 ¡Reporte PDF corporativo generado y descargado con éxito!");
+            } catch (error) {
+                document.body.removeChild(reportDiv);
+                alert("Error al generar el PDF: " + error.message);
+            }
         }
     </script>
 </body>
