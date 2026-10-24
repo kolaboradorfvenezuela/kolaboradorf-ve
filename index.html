@@ -185,10 +185,10 @@
                 </div>
                 <div class="text-xs text-slate-300 flex items-center gap-3 bg-slate-950 p-3 rounded-xl border border-slate-800">
                     <input type="checkbox" id="regTerms" required class="rounded bg-slate-900 border-slate-700 text-red-600 focus:ring-0 w-4 h-4 cursor-pointer" onclick="openTermsModal(event)">
-                    <span class="leading-relaxed">Acepto obligatoriamente las <button type="button" onclick="openTermsModal(event)" class="text-red-400 hover:text-red-300 underline font-bold">Políticas y Términos Generales</button></span>
+                    <span class="leading-relaxed">Acepto las <button type="button" onclick="openTermsModal(event)" class="text-red-400 hover:text-red-300 underline font-bold">Políticas, Términos y Condiciones </button></span>
                 </div>
                 <div class="flex justify-between items-center text-xs pt-1">
-                    <button type="button" onclick="switchAuthMode('login')" class="text-red-400 hover:underline">← Volver al Login</button>
+                    <button type="button" onclick="switchAuthMode('login')" class="text-red-400 hover:underline">← Volver al Inicio</button>
                 </div>
                 <button type="submit" class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-xl transition text-sm shadow-lg shadow-red-600/30 uppercase tracking-wider mt-2">Registrarse y Enviar Código</button>
             </form>
@@ -221,7 +221,7 @@
                     <input type="email" id="forgotEmail" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-red-600 transition shadow-inner">
                 </div>
                 <div class="flex justify-between items-center text-xs">
-                    <button type="button" onclick="switchAuthMode('login')" class="text-red-400 hover:underline">← Volver al Login</button>
+                    <button type="button" onclick="switchAuthMode('login')" class="text-red-400 hover:underline">← Volver al Inicio</button>
                 </div>
                 <button type="submit" class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-xl transition text-sm shadow-lg shadow-red-600/30 uppercase tracking-wider">Enviar Código por EmailJS</button>
             </form>
@@ -252,7 +252,7 @@
         <section id="pendingView" class="hidden max-w-md mx-auto bg-slate-900/90 backdrop-blur-xl rounded-3xl shadow-2xl p-10 text-center border border-slate-800 mt-12 shadow-red-950/20">
             <div class="w-16 h-16 bg-amber-500/10 rounded-2xl border border-amber-500/30 flex items-center justify-center mx-auto mb-4 text-3xl shadow-inner">⏳</div>
             <h2 class="text-xl font-extrabold text-white mb-2 tracking-tight">Cuenta en Espera de Aprobación</h2>
-            <p class="text-xs text-slate-300 mb-8 leading-relaxed">Su correo ha sido verificado correctamente y su cuenta se encuentra pendiente de autorización por el Administrador Supremo.</p>
+            <p class="text-xs text-slate-300 mb-8 leading-relaxed">Su correo ha sido verificado correctamente y su cuenta se encuentra pendiente de autorización por el Administrador.</p>
             <button onclick="logoutApp()" class="bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold px-6 py-3 rounded-xl transition border border-slate-700 shadow-lg uppercase tracking-wider">Cerrar Sesión</button>
         </section>
 
@@ -284,7 +284,7 @@
                         </div>
                     </div>
                     <div class="bg-slate-950 px-4 py-2 rounded-xl border border-slate-800 text-xs shadow-inner flex items-center gap-2">
-                        <span class="text-slate-400 font-semibold text-[10px] uppercase">Rol Activo:</span> <strong id="activeRoleBadge" class="text-red-400 uppercase font-black">Ayudante</strong>
+                        <span class="text-slate-400 font-semibold text-[10px] uppercase">Activo:</span> <strong id="activeeBadge" class="text-red-400 uppercase font-black">Ayudante</strong>
                     </div>
                     <div>
                         <button id="btnVacationToggle" onclick="toggleVacationMode()" class="bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold px-5 py-2.5 rounded-xl transition shadow-lg shadow-amber-600/20 uppercase tracking-wider">🌴 Estoy de vacaciones</button>
@@ -344,7 +344,7 @@
 
                         <!-- GRÁFICO ESTADÍSTICO VISUAL EN PANTALLA -->
                         <div class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-3 shadow-xl">
-                            <h4 class="text-sm font-extrabold text-white flex items-center gap-2 border-b border-slate-800 pb-3">📈 Dashboard Analytics — Rendimiento Reciente</h4>
+                            <h4 class="text-sm font-extrabold text-white flex items-center gap-2 border-b border-slate-800 pb-3">Rendimiento Reciente</h4>
                             <div id="screenDashboardChart" class="flex items-end justify-between h-40 gap-3 pt-6 px-2 bg-slate-950 rounded-xl border border-slate-800 shadow-inner">
                                 <p class="text-xs text-slate-400 m-auto">Cargando gráfico estadístico...</p>
                             </div>
@@ -514,7 +514,7 @@
             <div class="text-center space-y-2 border-b border-slate-800 pb-4">
                 <div class="w-12 h-12 bg-red-600/10 rounded-2xl border border-red-500/30 flex items-center justify-center mx-auto text-red-500 text-xl font-bold shadow-inner">🛡️</div>
                 <h3 class="text-lg font-black text-white tracking-tight">Aviso Legal, Privacidad y Cookies</h3>
-                <p class="text-[11px] text-red-300 font-bold uppercase tracking-wider">KOLABORADORF VE — DFPfantasy CorVe C.A ®</p>
+                <p class="text-[11px] text-red-300 font-bold uppercase tracking-wider">KOLABORADORF VE™/DFPfantasy® CorVe C.A</p>
             </div>
 
             <div class="space-y-3 text-xs text-slate-300 leading-relaxed bg-slate-950 p-5 rounded-2xl border border-slate-800 shadow-inner max-h-[50vh] overflow-y-auto pr-2">
@@ -524,7 +524,7 @@
                 <p>Es importante que estés consciente de que toda la información suministrada en la presente aplicación está totalmente segura y encriptada, pero de igual manera <strong class="text-white">no representa la versión final</strong> que tu compañía te va a dar como resultado de liquidación o pago.</p>
                 
                 <div class="border-t border-slate-800 pt-3 mt-3">
-                    <h5 class="text-[11px] font-bold text-white uppercase tracking-wider mb-1">🍪 Aviso sobre el Uso de Cookies y Almacenamiento Local</h5>
+                    <h5 class="text-[11px] font-bold text-white uppercase tracking-wider mb-1">Aviso sobre el Uso de Cookies y Almacenamiento Local</h5>
                     <p class="text-[11px] text-slate-400 leading-relaxed">Este sistema utiliza almacenamiento local (cookies y sesiones web seguras) exclusivamente para recordar tus preferencias de acceso, mantener tu sesión activa y almacenar temporalmente tu historial operativo. Al continuar, aceptas el uso de estas tecnologías para garantizar el funcionamiento óptimo de la plataforma.</p>
                 </div>
             </div>
