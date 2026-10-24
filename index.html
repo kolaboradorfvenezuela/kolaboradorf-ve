@@ -342,7 +342,7 @@
                             <div class="bg-slate-900/90 backdrop-blur-xl p-4 rounded-2xl border border-slate-800 text-center shadow-lg"><span class="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">Efectividad Diaria</span><h4 id="statEfectividadSemanal" class="text-2xl font-black text-blue-400 mt-1.5">100.0%</h4></div>
                         </div>
 
-                        <!-- NUEVA MEJORA 2: GRÁFICO ESTADÍSTICO VISUAL EN PANTALLA -->
+                        <!-- GRÁFICO ESTADÍSTICO VISUAL EN PANTALLA -->
                         <div class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-3 shadow-xl">
                             <h4 class="text-sm font-extrabold text-white flex items-center gap-2 border-b border-slate-800 pb-3">📈 Dashboard Analytics — Rendimiento Reciente</h4>
                             <div id="screenDashboardChart" class="flex items-end justify-between h-40 gap-3 pt-6 px-2 bg-slate-950 rounded-xl border border-slate-800 shadow-inner">
@@ -365,7 +365,7 @@
                             </div>
                         </div>
 
-                        <!-- TARJETA DE EFECTIVIDAD Y ACUMULADO DE INCENTIVOS DE LA SEMANA + BOTÓN CIERRE DE CICLO -->
+                        <!-- TARJETA DE EFECTIVIDAD Y ACUMULADO DE INCENTIVOS DE LA SEMANA -->
                         <div class="bg-gradient-to-br from-slate-900 via-slate-900/90 to-red-950/40 p-5 rounded-2xl border border-red-900/35 shadow-xl space-y-4">
                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                                 <div>
@@ -379,15 +379,9 @@
                                 </div>
                             </div>
 
-                            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-3 shadow-inner">
-                                <div class="flex items-center gap-2">
-                                    <span class="text-xs font-bold text-slate-300 uppercase tracking-wider">💰 Total Incentivo de la Semana:</span>
-                                    <span id="globalIncentivoSemanalBadge" class="text-xl font-black text-emerald-400">$0.00</span>
-                                </div>
-                                <!-- NUEVA MEJORA 3: BOTÓN DE CIERRE DE CICLO SEMANAL -->
-                                <button onclick="triggerWeeklyCycleReset()" class="bg-red-600/20 hover:bg-red-600/40 text-red-300 border border-red-500/30 text-xs font-bold px-4 py-2 rounded-xl transition shadow flex items-center gap-1.5">
-                                    🔄 Iniciar Nuevo Ciclo Semanal
-                                </button>
+                            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex justify-between items-center shadow-inner">
+                                <span class="text-xs font-bold text-slate-300 uppercase tracking-wider">💰 Total Incentivo de la Semana:</span>
+                                <span id="globalIncentivoSemanalBadge" class="text-xl font-black text-emerald-400">$0.00</span>
                             </div>
                         </div>
 
@@ -541,7 +535,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT PROFESIONAL INTEGRAL V6.8 (Con Gráficos en Pantalla, Cierre de Ciclo y Modo Claro/Oscuro) -->
+    <!-- SCRIPT PROFESIONAL INTEGRAL V6.9 -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBzMXFLJhTuPSPdKGsVqCqQRhP_NiGYBA",
@@ -595,7 +589,7 @@
             }, 5000);
         });
 
-        // NUEVA MEJORA 4: INTERRUPTOR DE MODO CLARO / OSCURO
+        // INTERRUPTOR DE MODO CLARO / OSCURO
         function toggleThemeMode() {
             const body = document.getElementById('appBody');
             const icon = document.getElementById('themeIcon');
@@ -1177,7 +1171,7 @@
             }
         }
 
-        // FUNCIONALIDAD GRÁFICO ESTADÍSTICO EN PANTALLA (Dashboard Analytics)
+        // GRÁFICO ESTADÍSTICO EN PANTALLA (Dashboard Analytics)
         function renderScreenDashboardChart(records) {
             const container = document.getElementById('screenDashboardChart');
             if (!records || records.length === 0) {
@@ -1199,7 +1193,7 @@
             container.innerHTML = barsHTML;
         }
 
-        // FUNCIÓN DE HISTORIAL ACUMULADO PERMANENTE
+        // HISTÓRICO ACUMULADO GENERAL DE JORNADAS
         function renderAccumulatedHistory(records) {
             const container = document.getElementById('todayHistoryContainer');
             container.innerHTML = '';
@@ -1254,34 +1248,17 @@
             }
         }
 
-        // NUEVA MEJORA 3: BOTÓN DE CIERRE DE CICLO SEMANAL
-        async function triggerWeeklyCycleReset() {
-            if (!confirm("🔄 ¿Deseas iniciar un nuevo ciclo semanal? Esto colocará el contador de tu tarjeta semanal en cero para sumar el nuevo período de cobro, manteniendo intacto y seguro tu historial general en la nube.")) return;
-
-            if (!currentUser || !currentUser.email) return;
-            const resetKey = `last_reset_date_${currentUser.email}`;
-            const todayStr = new Date().toISOString().split('T')[0];
-            
-            localStorage.setItem(resetKey, todayStr);
-            updateWeeklyCardFromHistory(cachedUserRecords);
-            alert("✅ ¡Nuevo ciclo semanal iniciado con éxito! Tu tarjeta semanal está lista para sumar los nuevos registros.");
-        }
-
         function updateWeeklyCardFromHistory(records) {
             const badge = document.getElementById('globalEfectividadBadge');
             const label = document.getElementById('globalEfectividadLabel');
             const incBadge = document.getElementById('globalIncentivoSemanalBadge');
 
             if (!currentUser || !currentUser.email) return;
-            const resetKey = `last_reset_date_${currentUser.email}`;
-            const lastResetDate = localStorage.getItem(resetKey) || "2000-01-01";
 
-            const activeWeekRecords = records.filter(r => r.fecha >= lastResetDate);
-
-            if (activeWeekRecords.length === 0) {
+            if (records.length === 0) {
                 badge.innerText = "100.0%";
                 badge.className = "text-2xl font-black text-slate-400";
-                label.innerText = "Ciclo semanal reiniciado (Listo)";
+                label.innerText = "Sin registros (Listo)";
                 incBadge.innerText = "$0.00";
                 return;
             }
@@ -1289,12 +1266,12 @@
             let sumaEf = 0;
             let totalIncentivoSemana = 0;
 
-            activeWeekRecords.forEach(r => {
+            records.forEach(r => {
                 sumaEf += parseFloat(r.efectividad) || 0;
                 totalIncentivoSemana += parseFloat(r.incentivoDiarioUSD) || 0;
             });
 
-            const promedioSemanal = sumaEf / activeWeekRecords.length;
+            const promedioSemanal = sumaEf / records.length;
 
             badge.innerText = `${promedioSemanal.toFixed(1)}%`;
             incBadge.innerText = `$${totalIncentivoSemana.toFixed(2)}`;
