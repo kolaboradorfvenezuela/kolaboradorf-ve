@@ -48,7 +48,6 @@
             background-position: center;
             background-attachment: fixed;
         }
-        /* Tipografía gruesa, moderna y de alto impacto visual para el Logo */
         .brand-heavy {
             font-family: 'Inter', sans-serif;
             font-weight: 900;
@@ -78,7 +77,7 @@
     <!-- CONTENEDOR PRINCIPAL -->
     <main class="flex-grow max-w-7xl w-full mx-auto px-6 py-8 flex flex-col justify-center">
 
-        <!-- Pantalla de Carga Inicial (Splash Screen de 5 segundos al abrir la app) -->
+        <!-- Pantalla de Carga Inicial -->
         <div id="loadingSessionView" class="text-center py-20 space-y-6">
             <div class="inline-block p-8 rounded-3xl bg-slate-900/80 border border-slate-800 shadow-2xl backdrop-blur-xl">
                 <h2 class="text-4xl sm:text-5xl font-black text-white brand-heavy tracking-tight drop-shadow-lg mb-3">Kolaboradorf <span class="text-red-500">VE</span></h2>
@@ -97,7 +96,7 @@
             </div>
         </div>
 
-        <!-- PANTALLA DE CARGA AL INICIAR SESIÓN (Barra de 3 segundos del 1 al 100) -->
+        <!-- PANTALLA DE CARGA AL INICIAR SESIÓN -->
         <div id="loginProgressView" class="hidden max-w-md mx-auto bg-slate-900/90 backdrop-blur-xl rounded-3xl shadow-2xl p-10 text-center border border-slate-800 mt-6 shadow-red-950/20 space-y-6">
             <div>
                 <h2 class="text-3xl font-black text-white brand-heavy tracking-tight drop-shadow mb-2">Kolaboradorf <span class="text-red-500">VE</span></h2>
@@ -296,7 +295,7 @@
                         <div id="loadFields" class="space-y-4">
                             <div class="grid grid-cols-2 gap-3">
                                 <div><label class="block text-[10px] font-bold text-slate-300 uppercase tracking-wider mb-1.5">Número de Ruta *</label><input type="text" id="inputRuta" placeholder="Ej. 016" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-600 shadow-inner"></div>
-                                <div><label class="block text-[10px] font-bold text-slate-300 uppercase tracking-wider mb-1.5">Fecha</label><input type="date" id="inputFechaJornada" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-2 text-xs text-white focus:outline-none focus:border-red-600 shadow-inner"></div>
+                                <div><label class="block text-[10px] font-bold text-slate-300 uppercase tracking-wider mb-1.5">Fecha</label><input type="date" id="inputFechaJornada" onchange="onDateChanged()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-2 text-xs text-white focus:outline-none focus:border-red-600 shadow-inner"></div>
                             </div>
                             
                             <div>
@@ -322,7 +321,7 @@
                         <button onclick="saveDailyRecord()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl transition text-xs shadow-lg shadow-emerald-600/30 uppercase tracking-wider mt-2 flex items-center justify-center gap-2">💾 Guardar Registro</button>
                     </div>
 
-                    <!-- Resumen Diario, Histórico del Día, Botón PDF y Tarjeta de Efectividad e Incentivo Semanal -->
+                    <!-- Resumen Diario, Histórico por Fecha Seleccionada y Tarjetas -->
                     <div class="lg:col-span-2 space-y-6">
                         <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
                             <div class="bg-slate-900/90 backdrop-blur-xl p-4 rounded-2xl border border-slate-800 text-center shadow-lg"><span class="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">Carga Inicial</span><h4 id="statCargaInicial" class="text-2xl font-black text-white mt-1.5">0</h4></div>
@@ -331,18 +330,18 @@
                             <div class="bg-slate-900/90 backdrop-blur-xl p-4 rounded-2xl border border-slate-800 text-center shadow-lg"><span class="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">Efectividad Diaria</span><h4 id="statEfectividadSemanal" class="text-2xl font-black text-blue-400 mt-1.5">100.0%</h4></div>
                         </div>
 
-                        <!-- HISTÓRICO DEL DÍA CON BOTÓN PARA LIMPIAR Y EXPORTAR A PDF -->
+                        <!-- HISTÓRICO FILTRADO POR LA FECHA SELECCIONADA -->
                         <div class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-3 shadow-xl">
                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-800 pb-3 gap-2">
-                                <h4 class="text-sm font-extrabold text-white flex items-center gap-2">📊 Histórico del Día (Registros de Hoy)</h4>
+                                <h4 class="text-sm font-extrabold text-white flex items-center gap-2">📊 Histórico de Jornadas (Fecha Seleccionada)</h4>
                                 <div class="flex items-center gap-2 flex-wrap">
-                                    <span class="text-[10px] text-slate-400" id="todayDateBadge">Fecha actual</span>
+                                    <span class="text-[10px] text-red-400 font-bold" id="todayDateBadge">Mostrando fecha actual</span>
                                     <button onclick="exportWeeklyReportPDF()" class="text-[10px] bg-red-600 hover:bg-red-500 text-white px-3 py-1 rounded-lg font-bold transition shadow flex items-center gap-1">📄 Exportar Reporte PDF</button>
-                                    <button onclick="clearTodayHistory()" class="text-[10px] bg-red-600/20 hover:bg-red-600/40 text-red-300 px-3 py-1 rounded-lg border border-red-500/30 font-semibold transition shadow">🗑️ Limpiar</button>
+                                    <button onclick="clearSelectedDateHistory()" class="text-[10px] bg-red-600/20 hover:bg-red-600/40 text-red-300 px-3 py-1 rounded-lg border border-red-500/30 font-semibold transition shadow">🗑️ Limpiar Fecha</button>
                                 </div>
                             </div>
                             <div id="todayHistoryContainer" class="space-y-2 max-h-48 overflow-y-auto pr-1">
-                                <p class="text-xs text-slate-400 text-center py-4">No hay registros guardados para el día de hoy.</p>
+                                <p class="text-xs text-slate-400 text-center py-4">No hay registros guardados para esta fecha.</p>
                             </div>
                         </div>
 
@@ -360,7 +359,6 @@
                                 </div>
                             </div>
 
-                            <!-- APARTADO: TOTAL INCENTIVO ACUMULADO EN LA SEMANA -->
                             <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex justify-between items-center shadow-inner">
                                 <span class="text-xs font-bold text-slate-300 uppercase tracking-wider">💰 Total Incentivo de la Semana:</span>
                                 <span id="globalIncentivoSemanalBadge" class="text-xl font-black text-emerald-400">$0.00</span>
@@ -382,7 +380,6 @@
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- Solicitudes Pendientes -->
                     <div class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-4 shadow-xl">
                         <h4 class="text-sm font-extrabold text-white border-b border-slate-800 pb-3">👥 Solicitudes de Acceso Pendientes</h4>
                         <div id="pendingApprovalsList" class="space-y-3 max-h-80 overflow-y-auto pr-1">
@@ -390,7 +387,6 @@
                         </div>
                     </div>
 
-                    <!-- Configuración Montos Entregadores -->
                     <div class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-4 shadow-xl">
                         <h4 class="text-sm font-extrabold text-red-400 border-b border-slate-800 pb-3 flex items-center gap-2">🚛 Configuración Dólares: Entregadores (Chóferes)</h4>
                         <div class="grid grid-cols-2 gap-3 text-xs max-h-60 overflow-y-auto pr-1 bg-slate-950 p-4 rounded-xl border border-slate-800 shadow-inner">
@@ -408,7 +404,6 @@
                         <button onclick="saveEntregadorConfig()" class="w-full bg-red-600 hover:bg-red-500 text-white text-xs font-bold py-3 rounded-xl transition shadow-lg shadow-red-600/30 uppercase tracking-wider">💾 Guardar Montos Entregadores</button>
                     </div>
 
-                    <!-- Configuración Montos Ayudantes -->
                     <div class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-4 lg:col-span-2 shadow-xl">
                         <h4 class="text-sm font-extrabold text-red-400 border-b border-slate-800 pb-3 flex items-center gap-2">🤝 Configuración Dólares: Ayudantes</h4>
                         <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 text-xs bg-slate-950 p-4 rounded-xl border border-slate-800 shadow-inner">
@@ -493,7 +488,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT PROFESIONAL INTEGRAL V6.4 (Con Exportación PDF Corporativa) -->
+    <!-- SCRIPT PROFESIONAL INTEGRAL V6.5 (Con Consulta de Fechas Anteriores) -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBzMXFLJhTuPSPdKGsVqCqQRhP_NiGYBA",
@@ -522,7 +517,7 @@
             const todayStr = new Date().toISOString().split('T')[0];
             const dateInput = document.getElementById('inputFechaJornada');
             if (dateInput) dateInput.value = todayStr;
-            document.getElementById('todayDateBadge').innerText = todayStr;
+            document.getElementById('todayDateBadge').innerText = `Fecha: ${todayStr}`;
 
             setTimeout(() => {
                 document.getElementById('loadingSessionView').classList.add('hidden');
@@ -1080,10 +1075,10 @@
 
                 if (doc.exists && doc.data().registros) {
                     cachedUserRecords = doc.data().registros;
-                    renderTodayHistory(cachedUserRecords);
+                    renderHistoryBySelectedDate(cachedUserRecords);
                     updateWeeklyCardFromHistory(cachedUserRecords);
                 } else {
-                    document.getElementById('todayHistoryContainer').innerHTML = '<p class="text-xs text-slate-400 text-center py-4">No hay registros guardados para el día de hoy.</p>';
+                    document.getElementById('todayHistoryContainer').innerHTML = '<p class="text-xs text-slate-400 text-center py-4">No hay registros guardados para esta fecha.</p>';
                     updateWeeklyCardFromHistory([]);
                 }
             } catch (e) {
@@ -1091,19 +1086,25 @@
             }
         }
 
-        function renderTodayHistory(records) {
-            const todayContainer = document.getElementById('todayHistoryContainer');
-            todayContainer.innerHTML = '';
+        function onDateChanged() {
+            const selectedDate = document.getElementById('inputFechaJornada').value;
+            document.getElementById('todayDateBadge').innerText = `Fecha: ${selectedDate}`;
+            renderHistoryBySelectedDate(cachedUserRecords);
+        }
 
-            const todayStr = new Date().toISOString().split('T')[0];
-            const todayRecords = records.filter(r => r.fecha === todayStr);
+        function renderHistoryBySelectedDate(records) {
+            const container = document.getElementById('todayHistoryContainer');
+            container.innerHTML = '';
 
-            if (todayRecords.length === 0) {
-                todayContainer.innerHTML = '<p class="text-xs text-slate-400 text-center py-4">No hay registros guardados para el día de hoy.</p>';
+            const selectedDate = document.getElementById('inputFechaJornada').value || new Date().toISOString().split('T')[0];
+            const filteredRecords = records.filter(r => r.fecha === selectedDate);
+
+            if (filteredRecords.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">No hay registros guardados para la fecha ${selectedDate}.</p>`;
                 return;
             }
 
-            todayRecords.forEach(rec => {
+            filteredRecords.forEach(rec => {
                 const card = document.createElement('div');
                 card.className = "bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs space-y-1.5 shadow-inner";
                 
@@ -1126,29 +1127,25 @@
                     </div>
                     ${pendientesHtml}
                 `;
-                todayContainer.appendChild(card);
+                container.appendChild(card);
             });
         }
 
-        async function clearTodayHistory() {
-            if (!confirm("⚠️ ¿Deseas limpiar/eliminar los registros del día de hoy? Esto también reiniciará automáticamente el acumulado semanal.")) return;
+        async function clearSelectedDateHistory() {
+            const selectedDate = document.getElementById('inputFechaJornada').value || new Date().toISOString().split('T')[0];
+            if (!confirm(`⚠️ ¿Deseas limpiar/eliminar los registros correspondientes a la fecha ${selectedDate}?`)) return;
 
-            const todayStr = new Date().toISOString().split('T')[0];
-            const updatedRecords = cachedUserRecords.filter(r => r.fecha !== todayStr);
+            const updatedRecords = cachedUserRecords.filter(r => r.fecha !== selectedDate);
 
             try {
                 const docRef = db.collection("historial_jornadas").doc(currentUser.email);
                 await docRef.set({ registros: updatedRecords }, { merge: true });
 
-                if (currentUser && currentUser.email) {
-                    localStorage.setItem(`last_reset_date_${currentUser.email}`, todayStr);
-                }
-
                 cachedUserRecords = updatedRecords;
-                renderTodayHistory(cachedUserRecords);
+                renderHistoryBySelectedDate(cachedUserRecords);
                 updateWeeklyCardFromHistory(cachedUserRecords);
 
-                alert("🗑️ ¡Historial del día limpiado y acumulado semanal reiniciado con éxito!");
+                alert(`🗑️ ¡Registros de la fecha ${selectedDate} limpiados con éxito!`);
             } catch (error) {
                 alert("Error al limpiar el historial en la nube.");
             }
@@ -1248,7 +1245,7 @@
 
                 alert("¡Registro guardado exitosamente!");
                 cachedUserRecords = registros;
-                renderTodayHistory(cachedUserRecords);
+                renderHistoryBySelectedDate(cachedUserRecords);
                 updateWeeklyCardFromHistory(cachedUserRecords);
 
                 document.getElementById('inputRuta').value = '';
@@ -1281,14 +1278,13 @@
             logoutApp();
         }
 
-        // FUNCIÓN DE EXPORTACIÓN A PDF CORPORATIVO CON RESUMEN GRÁFICO Y CINTILLO INSTITUCIONAL
+        // EXPORTACIÓN A PDF CORPORATIVO CON RESUMEN GRÁFICO
         async function exportWeeklyReportPDF() {
             if (!cachedUserRecords || cachedUserRecords.length === 0) {
                 alert("No hay registros en el historial para exportar.");
                 return;
             }
 
-            // Crear un contenedor temporal oculto con diseño corporativo impecable para el PDF
             const reportDiv = document.createElement('div');
             reportDiv.style.position = 'absolute';
             reportDiv.style.left = '-9999px';
@@ -1305,7 +1301,6 @@
             const userRole = currentUser ? currentUser.role : 'Entregador';
             const currentDate = new Date().toLocaleDateString('es-VE');
 
-            // Construir filas de la tabla
             let tableRowsHTML = '';
             cachedUserRecords.slice(0, 15).forEach(r => {
                 tableRowsHTML += `
@@ -1320,7 +1315,6 @@
                 `;
             });
 
-            // Construir gráfico de barras visual integrado en el PDF
             let barsHTML = '';
             cachedUserRecords.slice(0, 7).reverse().forEach(r => {
                 const heightPercent = Math.min(100, Math.max(15, (parseInt(r.cargaNetaDia) / 1200) * 100));
