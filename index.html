@@ -356,32 +356,6 @@
                     <p class="text-xs text-red-200/80 mt-1">Panel exclusivo de supervisión, aprobación de cuentas y configuración independiente de montos en dólares.</p>
                 </div>
 
-                <!-- ALERTA VIGÍA INTELIGENTE PARA EL ADMINISTRADOR (Si la tasa no es de hoy) -->
-                <div id="bcvAlertBanner" class="hidden bg-amber-500/15 border border-amber-500/40 p-4 rounded-2xl flex flex-col sm:flex-row justify-between items-center gap-4 shadow-xl">
-                    <div class="flex items-center gap-3">
-                        <span class="text-2xl">⚠️</span>
-                        <div>
-                            <h4 class="text-xs font-bold text-amber-300 uppercase tracking-wider">Aviso de Actualización Cambiaria</h4>
-                            <p id="bcvAlertText" class="text-[11px] text-amber-200/90 mt-0.5">La tasa oficial BCV no se ha actualizado para el día de hoy.</p>
-                        </div>
-                    </div>
-                    <button onclick="focusBcvInput()" class="bg-amber-600 hover:bg-amber-500 text-white text-[11px] font-bold px-4 py-2 rounded-xl transition shadow uppercase tracking-wider shrink-0">Actualizar Tasa Ahora</button>
-                </div>
-
-                <!-- GESTIÓN RÁPIDA DE LA TASA BCV DESDE EL ADMIN -->
-                <div class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-4 shadow-xl">
-                    <h4 class="text-sm font-extrabold text-emerald-400 border-b border-slate-800 pb-3 flex items-center gap-2">🇻🇪 Actualización Diaria de Tasa Oficial BCV</h4>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center bg-slate-950 p-4 rounded-xl border border-slate-800 shadow-inner">
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-300 uppercase tracking-wider mb-1">Tasa Oficial Actual (Bs. por USD)</label>
-                            <input type="number" step="0.01" id="inputAdminBcvTasa" value="883.40" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white font-bold focus:outline-none focus:border-red-600">
-                        </div>
-                        <div class="pt-2 sm:pt-5">
-                            <button onclick="saveBcvTasaAdmin()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-3 rounded-xl transition shadow-lg shadow-emerald-600/30 uppercase tracking-wider">💾 Guardar Tasa Oficial</button>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <!-- Solicitudes Pendientes -->
                     <div class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-4 shadow-xl">
@@ -427,23 +401,6 @@
                         <button onclick="saveAyudanteConfig()" class="w-full bg-red-600 hover:bg-red-500 text-white text-xs font-bold py-3 rounded-xl transition shadow-lg shadow-red-600/30 uppercase tracking-wider">💾 Guardar Montos Ayudantes</button>
                     </div>
                 </div>
-            </div>
-
-            <!-- WIDGET DE TASA BCV OFICIAL DENTRO DE LA SESIÓN -->
-            <div class="mt-8 mb-4 max-w-xs">
-                <a href="https://www.bcv.org.ve" target="_blank" rel="noopener noreferrer" 
-                   class="flex items-center gap-3 bg-slate-900/95 hover:bg-slate-800 backdrop-blur-xl border border-red-500/30 px-4 py-2.5 rounded-2xl shadow-xl transition group cursor-pointer">
-                    <div class="w-9 h-9 rounded-xl bg-red-600/10 border border-red-500/30 flex items-center justify-center text-red-400 font-black text-xs shadow-inner group-hover:scale-105 transition">🇻🇪</div>
-                    <div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-[10px] font-black text-white uppercase tracking-wider">Tasa BCV:</span>
-                            <span id="bcvTasaValor" class="text-xs font-black text-emerald-400">Bs. 883,40</span>
-                        </div>
-                        <div class="flex items-center gap-1.5 mt-0.5">
-                            <span id="bcvTasaFechaLabel" class="text-[9px] text-slate-400 group-hover:text-slate-300 transition">Actualizada hoy</span>
-                        </div>
-                    </div>
-                </a>
             </div>
         </div>
     </main>
@@ -511,7 +468,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT PROFESIONAL INTEGRAL V6.2 -->
+    <!-- SCRIPT PROFESIONAL INTEGRAL V6.3 -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBzMXFLJhTuPSPdKGsVqCqQRhP_NiGYBA",
@@ -557,76 +514,6 @@
                 switchAuthMode('login');
             }, 5000);
         });
-
-        async function loadBcvTasaWidget() {
-            const tasaEl = document.getElementById('bcvTasaValor');
-            const fechaLabel = document.getElementById('bcvTasaFechaLabel');
-            const alertBanner = document.getElementById('bcvAlertBanner');
-            const alertText = document.getElementById('bcvAlertText');
-            const inputAdminTasa = document.getElementById('inputAdminBcvTasa');
-
-            try {
-                const doc = await db.collection("config").doc("incentivos").get();
-                let tasaActual = 883.40;
-                let fechaActualizacion = new Date().toISOString().split('T')[0];
-
-                if (doc.exists) {
-                    const data = doc.data();
-                    if (data.tasaBcvActual) tasaActual = parseFloat(data.tasaBcvActual);
-                    if (data.tasaBcvFecha) fechaActualizacion = data.tasaBcvFecha;
-                }
-
-                if (tasaEl) tasaEl.innerText = `Bs. ${tasaActual.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-                if (inputAdminTasa) inputAdminTasa.value = tasaActual.toFixed(2);
-
-                const todayStr = new Date().toISOString().split('T')[0];
-                if (fechaActualizacion === todayStr) {
-                    if (fechaLabel) fechaLabel.innerText = "Actualizada hoy";
-                    if (alertBanner) alertBanner.classList.add('hidden');
-                } else {
-                    if (fechaLabel) fechaLabel.innerText = `Última: ${fechaActualizacion}`;
-                    if (alertBanner && currentUser && currentUser.isAdmin) {
-                        alertBanner.classList.remove('hidden');
-                        alertText.innerText = `⚠️ Atención: La tasa oficial data del ${fechaActualizacion} y aún no se ha actualizado para el día de hoy (${todayStr}).`;
-                    }
-                }
-            } catch (e) {
-                if (tasaEl) tasaEl.innerText = "Bs. 883,40";
-                if (fechaLabel) fechaLabel.innerText = "Actualizada hoy";
-            }
-        }
-
-        async function saveBcvTasaAdmin() {
-            const nuevaTasa = parseFloat(document.getElementById('inputAdminBcvTasa').value);
-            if (isNaN(nuevaTasa) || nuevaTasa <= 0) {
-                alert("Por favor, ingrese un monto de tasa válido.");
-                return;
-            }
-
-            const todayStr = new Date().toISOString().split('T')[0];
-
-            try {
-                await db.collection("config").doc("incentivos").set({
-                    tasaBcvActual: nuevaTasa,
-                    tasaBcvFecha: todayStr
-                }, { merge: true });
-
-                alert("¡Tasa oficial BCV actualizada y guardada con éxito!");
-                loadBcvTasaWidget();
-            } catch (error) {
-                alert("Error al guardar la tasa: " + error.message);
-            }
-        }
-
-        function focusBcvInput() {
-            const input = document.getElementById('inputAdminBcvTasa');
-            if (input) {
-                input.focus();
-                input.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                input.classList.add('ring-2', 'ring-amber-400');
-                setTimeout(() => input.classList.remove('ring-2', 'ring-amber-400'), 2000);
-            }
-        }
 
         function switchAuthMode(mode) {
             document.getElementById('loginForm').classList.add('hidden');
@@ -995,7 +882,6 @@
                 adminNavTabs.classList.add('hidden');
             }
 
-            loadBcvTasaWidget();
             await loadIncentiveConfig();
             calculateAntiquity();
             await loadUserHistory();
@@ -1044,7 +930,6 @@
                 btnAdmin.className = "flex-1 sm:flex-none px-5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-xl transition bg-red-600 text-white shadow-lg shadow-red-600/20";
                 btnWorker.className = "flex-1 sm:flex-none px-5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-xl transition bg-slate-800 text-slate-300 hover:bg-slate-700";
                 loadPendingApprovals();
-                loadBcvTasaWidget();
             }
         }
 
