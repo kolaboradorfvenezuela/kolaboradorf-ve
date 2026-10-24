@@ -295,7 +295,7 @@
                         <div id="loadFields" class="space-y-4">
                             <div class="grid grid-cols-2 gap-3">
                                 <div><label class="block text-[10px] font-bold text-slate-300 uppercase tracking-wider mb-1.5">Número de Ruta *</label><input type="text" id="inputRuta" placeholder="Ej. 016" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-600 shadow-inner"></div>
-                                <div><label class="block text-[10px] font-bold text-slate-300 uppercase tracking-wider mb-1.5">Fecha</label><input type="date" id="inputFechaJornada" onchange="onDateChanged()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-2 text-xs text-white focus:outline-none focus:border-red-600 shadow-inner"></div>
+                                <div><label class="block text-[10px] font-bold text-slate-300 uppercase tracking-wider mb-1.5">Fecha</label><input type="date" id="inputFechaJornada" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-2 text-xs text-white focus:outline-none focus:border-red-600 shadow-inner"></div>
                             </div>
                             
                             <div>
@@ -321,7 +321,7 @@
                         <button onclick="saveDailyRecord()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl transition text-xs shadow-lg shadow-emerald-600/30 uppercase tracking-wider mt-2 flex items-center justify-center gap-2">💾 Guardar Registro</button>
                     </div>
 
-                    <!-- Resumen Diario, Histórico por Fecha Seleccionada y Tarjetas -->
+                    <!-- Resumen Diario, Histórico AcUMULADO y Tarjetas -->
                     <div class="lg:col-span-2 space-y-6">
                         <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
                             <div class="bg-slate-900/90 backdrop-blur-xl p-4 rounded-2xl border border-slate-800 text-center shadow-lg"><span class="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">Carga Inicial</span><h4 id="statCargaInicial" class="text-2xl font-black text-white mt-1.5">0</h4></div>
@@ -330,18 +330,18 @@
                             <div class="bg-slate-900/90 backdrop-blur-xl p-4 rounded-2xl border border-slate-800 text-center shadow-lg"><span class="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">Efectividad Diaria</span><h4 id="statEfectividadSemanal" class="text-2xl font-black text-blue-400 mt-1.5">100.0%</h4></div>
                         </div>
 
-                        <!-- HISTÓRICO FILTRADO POR LA FECHA SELECCIONADA -->
+                        <!-- HISTÓRICO ACUMULADO GENERAL DE JORNADAS -->
                         <div class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-3 shadow-xl">
                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-800 pb-3 gap-2">
-                                <h4 class="text-sm font-extrabold text-white flex items-center gap-2">📊 Histórico de Jornadas (Fecha Seleccionada)</h4>
+                                <h4 class="text-sm font-extrabold text-white flex items-center gap-2">📊 Histórico Acumulado de Jornadas</h4>
                                 <div class="flex items-center gap-2 flex-wrap">
-                                    <span class="text-[10px] text-red-400 font-bold" id="todayDateBadge">Mostrando fecha actual</span>
+                                    <span class="text-[10px] text-red-400 font-bold" id="todayDateBadge">Visible permanentemente</span>
                                     <button onclick="exportWeeklyReportPDF()" class="text-[10px] bg-red-600 hover:bg-red-500 text-white px-3 py-1 rounded-lg font-bold transition shadow flex items-center gap-1">📄 Exportar Reporte PDF</button>
-                                    <button onclick="clearSelectedDateHistory()" class="text-[10px] bg-red-600/20 hover:bg-red-600/40 text-red-300 px-3 py-1 rounded-lg border border-red-500/30 font-semibold transition shadow">🗑️ Limpiar Fecha</button>
+                                    <button onclick="clearAllHistory()" class="text-[10px] bg-red-600/20 hover:bg-red-600/40 text-red-300 px-3 py-1 rounded-lg border border-red-500/30 font-semibold transition shadow">🗑️ Borrar Histórico</button>
                                 </div>
                             </div>
                             <div id="todayHistoryContainer" class="space-y-2 max-h-48 overflow-y-auto pr-1">
-                                <p class="text-xs text-slate-400 text-center py-4">No hay registros guardados para esta fecha.</p>
+                                <p class="text-xs text-slate-400 text-center py-4">No hay registros guardados en el historial.</p>
                             </div>
                         </div>
 
@@ -488,7 +488,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT PROFESIONAL INTEGRAL V6.5 (Con Consulta de Fechas Anteriores) -->
+    <!-- SCRIPT PROFESIONAL INTEGRAL V6.6 (Histórico Acumulado Permanente) -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBzMXFLJhTuPSPdKGsVqCqQRhP_NiGYBA",
@@ -517,7 +517,6 @@
             const todayStr = new Date().toISOString().split('T')[0];
             const dateInput = document.getElementById('inputFechaJornada');
             if (dateInput) dateInput.value = todayStr;
-            document.getElementById('todayDateBadge').innerText = `Fecha: ${todayStr}`;
 
             setTimeout(() => {
                 document.getElementById('loadingSessionView').classList.add('hidden');
@@ -1075,10 +1074,10 @@
 
                 if (doc.exists && doc.data().registros) {
                     cachedUserRecords = doc.data().registros;
-                    renderHistoryBySelectedDate(cachedUserRecords);
+                    renderAccumulatedHistory(cachedUserRecords);
                     updateWeeklyCardFromHistory(cachedUserRecords);
                 } else {
-                    document.getElementById('todayHistoryContainer').innerHTML = '<p class="text-xs text-slate-400 text-center py-4">No hay registros guardados para esta fecha.</p>';
+                    document.getElementById('todayHistoryContainer').innerHTML = '<p class="text-xs text-slate-400 text-center py-4">No hay registros guardados en el historial.</p>';
                     updateWeeklyCardFromHistory([]);
                 }
             } catch (e) {
@@ -1086,25 +1085,17 @@
             }
         }
 
-        function onDateChanged() {
-            const selectedDate = document.getElementById('inputFechaJornada').value;
-            document.getElementById('todayDateBadge').innerText = `Fecha: ${selectedDate}`;
-            renderHistoryBySelectedDate(cachedUserRecords);
-        }
-
-        function renderHistoryBySelectedDate(records) {
+        // FUNCIÓN DE HISTORIAL ACUMULADO PERMANENTE
+        function renderAccumulatedHistory(records) {
             const container = document.getElementById('todayHistoryContainer');
             container.innerHTML = '';
 
-            const selectedDate = document.getElementById('inputFechaJornada').value || new Date().toISOString().split('T')[0];
-            const filteredRecords = records.filter(r => r.fecha === selectedDate);
-
-            if (filteredRecords.length === 0) {
-                container.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">No hay registros guardados para la fecha ${selectedDate}.</p>`;
+            if (!records || records.length === 0) {
+                container.innerHTML = '<p class="text-xs text-slate-400 text-center py-4">No hay registros guardados en el historial.</p>';
                 return;
             }
 
-            filteredRecords.forEach(rec => {
+            records.forEach(rec => {
                 const card = document.createElement('div');
                 card.className = "bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs space-y-1.5 shadow-inner";
                 
@@ -1117,7 +1108,7 @@
                 card.innerHTML = `
                     <div class="flex justify-between items-center">
                         <strong class="text-white text-xs">Ruta: ${rec.ruta}</strong>
-                        <span class="text-[10px] text-slate-400">${rec.fecha}</span>
+                        <span class="text-[10px] text-red-400 font-bold">${rec.fecha}</span>
                     </div>
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-slate-300 text-[11px]">
                         <div>C. Inicial: <strong class="text-white">${rec.cargaInicial}</strong></div>
@@ -1131,21 +1122,18 @@
             });
         }
 
-        async function clearSelectedDateHistory() {
-            const selectedDate = document.getElementById('inputFechaJornada').value || new Date().toISOString().split('T')[0];
-            if (!confirm(`⚠️ ¿Deseas limpiar/eliminar los registros correspondientes a la fecha ${selectedDate}?`)) return;
-
-            const updatedRecords = cachedUserRecords.filter(r => r.fecha !== selectedDate);
+        async function clearAllHistory() {
+            if (!confirm("⚠️ ¿Estás seguro de que deseas borrar por completo todo el historial acumulado? Esta acción vaciará los registros visibles.")) return;
 
             try {
                 const docRef = db.collection("historial_jornadas").doc(currentUser.email);
-                await docRef.set({ registros: updatedRecords }, { merge: true });
+                await docRef.set({ registros: [] }, { merge: true });
 
-                cachedUserRecords = updatedRecords;
-                renderHistoryBySelectedDate(cachedUserRecords);
+                cachedUserRecords = [];
+                renderAccumulatedHistory(cachedUserRecords);
                 updateWeeklyCardFromHistory(cachedUserRecords);
 
-                alert(`🗑️ ¡Registros de la fecha ${selectedDate} limpiados con éxito!`);
+                alert("🗑️ ¡Historial borrado y reiniciado con éxito!");
             } catch (error) {
                 alert("Error al limpiar el historial en la nube.");
             }
@@ -1245,7 +1233,7 @@
 
                 alert("¡Registro guardado exitosamente!");
                 cachedUserRecords = registros;
-                renderHistoryBySelectedDate(cachedUserRecords);
+                renderAccumulatedHistory(cachedUserRecords);
                 updateWeeklyCardFromHistory(cachedUserRecords);
 
                 document.getElementById('inputRuta').value = '';
