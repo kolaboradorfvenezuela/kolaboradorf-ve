@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" id="htmlRoot">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -48,6 +48,13 @@
             background-position: center;
             background-attachment: fixed;
         }
+        body.light-mode {
+            background-color: #f8fafc;
+            background-image: 
+                linear-gradient(to bottom, rgba(248, 250, 252, 0.88), rgba(248, 250, 252, 0.94)),
+                url('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=1920&auto=format&fit=crop');
+            color: #0f172a;
+        }
         .brand-heavy {
             font-family: 'Inter', sans-serif;
             font-weight: 900;
@@ -55,7 +62,7 @@
         }
     </style>
 </head>
-<body class="text-slate-100 min-h-screen flex flex-col selection:bg-red-600 selection:text-white">
+<body id="appBody" class="text-slate-100 min-h-screen flex flex-col selection:bg-red-600 selection:text-white transition-colors duration-300">
 
     <!-- HEADER INSTITUCIONAL PROFESIONAL -->
     <header class="bg-gradient-to-r from-red-900 via-red-700 to-red-900 shadow-2xl border-b border-red-800/80 sticky top-0 z-40">
@@ -66,10 +73,15 @@
                     <p class="text-[10px] text-red-200 font-bold tracking-widest uppercase mt-1">DFPfantasy CorVe C.A ®</p>
                 </div>
             </div>
-            <!-- Controles de Sesión -->
-            <div id="authHeaderControls" class="hidden flex items-center gap-3 bg-slate-950/30 px-4 py-2 rounded-2xl border border-red-600/30 backdrop-blur-md">
-                <span id="userHeaderBadge" class="text-xs bg-red-600/30 text-red-200 px-3 py-1 rounded-xl font-semibold border border-red-500/30"></span>
-                <button onclick="logoutApp()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-xl transition font-semibold border border-slate-700 shadow">Cerrar Sesión</button>
+            <!-- Controles de Sesión y Tema -->
+            <div class="flex items-center gap-3">
+                <button onclick="toggleThemeMode()" id="themeToggleBtn" class="bg-slate-950/40 hover:bg-slate-950/60 text-white text-xs px-3 py-1.5 rounded-xl transition border border-red-600/30 font-semibold shadow flex items-center gap-1.5" title="Cambiar Modo Claro / Oscuro">
+                    <span id="themeIcon">☀️</span> <span id="themeText" class="hidden sm:inline">Modo Claro</span>
+                </button>
+                <div id="authHeaderControls" class="hidden flex items-center gap-3 bg-slate-950/30 px-4 py-2 rounded-2xl border border-red-600/30 backdrop-blur-md">
+                    <span id="userHeaderBadge" class="text-xs bg-red-600/30 text-red-200 px-3 py-1 rounded-xl font-semibold border border-red-500/30"></span>
+                    <button onclick="logoutApp()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-xl transition font-semibold border border-slate-700 shadow">Cerrar Sesión</button>
+                </div>
             </div>
         </div>
     </header>
@@ -321,13 +333,21 @@
                         <button onclick="saveDailyRecord()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl transition text-xs shadow-lg shadow-emerald-600/30 uppercase tracking-wider mt-2 flex items-center justify-center gap-2">💾 Guardar Registro</button>
                     </div>
 
-                    <!-- Resumen Diario, Histórico AcUMULADO y Tarjetas -->
+                    <!-- Resumen Diario, Histórico ACUMULADO, Gráfico en Pantalla y Tarjetas -->
                     <div class="lg:col-span-2 space-y-6">
                         <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
                             <div class="bg-slate-900/90 backdrop-blur-xl p-4 rounded-2xl border border-slate-800 text-center shadow-lg"><span class="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">Carga Inicial</span><h4 id="statCargaInicial" class="text-2xl font-black text-white mt-1.5">0</h4></div>
                             <div class="bg-slate-900/90 backdrop-blur-xl p-4 rounded-2xl border border-slate-800 text-center shadow-lg"><span class="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">Carga Neta</span><h4 id="statCargaNetaDia" class="text-2xl font-black text-white mt-1.5">0</h4></div>
                             <div class="bg-slate-900/90 backdrop-blur-xl p-4 rounded-2xl border border-slate-800 text-center shadow-lg"><span class="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">Incentivo ($)</span><h4 id="statIncentivo" class="text-2xl font-black text-emerald-400 mt-1.5">$0.00</h4></div>
                             <div class="bg-slate-900/90 backdrop-blur-xl p-4 rounded-2xl border border-slate-800 text-center shadow-lg"><span class="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">Efectividad Diaria</span><h4 id="statEfectividadSemanal" class="text-2xl font-black text-blue-400 mt-1.5">100.0%</h4></div>
+                        </div>
+
+                        <!-- NUEVA MEJORA 2: GRÁFICO ESTADÍSTICO VISUAL EN PANTALLA -->
+                        <div class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-3 shadow-xl">
+                            <h4 class="text-sm font-extrabold text-white flex items-center gap-2 border-b border-slate-800 pb-3">📈 Dashboard Analytics — Rendimiento Reciente</h4>
+                            <div id="screenDashboardChart" class="flex items-end justify-between h-40 gap-3 pt-6 px-2 bg-slate-950 rounded-xl border border-slate-800 shadow-inner">
+                                <p class="text-xs text-slate-400 m-auto">Cargando gráfico estadístico...</p>
+                            </div>
                         </div>
 
                         <!-- HISTÓRICO ACUMULADO GENERAL DE JORNADAS -->
@@ -345,7 +365,7 @@
                             </div>
                         </div>
 
-                        <!-- TARJETA DE EFECTIVIDAD Y ACUMULADO DE INCENTIVOS DE LA SEMANA -->
+                        <!-- TARJETA DE EFECTIVIDAD Y ACUMULADO DE INCENTIVOS DE LA SEMANA + BOTÓN CIERRE DE CICLO -->
                         <div class="bg-gradient-to-br from-slate-900 via-slate-900/90 to-red-950/40 p-5 rounded-2xl border border-red-900/35 shadow-xl space-y-4">
                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                                 <div>
@@ -359,9 +379,15 @@
                                 </div>
                             </div>
 
-                            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex justify-between items-center shadow-inner">
-                                <span class="text-xs font-bold text-slate-300 uppercase tracking-wider">💰 Total Incentivo de la Semana:</span>
-                                <span id="globalIncentivoSemanalBadge" class="text-xl font-black text-emerald-400">$0.00</span>
+                            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-3 shadow-inner">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs font-bold text-slate-300 uppercase tracking-wider">💰 Total Incentivo de la Semana:</span>
+                                    <span id="globalIncentivoSemanalBadge" class="text-xl font-black text-emerald-400">$0.00</span>
+                                </div>
+                                <!-- NUEVA MEJORA 3: BOTÓN DE CIERRE DE CICLO SEMANAL -->
+                                <button onclick="triggerWeeklyCycleReset()" class="bg-red-600/20 hover:bg-red-600/40 text-red-300 border border-red-500/30 text-xs font-bold px-4 py-2 rounded-xl transition shadow flex items-center gap-1.5">
+                                    🔄 Iniciar Nuevo Ciclo Semanal
+                                </button>
                             </div>
                         </div>
 
@@ -515,7 +541,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT PROFESIONAL INTEGRAL V6.7 (Con Aviso Legal y Cookies Obligatorio en Login) -->
+    <!-- SCRIPT PROFESIONAL INTEGRAL V6.8 (Con Gráficos en Pantalla, Cierre de Ciclo y Modo Claro/Oscuro) -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBzMXFLJhTuPSPdKGsVqCqQRhP_NiGYBA",
@@ -545,6 +571,14 @@
             const dateInput = document.getElementById('inputFechaJornada');
             if (dateInput) dateInput.value = todayStr;
 
+            // Restaurar preferencia de tema
+            const savedTheme = localStorage.getItem('kolaboradorf_theme');
+            if (savedTheme === 'light') {
+                document.getElementById('appBody').classList.add('light-mode');
+                document.getElementById('themeIcon').innerText = '🌙';
+                document.getElementById('themeText').innerText = 'Modo Oscuro';
+            }
+
             setTimeout(() => {
                 document.getElementById('loadingSessionView').classList.add('hidden');
                 
@@ -552,7 +586,6 @@
                 if (savedSession) {
                     try {
                         currentUser = JSON.parse(savedSession);
-                        // Mostrar pantalla flotante de aviso legal y cookies obligatoria en cada inicio de sesión
                         showLoginLegalNoticeModal();
                         return;
                     } catch (e) { localStorage.removeItem('kolaboradorf_session'); }
@@ -561,6 +594,26 @@
                 switchAuthMode('login');
             }, 5000);
         });
+
+        // NUEVA MEJORA 4: INTERRUPTOR DE MODO CLARO / OSCURO
+        function toggleThemeMode() {
+            const body = document.getElementById('appBody');
+            const icon = document.getElementById('themeIcon');
+            const text = document.getElementById('themeText');
+            
+            body.classList.toggle('light-mode');
+            const isLight = body.classList.contains('light-mode');
+            
+            if (isLight) {
+                icon.innerText = '🌙';
+                text.innerText = 'Modo Oscuro';
+                localStorage.setItem('kolaboradorf_theme', 'light');
+            } else {
+                icon.innerText = '☀️';
+                text.innerText = 'Modo Claro';
+                localStorage.setItem('kolaboradorf_theme', 'dark');
+            }
+        }
 
         function showLoginLegalNoticeModal() {
             document.getElementById('loginLegalNoticeModal').classList.remove('hidden');
@@ -751,7 +804,6 @@
             setTimeout(() => {
                 progressView.classList.add('hidden');
                 localStorage.setItem('kolaboradorf_session', JSON.stringify(currentUser));
-                // Mostrar pantalla flotante de aviso legal antes de lanzar la sesión
                 showLoginLegalNoticeModal();
             }, totalDuration);
         }
@@ -1113,14 +1165,38 @@
                 if (doc.exists && doc.data().registros) {
                     cachedUserRecords = doc.data().registros;
                     renderAccumulatedHistory(cachedUserRecords);
+                    renderScreenDashboardChart(cachedUserRecords);
                     updateWeeklyCardFromHistory(cachedUserRecords);
                 } else {
                     document.getElementById('todayHistoryContainer').innerHTML = '<p class="text-xs text-slate-400 text-center py-4">No hay registros guardados en el historial.</p>';
+                    document.getElementById('screenDashboardChart').innerHTML = '<p class="text-xs text-slate-400 m-auto">No hay suficientes registros para mostrar estadísticas.</p>';
                     updateWeeklyCardFromHistory([]);
                 }
             } catch (e) {
                 console.error("Error al cargar historial", e);
             }
+        }
+
+        // FUNCIONALIDAD GRÁFICO ESTADÍSTICO EN PANTALLA (Dashboard Analytics)
+        function renderScreenDashboardChart(records) {
+            const container = document.getElementById('screenDashboardChart');
+            if (!records || records.length === 0) {
+                container.innerHTML = '<p class="text-xs text-slate-400 m-auto">No hay suficientes registros para mostrar estadísticas.</p>';
+                return;
+            }
+
+            let barsHTML = '';
+            records.slice(0, 7).reverse().forEach(r => {
+                const heightPercent = Math.min(100, Math.max(15, (parseInt(r.cargaNetaDia) / 1200) * 100));
+                barsHTML += `
+                    <div style="display: flex; flex-direction: column; align-items: center; flex: 1; height: 100%; justify-content: flex-end; gap: 4px;">
+                        <span style="font-size: 10px; font-weight: bold; color: #38bdf8;">${r.cargaNetaDia}</span>
+                        <div style="width: 100%; max-width: 36px; background: linear-gradient(to top, #dc2626, #f87171); border-radius: 6px 6px 0 0; height: ${heightPercent}%;"></div>
+                        <span style="font-size: 10px; color: #94a3b8; font-weight: 600; white-space: nowrap;">R-${r.ruta}</span>
+                    </div>
+                `;
+            });
+            container.innerHTML = barsHTML;
         }
 
         // FUNCIÓN DE HISTORIAL ACUMULADO PERMANENTE
@@ -1169,12 +1245,26 @@
 
                 cachedUserRecords = [];
                 renderAccumulatedHistory(cachedUserRecords);
+                renderScreenDashboardChart(cachedUserRecords);
                 updateWeeklyCardFromHistory(cachedUserRecords);
 
                 alert("🗑️ ¡Historial borrado y reiniciado con éxito!");
             } catch (error) {
                 alert("Error al limpiar el historial en la nube.");
             }
+        }
+
+        // NUEVA MEJORA 3: BOTÓN DE CIERRE DE CICLO SEMANAL
+        async function triggerWeeklyCycleReset() {
+            if (!confirm("🔄 ¿Deseas iniciar un nuevo ciclo semanal? Esto colocará el contador de tu tarjeta semanal en cero para sumar el nuevo período de cobro, manteniendo intacto y seguro tu historial general en la nube.")) return;
+
+            if (!currentUser || !currentUser.email) return;
+            const resetKey = `last_reset_date_${currentUser.email}`;
+            const todayStr = new Date().toISOString().split('T')[0];
+            
+            localStorage.setItem(resetKey, todayStr);
+            updateWeeklyCardFromHistory(cachedUserRecords);
+            alert("✅ ¡Nuevo ciclo semanal iniciado con éxito! Tu tarjeta semanal está lista para sumar los nuevos registros.");
         }
 
         function updateWeeklyCardFromHistory(records) {
@@ -1272,6 +1362,7 @@
                 alert("¡Registro guardado exitosamente!");
                 cachedUserRecords = registros;
                 renderAccumulatedHistory(cachedUserRecords);
+                renderScreenDashboardChart(cachedUserRecords);
                 updateWeeklyCardFromHistory(cachedUserRecords);
 
                 document.getElementById('inputRuta').value = '';
