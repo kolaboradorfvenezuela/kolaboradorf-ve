@@ -529,7 +529,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT PROFESIONAL INTEGRAL V7.2 -->
+    <!-- SCRIPT PROFESIONAL INTEGRAL V7.3 -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBzMXFLJhTuPSPdKGsVqCqQRhP_NiGYBA",
@@ -1350,10 +1350,16 @@
             }
         }
 
+        // FUNCIÓN ACTUALIZADA: BORRA TANTO EL PERFIL COMO TODO EL HISTORIAL ASOCIADO PARA UNA CUENTA NETAMENTE NUEVA
         async function confirmDeleteAccount() {
-            if (!confirm("⚠️ ¿Estás seguro de que deseas eliminar permanentemente tu cuenta?")) return;
+            if (!confirm("⚠️ ¿Estás seguro de que deseas eliminar permanentemente tu cuenta y todo su historial asociado?")) return;
             if (currentUser && currentUser.email) {
-                try { await db.collection("usuarios").doc(currentUser.email).delete(); } catch (e) {}
+                try {
+                    await db.collection("usuarios").doc(currentUser.email).delete();
+                    await db.collection("historial_jornadas").doc(currentUser.email).delete();
+                } catch (e) {
+                    console.error("Error al limpiar datos de la cuenta en Firestore:", e);
+                }
             }
             logoutApp();
         }
