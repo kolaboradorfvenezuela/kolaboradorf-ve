@@ -529,7 +529,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT PROFESIONAL INTEGRAL V7.0 -->
+    <!-- SCRIPT PROFESIONAL INTEGRAL V7.1 -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBzMXFLJhTuPSPdKGsVqCqQRhP_NiGYBA",
@@ -798,7 +798,7 @@
             event.preventDefault();
             const pass = document.getElementById('regPass').value;
             const passConfirm = document.getElementById('regPassConfirm').value;
-            const email = document.getElementById('regEmail').value.trim();
+            const email = document.getElementById('regEmail').value.trim().toLowerCase();
             const name = document.getElementById('regName').value.trim();
             const selectedRole = document.getElementById('regCargo').value;
             const termsChecked = document.getElementById('regTerms').checked;
@@ -837,9 +837,10 @@
             if (enteredCode !== generatedVerificationCode) { alert("Código incorrecto."); return; }
 
             try {
-                await db.collection("usuarios").doc(pendingVerificationData.email).set({
+                const userEmail = pendingVerificationData.email.trim().toLowerCase();
+                await db.collection("usuarios").doc(userEmail).set({
                     name: pendingVerificationData.name,
-                    email: pendingVerificationData.email,
+                    email: userEmail,
                     password: pendingVerificationData.pass,
                     role: pendingVerificationData.role,
                     fechaIngreso: pendingVerificationData.fechaIngreso,
@@ -851,13 +852,11 @@
                 document.getElementById('authView').classList.add('hidden');
                 document.getElementById('pendingView').classList.remove('hidden');
             } catch (error) {
-                alert("¡Cuenta verificada con éxito!");
-                document.getElementById('authView').classList.add('hidden');
-                document.getElementById('pendingView').classList.remove('hidden');
+                alert("Error al guardar en la base de datos: " + error.message);
             }
         }
 
-        // FUNCIÓN BLINDADA PARA CARGAR SOLICITUDES
+        // FUNCIÓN BLINDADA PARA CARGAR SOLICITUDES USANDO EL CORREO COMO ID
         async function loadPendingApprovals() {
             const container = document.getElementById('pendingApprovalsList');
             container.innerHTML = '<p class="text-xs text-slate-400 text-center py-6">Cargando solicitudes...</p>';
@@ -872,16 +871,17 @@
                 container.innerHTML = '';
                 snapshot.forEach(doc => {
                     const user = doc.data();
+                    const userEmailId = doc.id; // Aquí tomamos el correo que usamos como ID del documento
                     const card = document.createElement('div');
                     card.className = "bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 shadow-inner";
                     card.innerHTML = `
                         <div>
                             <strong class="text-white text-sm font-extrabold">${user.name || 'Sin Nombre'}</strong>
-                            <p class="text-[11px] text-slate-400">${user.email} — <span class="text-red-400 uppercase font-bold">${user.role || 'Ayudante'}</span></p>
+                            <p class="text-[11px] text-slate-400">${userEmailId} — <span class="text-red-400 uppercase font-bold">${user.role || 'Ayudante'}</span></p>
                         </div>
                         <div class="flex gap-2 w-full sm:w-auto">
-                            <button onclick="approveUser('${doc.id}')" class="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg transition shadow">Dar Acceso</button>
-                            <button onclick="rejectUser('${doc.id}')" class="flex-1 sm:flex-none bg-red-600 hover:bg-red-500 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg transition shadow">Rechazar</button>
+                            <button onclick="approveUser('${userEmailId}')" class="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg transition shadow">Dar Acceso</button>
+                            <button onclick="rejectUser('${userEmailId}')" class="flex-1 sm:flex-none bg-red-600 hover:bg-red-500 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg transition shadow">Rechazar</button>
                         </div>
                     `;
                     container.appendChild(card);
