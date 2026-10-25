@@ -332,13 +332,13 @@
 
                         <button onclick="saveDailyRecord()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl transition text-xs shadow-lg shadow-emerald-600/30 uppercase tracking-wider mt-2 flex items-center justify-center gap-2">💾 Guardar Registro</button>
 
-                        <!-- SECCIÓN DE PUBLICIDAD UBICADA EXACTAMENTE DEBAJO DEL BOTÓN DE GUARDAR (CON OBJECT-CONTAIN PARA EVITAR DEFORMACIONES) -->
-                        <div id="globalPublicidadContainer" class="hidden w-full bg-slate-950 rounded-2xl border border-red-900/40 overflow-hidden shadow-lg shadow-red-950/20 mt-4">
+                        <!-- SECCIÓN DE PUBLICIDAD: EL RECUADRO SE AJUSTA NATURALMENTE A LA IMAGEN -->
+                        <div id="globalPublicidadContainer" class="hidden w-fit mx-auto bg-slate-950 rounded-2xl border border-red-900/40 overflow-hidden shadow-lg shadow-red-950/20 mt-4">
                             <div class="bg-red-950/80 px-3 py-1.5 border-b border-red-900/40 flex items-center justify-between">
                                 <span class="text-[9px] font-black uppercase tracking-widest text-red-300">Publicidad</span>
                             </div>
-                            <div class="relative w-full h-56 sm:h-64 bg-slate-950 flex items-center justify-center overflow-hidden p-2">
-                                <img id="globalPublicidadImg" src="" alt="Publicidad Corporativa" class="max-h-full max-w-full object-contain object-center block">
+                            <div class="bg-slate-950 flex items-center justify-center p-2">
+                                <img id="globalPublicidadImg" src="" alt="Publicidad Corporativa" class="w-auto h-auto max-w-[280px] sm:max-w-[320px] object-contain rounded-xl block mx-auto">
                             </div>
                         </div>
                     </div>
@@ -504,15 +504,15 @@
 
                 <p><strong>Artículo 2.2 — Inconsistencias en Nómina, Pagos o Comisiones</strong><br>
                 La Aplicación ejecuta cálculos automatizados basados únicamente en la información ingresada directamente por el Usuario.<br>
-                1. Falta de Valor Legal: Los reportes, sumatorias, contabilidad interna o métricas generadas por KOLABORADORF VE no constituyen comprobantes de nómina, recibos de pago ni documentos probatorios con validez mercantil o laboral frente a terceros.<br>
+                1. Falta de Valor Legal: Los reportes, sumatorias, contabilidad interna o métricas generadas por KOLABORADORF VE não constituyen comprobantes de nómina, recibos de pago ni documentos probatorios con validez mercantil o laboral frente a terceros.<br>
                 2. Procedimiento ante Discrepancias: En caso de que el Usuario observe diferencias o inconsistencias entre los datos calculados por la Aplicación y sus pagos reales, cómputos de nómina o liquidaciones, el Usuario se compromete de manera expresa a no presentar reclamos ni demandas contra la Aplicación ni sus desarrolladores. Debe dirigir cualquier aclaratoria directamente al supervisor, gerencia de operaciones o departamento de Recursos Humanos de su empresa contratante.</p>
 
                 <h4 class="font-bold text-white uppercase mt-3">CAPÍTULO III: ORIGEN DE LOS DATOS Y RESPONSABILIDAD DE CARGA</h4>
                 <p><strong>Artículo 3.1 — Insumo de Información por el Usuario</strong><br>
-                KOLABORADORF VE es una plataforma que se alimenta de la información suministrada voluntaria e independientemente por el Usuario. La Aplicación não almacena por cuenta propia, no verifica, no audita ni valida la veracidad, exactitud o legalidad de los datos introducidos (tales como cantidad de cajas, tarifas, rutas, montos recopilados o nombres de clientes).</p>
+                KOLABORADORF VE es una plataforma que se alimenta de la información suministrada voluntaria e independientemente por el Usuario. La Aplicación no almacena por cuenta propia, no verifica, no audita ni valida la veracidad, exactitud o legalidad de los datos introducidos (tales como cantidad de cajas, tarifas, rutas, montos recopilados o nombres de clientes).</p>
 
                 <p><strong>Artículo 3.2 — Uso Inadecuado de Marcas, Imagen y Propiedad Intelectual</strong><br>
-                Queda estrictamente prohibido al Usuario ingresar imágenes, logotipos, registros fotográficos o información confidencial de terceros o empresas sin contar con la autorización correspondiente. DFPfantasy CorVe no responderá bajo ningún concepto por demandas, sanciones o reclamos derivados del uso indebido de imagen, marcas registradas o secretos comerciales ingresados por los usuarios en la plataforma.</p>
+                Queda estrictamente prohibido al Usuario ingresar imágenes, logotipos, registros fotográficos o información confidencial de terceros o empresas sin contar con la autorización correspondiente. DFPfantasy CorVe não responderá bajo ningún concepto por demandas, sanciones o reclamos derivados del uso indebido de imagen, marcas registradas o secretos comerciales ingresados por los usuarios en la plataforma.</p>
 
                 <h4 class="font-bold text-white uppercase mt-3">CAPÍTULO IV: INFRAESTRUCTURA TÉCNICA, GRATUIDAD Y ACTUALIZACIONES</h4>
                 <p><strong>Artículo 4.1 — Modelo de Servicio Gratuito y Modificaciones</strong><br>
@@ -556,7 +556,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT PROFESIONAL INTEGRAL V7.6 -->
+    <!-- SCRIPT PROFESIONAL INTEGRAL V7.7 -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBzMXFLJhTuPSPdKGsVqCqQRhP_NiGYBA",
