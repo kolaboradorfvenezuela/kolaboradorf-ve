@@ -272,6 +272,13 @@
                 </div>
             </div>
 
+            <!-- SECCIÓN DE PUBLICIDAD GLOBAL (CONDICIONAL: SÓLO APARECE SI HAY IMAGEN CARGADA Y NUNCA SE DEFORMA) -->
+            <div id="globalPublicidadContainer" class="hidden w-full bg-slate-900/90 backdrop-blur-xl rounded-2xl border border-red-900/40 overflow-hidden shadow-xl shadow-red-950/20">
+                <div class="relative w-full h-40 sm:h-52 md:h-60 bg-slate-950 flex items-center justify-center overflow-hidden">
+                    <img id="globalPublicidadImg" src="" alt="Publicidad Corporativa" class="w-full h-full object-cover object-center transition duration-500 hover:scale-105">
+                </div>
+            </div>
+
             <!-- Panel Operativo -->
             <div id="workerSection" class="space-y-6">
                 <div class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-5 shadow-xl">
@@ -399,6 +406,22 @@
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- GESTIÓN DE PUBLICIDAD EXCLUSIVA ADMIN -->
+                    <div class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-4 shadow-xl">
+                        <h4 class="text-sm font-extrabold text-white border-b border-slate-800 pb-3 flex items-center gap-2">📢 Gestión de Publicidad Global</h4>
+                        <p class="text-xs text-slate-400 leading-relaxed">Sube o cambia la imagen publicitaria corporativa. Si está vacía, no se mostrará ningún espacio publicitario a los usuarios.</p>
+                        
+                        <div class="space-y-3 bg-slate-950 p-4 rounded-xl border border-slate-800 shadow-inner">
+                            <label class="block text-[10px] font-bold text-slate-300 uppercase tracking-wider">Seleccionar Imagen (Archivo Local)</label>
+                            <input type="file" id="adminAdImageFile" accept="image/*" class="w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-red-600 file:text-white hover:file:bg-red-500 cursor-pointer">
+                            
+                            <div class="flex gap-2 pt-2">
+                                <button onclick="uploadAndSaveAdminAd()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-2.5 rounded-xl transition shadow">🚀 Publicar Publicidad</button>
+                                <button onclick="removeAdminAd()" class="bg-red-600/20 hover:bg-red-600/40 text-red-300 border border-red-500/30 text-xs font-bold px-4 py-2.5 rounded-xl transition shadow">🗑️ Eliminar</button>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-4 shadow-xl">
                         <h4 class="text-sm font-extrabold text-white border-b border-slate-800 pb-3">👥 Solicitudes de Acceso Pendientes</h4>
                         <div id="pendingApprovalsList" class="space-y-3 max-h-80 overflow-y-auto pr-1">
@@ -529,7 +552,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT PROFESIONAL INTEGRAL V7.3 -->
+    <!-- SCRIPT PROFESIONAL INTEGRAL V7.4 -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBzMXFLJhTuPSPdKGsVqCqQRhP_NiGYBA",
@@ -686,6 +709,59 @@
                     });
                 }
             } catch (e) {}
+        }
+
+        // CARGAR Y SINCRONIZAR PUBLICIDAD GLOBAL
+        async function loadGlobalPublicidad() {
+            const container = document.getElementById('globalPublicidadContainer');
+            const imgElement = document.getElementById('globalPublicidadImg');
+            try {
+                const doc = await db.collection("config").doc("publicidad").get();
+                if (doc.exists && doc.data().imageUrl) {
+                    imgElement.src = doc.data().imageUrl;
+                    container.classList.remove('hidden');
+                } else {
+                    container.classList.add('hidden');
+                    imgElement.src = '';
+                }
+            } catch (e) {
+                container.classList.add('hidden');
+            }
+        }
+
+        async function uploadAndSaveAdminAd() {
+            const fileInput = document.getElementById('adminAdImageFile');
+            if (!fileInput.files || fileInput.files.length === 0) {
+                alert("Por favor, seleccione una imagen para la publicidad.");
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = async function(e) {
+                const base64String = e.target.result;
+                try {
+                    await db.collection("config").doc("publicidad").set({ imageUrl: base64String }, { merge: true });
+                    alert("¡Publicidad actualizada y publicada con éxito para todos los colaboradores!");
+                    fileInput.value = '';
+                    loadGlobalPublicidad();
+                } catch (error) {
+                    alert("Error al guardar la publicidad en Firestore: " + error.message);
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function removeAdminAd() {
+            if (!confirm("¿Deseas eliminar la publicidad actual? Dejará de mostrarse en toda la aplicación.")) return;
+            try {
+                await db.collection("config").doc("publicidad").set({ imageUrl: "" }, { merge: true });
+                alert("Publicidad eliminada.");
+                loadGlobalPublicidad();
+            } catch (error) {
+                alert("Error al eliminar: " + error.message);
+            }
         }
 
         async function saveEntregadorConfig() {
@@ -856,7 +932,6 @@
             }
         }
 
-        // FUNCIÓN BLINDADA PARA CARGAR SOLICITUDES USANDO EL CORREO COMO ID
         async function loadPendingApprovals() {
             const container = document.getElementById('pendingApprovalsList');
             container.innerHTML = '<p class="text-xs text-slate-400 text-center py-6">Cargando solicitudes...</p>';
@@ -887,7 +962,6 @@
                     container.appendChild(card);
                 });
             } catch (e) {
-                console.error("Error al cargar solicitudes:", e);
                 container.innerHTML = '<p class="text-xs text-amber-400 text-center py-6">No hay solicitudes pendientes o la base de datos está inicializándose.</p>';
             }
         }
@@ -909,7 +983,6 @@
             } catch (e) { alert("Error al rechazar: " + e.message); }
         }
 
-        // FUNCIÓN VALIDADA: RECUPERACIÓN CON BLOQUEO SI EL CORREO NO EXISTE EN FIRESTORE
         async function handleForgotRequest(event) {
             event.preventDefault();
             const email = document.getElementById('forgotEmail').value.trim().toLowerCase();
@@ -990,6 +1063,7 @@
             }
 
             await loadIncentiveConfig();
+            await loadGlobalPublicidad();
             calculateAntiquity();
             await loadUserHistory();
             calculateRealTime();
@@ -1350,7 +1424,6 @@
             }
         }
 
-        // FUNCIÓN ACTUALIZADA: BORRA TANTO EL PERFIL COMO TODO EL HISTORIAL ASOCIADO PARA UNA CUENTA NETAMENTE NUEVA
         async function confirmDeleteAccount() {
             if (!confirm("⚠️ ¿Estás seguro de que deseas eliminar permanentemente tu cuenta y todo su historial asociado?")) return;
             if (currentUser && currentUser.email) {
