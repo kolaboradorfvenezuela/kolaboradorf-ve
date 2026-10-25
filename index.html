@@ -529,7 +529,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT PROFESIONAL INTEGRAL V7.1 -->
+    <!-- SCRIPT PROFESIONAL INTEGRAL V7.2 -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBzMXFLJhTuPSPdKGsVqCqQRhP_NiGYBA",
@@ -871,7 +871,7 @@
                 container.innerHTML = '';
                 snapshot.forEach(doc => {
                     const user = doc.data();
-                    const userEmailId = doc.id; // Aquí tomamos el correo que usamos como ID del documento
+                    const userEmailId = doc.id;
                     const card = document.createElement('div');
                     card.className = "bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 shadow-inner";
                     card.innerHTML = `
@@ -909,33 +909,43 @@
             } catch (e) { alert("Error al rechazar: " + e.message); }
         }
 
+        // FUNCIÓN VALIDADA: RECUPERACIÓN CON BLOQUEO SI EL CORREO NO EXISTE EN FIRESTORE
         async function handleForgotRequest(event) {
             event.preventDefault();
             const email = document.getElementById('forgotEmail').value.trim().toLowerCase();
             if (!email) { alert("Ingrese su correo."); return; }
 
-            pendingResetEmail = email;
-            recoveryCode = Math.floor(100000 + Math.random() * 900000).toString();
-
-            const templateParams = {
-                email: email,
-                to_email: email,
-                name: email,
-                colaborador_nombre: email,
-                cargo_colaborador: "Recuperación de Contraseña",
-                anos_servicio: "N/A",
-                fecha: new Date().toISOString().split('T')[0],
-                nro_ruta: "RECUPERACIÓN",
-                total_entregado: `CÓDIGO DE RECUPERACIÓN: ${recoveryCode}`,
-                productos_pendientes: "Ingrese este código en la aplicación para establecer su nueva contraseña."
-            };
-
             try {
+                const userDocRef = db.collection("usuarios").doc(email);
+                const userDoc = await userDocRef.get();
+
+                if (!userDoc.exists) {
+                    alert("⚠️ Este correo no se encuentra registrado en nuestra base de datos. Debe registrarse primero.");
+                    return;
+                }
+
+                pendingResetEmail = email;
+                recoveryCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+                const templateParams = {
+                    email: email,
+                    to_email: email,
+                    name: email,
+                    colaborador_nombre: email,
+                    cargo_colaborador: "Recuperación de Contraseña",
+                    anos_servicio: "N/A",
+                    fecha: new Date().toISOString().split('T')[0],
+                    nro_ruta: "RECUPERACIÓN",
+                    total_entregado: `CÓDIGO DE RECUPERACIÓN: ${recoveryCode}`,
+                    productos_pendientes: "Ingrese este código en la aplicación para establecer su nueva contraseña."
+                };
+
                 await emailjs.send('service_p63esgd', 'template_dl48xbt', templateParams);
                 alert("¡Código de recuperación enviado con éxito a " + email + "!");
                 switchAuthMode('reset');
+
             } catch (error) {
-                alert("Error al enviar el correo de recuperación: " + (error.text || error.message || JSON.stringify(error)));
+                alert("Error al verificar el correo en la base de datos: " + (error.text || error.message || JSON.stringify(error)));
             }
         }
 
