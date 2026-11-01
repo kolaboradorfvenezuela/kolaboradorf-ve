@@ -60,6 +60,80 @@
             font-weight: 900;
             letter-spacing: -0.03em;
         }
+
+        /* ===== Mejoras visuales Kolaboradorf VE ===== */
+        :root { --kv-ease: cubic-bezier(0.22, 1, 0.36, 1); }
+        html { scroll-behavior: smooth; }
+        :focus-visible { outline: 2px solid #f87171; outline-offset: 2px; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #7f1d1d; border-radius: 8px; }
+        ::-webkit-scrollbar-thumb:hover { background: #dc2626; }
+
+        @keyframes kvIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+        @keyframes kvFade { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes kvPop { from { opacity: 0; transform: scale(.96) translateY(8px); } to { opacity: 1; transform: none; } }
+        @keyframes kvGrow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+        @keyframes kvPulse { 0%,100% { opacity: 1; } 50% { opacity: .72; } }
+        @keyframes kvShimmer { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+
+        /* Cambio de pantalla: se reinicia sola cada vez que se quita "hidden" */
+        #authView:not(.hidden), #pendingView:not(.hidden), #mainAppView:not(.hidden),
+        #loginProgressView:not(.hidden), #logoutProgressView:not(.hidden),
+        #loginForm:not(.hidden), #registerForm:not(.hidden), #verifyCodeForm:not(.hidden),
+        #forgotForm:not(.hidden), #resetPassForm:not(.hidden),
+        #workerSection:not(.hidden), #adminSection:not(.hidden) {
+            animation: kvIn .45s var(--kv-ease) backwards;
+        }
+
+        /* Modales */
+        #termsModal:not(.hidden), #loginLegalNoticeModal:not(.hidden) { animation: kvFade .25s ease-out backwards; }
+        #termsModal:not(.hidden) > div, #loginLegalNoticeModal:not(.hidden) > div { animation: kvPop .35s var(--kv-ease) backwards; }
+
+        /* Entrada escalonada del panel (un solo momento orquestado) */
+        #workerSection:not(.hidden) #operationalContainer > div > * { animation: kvIn .6s var(--kv-ease) backwards; }
+        #operationalContainer > div > *:nth-child(1) { animation-delay: .10s !important; }
+        #operationalContainer > div > *:nth-child(2) { animation-delay: .18s !important; }
+        #operationalContainer > div > *:nth-child(3) { animation-delay: .26s !important; }
+        #operationalContainer > div > *:nth-child(4) { animation-delay: .34s !important; }
+        #operationalContainer > div > *:nth-child(5) { animation-delay: .42s !important; }
+
+        /* Gráfico: las barras crecen desde la base */
+        #screenDashboardChart > div > div { transform-origin: bottom; animation: kvGrow .8s var(--kv-ease) backwards; }
+        #screenDashboardChart > div:nth-child(2) > div { animation-delay: .08s; }
+        #screenDashboardChart > div:nth-child(3) > div { animation-delay: .16s; }
+        #screenDashboardChart > div:nth-child(4) > div { animation-delay: .24s; }
+        #screenDashboardChart > div:nth-child(5) > div { animation-delay: .32s; }
+        #screenDashboardChart > div:nth-child(6) > div { animation-delay: .40s; }
+        #screenDashboardChart > div:nth-child(7) > div { animation-delay: .48s; }
+
+        /* Listas dinámicas (histórico y solicitudes) */
+        #todayHistoryContainer > div, #pendingApprovalsList > div { animation: kvIn .4s var(--kv-ease) backwards; }
+
+        /* Respuesta a la acción del usuario */
+        button { transition: transform .15s ease, background-color .2s ease, box-shadow .2s ease, opacity .2s ease; }
+        button:not(:disabled):hover { transform: translateY(-1px); }
+        button:not(:disabled):active { transform: scale(.97); }
+        input, select, textarea { transition: border-color .2s ease, box-shadow .2s ease; }
+        input:focus, select:focus, textarea:focus { box-shadow: 0 0 0 3px rgba(220, 38, 38, .22); }
+
+        /* Pantallas de carga */
+        #loadingSessionView h2, #logoutProgressView h2, #loginProgressView h2 { animation: kvPulse 2.2s ease-in-out infinite; }
+        #loginProgressBar { position: relative; overflow: hidden; }
+        #loginProgressBar::after {
+            content: ""; position: absolute; inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,.35), transparent);
+            animation: kvShimmer 1.2s linear infinite;
+        }
+
+        /* Encabezado al hacer scroll */
+        header { transition: box-shadow .3s ease; }
+        header.kv-scrolled { box-shadow: 0 14px 34px -12px rgba(0,0,0,.75); }
+
+        /* Accesibilidad: sin movimiento si el usuario lo pide */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+        }
     </style>
 </head>
 <body id="appBody" class="text-slate-100 min-h-screen flex flex-col selection:bg-red-600 selection:text-white transition-colors duration-300">
@@ -1535,6 +1609,57 @@
                 alert("Error al generar el PDF: " + error.message);
             }
         }
+    </script>
+
+    <script>
+    /* Pulido Kolaboradorf VE: no modifica ninguna función existente */
+    (function () {
+        var $ = function (id) { return document.getElementById(id); };
+
+        // Atributos de accesibilidad y teclado móvil
+        var A = function (id, o) { var e = $(id); if (e) Object.keys(o).forEach(function (k) { e.setAttribute(k, o[k]); }); };
+        A('loginEmail', { autocomplete: 'email' });
+        A('regEmail', { autocomplete: 'email' });
+        A('forgotEmail', { autocomplete: 'email' });
+        A('loginPass', { autocomplete: 'current-password' });
+        A('regPass', { autocomplete: 'new-password' });
+        A('regPassConfirm', { autocomplete: 'new-password' });
+        A('newPasswordInput', { autocomplete: 'new-password' });
+        A('inputVerificationCode', { inputmode: 'numeric', maxlength: '6', autocomplete: 'one-time-code' });
+        A('resetCodeInput', { inputmode: 'numeric', maxlength: '6', autocomplete: 'one-time-code' });
+        A('eyeLogin', { 'aria-label': 'Mostrar u ocultar contraseña' });
+        A('themeToggleBtn', { 'aria-label': 'Cambiar entre modo claro y oscuro' });
+
+        // Sombra del encabezado al desplazarse
+        var h = document.querySelector('header');
+        if (h) addEventListener('scroll', function () { h.classList.toggle('kv-scrolled', scrollY > 8); }, { passive: true });
+
+        // Contadores animados (solo si el usuario no pidió menos movimiento)
+        if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        var parse = function (t) {
+            var m = /^(\$?)(\d+(?:\.(\d+))?)$/.exec(String(t).trim());
+            return m ? { p: m[1], v: parseFloat(m[2]), d: (m[3] || '').length } : null;
+        };
+        ['statCargaInicial', 'statCargaNetaDia', 'statIncentivo', 'globalIncentivoSemanalBadge'].forEach(function (id) {
+            var el = $(id); if (!el) return;
+            var last = el.textContent, raf;
+            new MutationObserver(function () {
+                var now = el.textContent;
+                if (now === last) return;
+                var to = parse(now), from = parse(last);
+                last = now;
+                if (!to || !from || to.v === from.v) return;
+                cancelAnimationFrame(raf);
+                var t0 = performance.now(), dur = 550;
+                (function step(t) {
+                    var k = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - k, 3);
+                    var txt = k < 1 ? to.p + (from.v + (to.v - from.v) * e).toFixed(to.d) : now;
+                    last = txt; el.textContent = txt;
+                    if (k < 1) raf = requestAnimationFrame(step);
+                })(t0);
+            }).observe(el, { childList: true, characterData: true, subtree: true });
+        });
+    })();
     </script>
 </body>
 </html>
