@@ -953,7 +953,7 @@
                         fechaIngreso: userData.fechaIngreso || "2026-01-01"
                     };
                 } catch (error) { 
-                    alert("Error al iniciar sesión: " + (error.code || error.message)); 
+                    alert(error.code === 'permission-denied' ? "Correo o contraseña incorrectos." : "Error al iniciar sesión: " + (error.code || error.message)); 
                     return;
                 }
             }
