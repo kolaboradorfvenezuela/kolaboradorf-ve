@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es" id="htmlRoot">
 <head>
@@ -129,6 +130,29 @@
         /* Encabezado al hacer scroll */
         header { transition: box-shadow .3s ease; }
         header.kv-scrolled { box-shadow: 0 14px 34px -12px rgba(0,0,0,.75); }
+
+        /* Logo del encabezado: destello elegante y constante */
+        @keyframes kvLogoShine {
+            0%   { background-position: 160% 0; }
+            55%, 100% { background-position: -60% 0; }
+        }
+        @keyframes kvVeGlow {
+            0%, 100% { text-shadow: 0 0 0 rgba(252,165,165,0); }
+            50%      { text-shadow: 0 0 14px rgba(252,165,165,.75); }
+        }
+        header h1 {
+            background: linear-gradient(105deg, #ffffff 0%, #ffffff 40%, #fecaca 47%, #ffffff 54%, #ffffff 100%);
+            background-size: 300% 100%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: kvLogoShine 5.5s ease-in-out infinite;
+        }
+        header h1 span {
+            -webkit-text-fill-color: #fca5a5;
+            animation: kvVeGlow 3.2s ease-in-out infinite;
+        }
+        header h1 + p { animation: kvPulse 4s ease-in-out infinite; }
 
         /* Accesibilidad: sin movimiento si el usuario lo pide */
         @media (prefers-reduced-motion: reduce) {
