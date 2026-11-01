@@ -647,6 +647,11 @@
         (function(){ emailjs.init("FY9R7XtKtAcWovSVu"); })();
         firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(()=>{});
 
+        // Limpia texto antes de insertarlo como HTML (bloquea XSS)
+        function escapeHTML(v) {
+            return String(v === undefined || v === null ? '' : v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+
         const ADMIN_EMAIL = "dhermes73@gmail.com";
         let currentUser = null;
         let isVacation = false;
@@ -1063,12 +1068,12 @@
                     card.className = "bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 shadow-inner";
                     card.innerHTML = `
                         <div>
-                            <strong class="text-white text-sm font-extrabold">${user.name || 'Sin Nombre'}</strong>
-                            <p class="text-[11px] text-slate-400">${userEmailId} — <span class="text-red-400 uppercase font-bold">${user.role || 'Ayudante'}</span></p>
+                            <strong class="text-white text-sm font-extrabold">${escapeHTML(user.name || 'Sin Nombre')}</strong>
+                            <p class="text-[11px] text-slate-400">${escapeHTML(userEmailId)} — <span class="text-red-400 uppercase font-bold">${escapeHTML(user.role || 'Ayudante')}</span></p>
                         </div>
                         <div class="flex gap-2 w-full sm:w-auto">
-                            <button onclick="approveUser('${userEmailId}')" class="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg transition shadow">Dar Acceso</button>
-                            <button onclick="rejectUser('${userEmailId}')" class="flex-1 sm:flex-none bg-red-600 hover:bg-red-500 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg transition shadow">Rechazar</button>
+                            <button data-email="${escapeHTML(userEmailId)}" onclick="approveUser(this.dataset.email)" class="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg transition shadow">Dar Acceso</button>
+                            <button data-email="${escapeHTML(userEmailId)}" onclick="rejectUser(this.dataset.email)" class="flex-1 sm:flex-none bg-red-600 hover:bg-red-500 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg transition shadow">Rechazar</button>
                         </div>
                     `;
                     container.appendChild(card);
@@ -1347,9 +1352,9 @@
                 const heightPercent = Math.min(100, Math.max(15, (parseInt(r.cargaNetaDia) / 1200) * 100));
                 barsHTML += `
                     <div style="display: flex; flex-direction: column; align-items: center; flex: 1; height: 100%; justify-content: flex-end; gap: 4px;">
-                        <span style="font-size: 10px; font-weight: bold; color: #38bdf8;">${r.cargaNetaDia}</span>
+                        <span style="font-size: 10px; font-weight: bold; color: #38bdf8;">${escapeHTML(r.cargaNetaDia)}</span>
                         <div style="width: 100%; max-width: 36px; background: linear-gradient(to top, #dc2626, #f87171); border-radius: 6px 6px 0 0; height: ${heightPercent}%;"></div>
-                        <span style="font-size: 10px; color: #94a3b8; font-weight: 600; white-space: nowrap;">R-${r.ruta}</span>
+                        <span style="font-size: 10px; color: #94a3b8; font-weight: 600; white-space: nowrap;">R-${escapeHTML(r.ruta)}</span>
                     </div>
                 `;
             });
@@ -1371,20 +1376,20 @@
                 
                 const pendientesHtml = rec.productosPendientes ? `
                     <div class="bg-amber-500/10 border border-amber-500/30 p-2 rounded-lg text-amber-300 text-[11px] font-medium">
-                        📦 <strong>Pendientes:</strong> ${rec.productosPendientes}
+                        📦 <strong>Pendientes:</strong> ${escapeHTML(rec.productosPendientes)}
                     </div>
                 ` : '';
 
                 card.innerHTML = `
                     <div class="flex justify-between items-center">
-                        <strong class="text-white text-xs">Ruta: ${rec.ruta}</strong>
-                        <span class="text-[10px] text-red-400 font-bold">${rec.fecha}</span>
+                        <strong class="text-white text-xs">Ruta: ${escapeHTML(rec.ruta)}</strong>
+                        <span class="text-[10px] text-red-400 font-bold">${escapeHTML(rec.fecha)}</span>
                     </div>
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-slate-300 text-[11px]">
-                        <div>C. Inicial: <strong class="text-white">${rec.cargaInicial}</strong></div>
-                        <div>C. Neta: <strong class="text-white">${rec.cargaNetaDia}</strong></div>
-                        <div>Incentivo: <strong class="text-emerald-400">$${rec.incentivoDiarioUSD}</strong></div>
-                        <div>Efectividad: <strong class="text-blue-400">${rec.efectividad}%</strong></div>
+                        <div>C. Inicial: <strong class="text-white">${escapeHTML(rec.cargaInicial)}</strong></div>
+                        <div>C. Neta: <strong class="text-white">${escapeHTML(rec.cargaNetaDia)}</strong></div>
+                        <div>Incentivo: <strong class="text-emerald-400">$${escapeHTML(rec.incentivoDiarioUSD)}</strong></div>
+                        <div>Efectividad: <strong class="text-blue-400">${escapeHTML(rec.efectividad)}%</strong></div>
                     </div>
                     ${pendientesHtml}
                 `;
@@ -1552,12 +1557,12 @@
             cachedUserRecords.slice(0, 15).forEach(r => {
                 tableRowsHTML += `
                     <tr style="border-bottom: 1px solid #e5e7eb;">
-                        <td style="padding: 10px; font-size: 11px; font-weight: bold; color: #111827;">${r.ruta}</td>
-                        <td style="padding: 10px; font-size: 11px; color: #4b5563;">${r.fecha}</td>
-                        <td style="padding: 10px; font-size: 11px; color: #111827;">${r.cargaInicial}</td>
-                        <td style="padding: 10px; font-size: 11px; font-weight: bold; color: #16a34a;">${r.cargaNetaDia}</td>
-                        <td style="padding: 10px; font-size: 11px; color: #2563eb;">${r.efectividad}%</td>
-                        <td style="padding: 10px; font-size: 11px; font-weight: bold; color: #111827;">$${r.incentivoDiarioUSD}</td>
+                        <td style="padding: 10px; font-size: 11px; font-weight: bold; color: #111827;">${escapeHTML(r.ruta)}</td>
+                        <td style="padding: 10px; font-size: 11px; color: #4b5563;">${escapeHTML(r.fecha)}</td>
+                        <td style="padding: 10px; font-size: 11px; color: #111827;">${escapeHTML(r.cargaInicial)}</td>
+                        <td style="padding: 10px; font-size: 11px; font-weight: bold; color: #16a34a;">${escapeHTML(r.cargaNetaDia)}</td>
+                        <td style="padding: 10px; font-size: 11px; color: #2563eb;">${escapeHTML(r.efectividad)}%</td>
+                        <td style="padding: 10px; font-size: 11px; font-weight: bold; color: #111827;">$${escapeHTML(r.incentivoDiarioUSD)}</td>
                     </tr>
                 `;
             });
@@ -1573,8 +1578,8 @@
                     </div>
                     <div style="text-align: right;">
                         <h3 style="font-size: 14px; font-weight: 800; color: #111827; margin: 0;">REPORTE OFICIAL DE JORNADAS</h3>
-                        <p style="font-size: 11px; color: #4b5563; margin: 4px 0 0 0;"><strong>KOLABORADORF:</strong> ${userName}</p>
-                        <p style="font-size: 11px; color: #4b5563; margin: 2px 0 0 0;"><strong>Cargo:</strong> ${userRole} | ${userEmail}</p>
+                        <p style="font-size: 11px; color: #4b5563; margin: 4px 0 0 0;"><strong>KOLABORADORF:</strong> ${escapeHTML(userName)}</p>
+                        <p style="font-size: 11px; color: #4b5563; margin: 2px 0 0 0;"><strong>Cargo:</strong> ${escapeHTML(userRole)} | ${escapeHTML(userEmail)}</p>
                         <p style="font-size: 11px; color: #4b5563; margin: 2px 0 0 0;"><strong>Fecha:</strong> ${currentDate}</p>
                     </div>
                 </div>
