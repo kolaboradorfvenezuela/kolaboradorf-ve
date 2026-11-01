@@ -647,6 +647,7 @@
         (function(){ emailjs.init("FY9R7XtKtAcWovSVu"); })();
         firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(()=>{});
 
+        const ADMIN_EMAIL = "dhermes73@gmail.com";
         let currentUser = null;
         let isVacation = false;
         let pendingVerificationData = null;
@@ -674,6 +675,20 @@
                 if (savedSession) {
                     try {
                         currentUser = JSON.parse(savedSession);
+                        if (currentUser.isAdmin) {
+                            const unsub = firebase.auth().onAuthStateChanged(u => {
+                                unsub();
+                                if (u && u.email && u.email.toLowerCase() === ADMIN_EMAIL) {
+                                    showLoginLegalNoticeModal();
+                                } else {
+                                    localStorage.removeItem('kolaboradorf_session');
+                                    currentUser = null;
+                                    document.getElementById('authView').classList.remove('hidden');
+                                    switchAuthMode('login');
+                                }
+                            });
+                            return;
+                        }
                         showLoginLegalNoticeModal();
                         return;
                     } catch (e) { localStorage.removeItem('kolaboradorf_session'); }
@@ -871,9 +886,11 @@
             const email = document.getElementById('loginEmail').value.trim().toLowerCase();
             const pass = document.getElementById('loginPass').value;
             
-            if (email === "dhermes73@gmail.com") {
-                if (pass !== "Fernando878" && pass !== "admin123") {
-                    alert("Contraseña incorrecta para el Administrador Supremo.");
+            if (email === ADMIN_EMAIL) {
+                try {
+                    await firebase.auth().signInWithEmailAndPassword(email, pass);
+                } catch (error) {
+                    alert("Credenciales incorrectas para el Administrador Supremo.");
                     return;
                 }
                 currentUser = { 
