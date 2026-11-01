@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es" id="htmlRoot">
 <head>
@@ -131,28 +130,79 @@
         header { transition: box-shadow .3s ease; }
         header.kv-scrolled { box-shadow: 0 14px 34px -12px rgba(0,0,0,.75); }
 
-        /* Logo del encabezado: destello elegante y constante */
+        /* Logo del encabezado: destello llamativo y frecuente */
         @keyframes kvLogoShine {
-            0%   { background-position: 160% 0; }
-            55%, 100% { background-position: -60% 0; }
+            0%   { background-position: 170% 0; }
+            48%, 100% { background-position: -70% 0; }
         }
         @keyframes kvVeGlow {
-            0%, 100% { text-shadow: 0 0 0 rgba(252,165,165,0); }
-            50%      { text-shadow: 0 0 14px rgba(252,165,165,.75); }
+            0%, 100% { text-shadow: 0 0 6px rgba(252,165,165,.25); transform: scale(1); }
+            50%      { text-shadow: 0 0 20px rgba(255,255,255,.95), 0 0 36px rgba(248,113,113,.9); transform: scale(1.07); }
+        }
+        @keyframes kvLineSweep {
+            from { background-position: -60% 100%; }
+            to   { background-position: 160% 100%; }
         }
         header h1 {
-            background: linear-gradient(105deg, #ffffff 0%, #ffffff 40%, #fecaca 47%, #ffffff 54%, #ffffff 100%);
-            background-size: 300% 100%;
+            background: linear-gradient(105deg, #ffffff 0%, #ffffff 34%, #fca5a5 43%, #ffffff 50%, #fca5a5 57%, #ffffff 66%, #ffffff 100%);
+            background-size: 250% 100%;
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
-            animation: kvLogoShine 5.5s ease-in-out infinite;
+            animation: kvLogoShine 2.8s ease-in-out infinite;
         }
         header h1 span {
-            -webkit-text-fill-color: #fca5a5;
-            animation: kvVeGlow 3.2s ease-in-out infinite;
+            display: inline-block;
+            -webkit-text-fill-color: #fecaca;
+            animation: kvVeGlow 2.2s ease-in-out infinite;
         }
-        header h1 + p { animation: kvPulse 4s ease-in-out infinite; }
+        header h1 + p {
+            padding-bottom: 3px;
+            background: linear-gradient(90deg, transparent, #fecaca, transparent) no-repeat -60% 100% / 45% 1px;
+            animation: kvPulse 4s ease-in-out infinite, kvLineSweep 2.8s linear infinite;
+        }
+
+        /* Aviso de solicitudes pendientes (administrador) */
+        @keyframes kvBadge { 0%,100% { box-shadow: 0 0 0 0 rgba(255,255,255,.7); } 50% { box-shadow: 0 0 0 7px rgba(255,255,255,0); } }
+        .kv-badge { margin-left: 8px; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; background: #ffffff; color: #b91c1c; font-size: 11px; font-weight: 900; align-items: center; justify-content: center; animation: kvBadge 1.6s ease-in-out infinite; }
+        .kv-badge:not(.hidden) { display: inline-flex; }
+        #pendingBanner:not(.hidden) { animation: kvIn .5s var(--kv-ease) backwards; }
+
+        /* Widget flotante estilo Glass: tasa BCV */
+        @keyframes kvGlassShine { 0%, 62% { transform: translateX(-120%); } 100% { transform: translateX(120%); } }
+        @keyframes kvDot { 0% { box-shadow: 0 0 0 0 rgba(74,222,128,.7); } 100% { box-shadow: 0 0 0 8px rgba(74,222,128,0); } }
+        @keyframes kvSpin { to { transform: rotate(360deg); } }
+        @keyframes kvFlash { 0% { color: #86efac; transform: scale(1.07); } 100% { color: #ffffff; transform: none; } }
+        .kv-glass {
+            position: fixed; right: 16px; bottom: 16px; z-index: 35; min-width: 176px; overflow: hidden;
+            border-radius: 20px; color: #ffffff;
+            background: linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,255,255,.05));
+            border: 1px solid rgba(255,255,255,.24);
+            box-shadow: 0 10px 34px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.28);
+            -webkit-backdrop-filter: blur(18px) saturate(170%); backdrop-filter: blur(18px) saturate(170%);
+            animation: kvIn .6s var(--kv-ease) 1s backwards;
+        }
+        .kv-glass::before {
+            content: ""; position: absolute; inset: 0; pointer-events: none;
+            background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,.2) 50%, transparent 70%);
+            transform: translateX(-120%); animation: kvGlassShine 6s ease-in-out infinite;
+        }
+        .kv-glass-toggle { display: flex; align-items: center; gap: 8px; width: 100%; padding: 10px 14px; background: none; border: 0; color: inherit; cursor: pointer; font: 800 11px Inter, sans-serif; letter-spacing: .14em; text-transform: uppercase; }
+        .kv-glass-mini { margin-left: auto; display: none; font-weight: 800; letter-spacing: 0; }
+        .kv-collapsed .kv-glass-mini { display: inline; }
+        .kv-collapsed .kv-glass-body { display: none; }
+        .kv-glass-body { padding: 0 16px 14px; position: relative; }
+        .kv-glass-title { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; opacity: .75; font-weight: 700; }
+        .kv-glass-rate { font: 900 30px/1.15 Inter, sans-serif; margin-top: 2px; letter-spacing: -.02em; }
+        .kv-glass-rate small { font-size: 13px; font-weight: 700; opacity: .8; margin-right: 2px; }
+        .kv-glass-meta { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 6px; font-size: 10px; opacity: .8; }
+        .kv-glass-meta button { background: none; border: 0; color: inherit; font-size: 15px; cursor: pointer; line-height: 1; padding: 2px 4px; }
+        .kv-glass button:not(:disabled):hover { transform: none; }
+        .kv-live-dot { width: 8px; height: 8px; border-radius: 50%; background: #4ade80; animation: kvDot 1.8s ease-out infinite; flex: none; }
+        .kv-live-dot.kv-off { background: #f59e0b; animation: none; }
+        .kv-spin { display: inline-block; animation: kvSpin .8s linear infinite; }
+        .kv-flash { display: inline-block; animation: kvFlash .9s ease; }
+        @media (max-width: 480px) { .kv-glass { right: 10px; bottom: 10px; min-width: 156px; } .kv-glass-rate { font-size: 26px; } }
 
         /* Accesibilidad: sin movimiento si el usuario lo pide */
         @media (prefers-reduced-motion: reduce) {
@@ -359,7 +409,7 @@
             <div id="adminNavTabs" class="hidden bg-slate-900/90 backdrop-blur-xl p-3 rounded-2xl border border-slate-800 flex flex-col sm:flex-row gap-3 justify-between items-center shadow-lg">
                 <div class="flex gap-2 w-full sm:w-auto">
                     <button onclick="switchAppTab('worker')" id="btnTabWorker" class="flex-1 sm:flex-none px-5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-xl transition bg-red-600 text-white shadow-lg shadow-red-600/20">Mi Panel Operativo</button>
-                    <button onclick="switchAppTab('admin')" id="btnTabAdmin" class="flex-1 sm:flex-none px-5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-xl transition bg-slate-800 text-slate-300 hover:bg-slate-700">Centro de Mando (Admin)</button>
+                    <button onclick="switchAppTab('admin')" id="btnTabAdmin" class="flex-1 sm:flex-none px-5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-xl transition bg-slate-800 text-slate-300 hover:bg-slate-700">Centro de Mando (Admin)<span id="adminPendingBadge" class="hidden kv-badge" aria-label="Solicitudes pendientes">0</span></button>
                 </div>
                 <div id="roleSimulatorContainer" class="hidden flex items-center gap-3 bg-slate-950 px-4 py-2 rounded-xl border border-slate-800 text-xs w-full sm:w-auto justify-between shadow-inner">
                     <span class="text-slate-400 font-bold uppercase tracking-wider text-[10px]">Simular Rol:</span>
@@ -502,6 +552,10 @@
 
             <!-- CENTRO DE MANDO ADMINISTRADOR SUPREMO -->
             <div id="adminSection" class="hidden space-y-6">
+                <div id="pendingBanner" class="hidden flex flex-col sm:flex-row items-center justify-between gap-3 bg-amber-500/10 border border-amber-500/40 rounded-2xl px-5 py-3 text-amber-200 text-xs font-bold shadow-lg" role="status">
+                    <span>🔔 <span id="pendingBannerText"></span></span>
+                    <button type="button" onclick="document.getElementById('pendingApprovalsList').scrollIntoView({behavior:'smooth',block:'center'})" class="bg-amber-500 hover:bg-amber-400 text-slate-950 text-[11px] font-black px-4 py-1.5 rounded-lg uppercase tracking-wider">Revisar ahora</button>
+                </div>
                 <div class="bg-gradient-to-r from-red-950/60 via-red-900/30 to-red-950/60 border border-red-800/50 rounded-2xl p-6 shadow-2xl backdrop-blur-md">
                     <h3 class="text-lg font-black text-white flex items-center gap-2">⚙️ Centro de Mando Supremo (Administrador)</h3>
                     <p class="text-xs text-red-200/80 mt-1">Panel exclusivo de supervisión, aprobación de cuentas y configuración independiente de montos en dólares.</p>
@@ -654,6 +708,23 @@
         </div>
     </div>
 
+    <!-- WIDGET FLOTANTE ESTILO GLASS: TASA OFICIAL BCV (se actualiza sola) -->
+    <aside id="bcvWidget" class="kv-glass" aria-live="polite">
+        <button type="button" id="bcvToggle" class="kv-glass-toggle" aria-label="Minimizar o expandir la tasa BCV" title="Minimizar / expandir">
+            <span class="kv-live-dot" id="bcvDot"></span>
+            <span>BCV</span>
+            <span id="bcvMini" class="kv-glass-mini">--</span>
+        </button>
+        <div class="kv-glass-body">
+            <div class="kv-glass-title">Dólar oficial · BCV</div>
+            <div class="kv-glass-rate"><small>Bs.</small><span id="bcvRate">--,--</span></div>
+            <div class="kv-glass-meta">
+                <span id="bcvUpdated">Cargando...</span>
+                <button type="button" id="bcvRefresh" aria-label="Actualizar tasa ahora" title="Actualizar ahora">↻</button>
+            </div>
+        </div>
+    </aside>
+
     <!-- SCRIPT PROFESIONAL INTEGRAL V7.7 -->
     <script>
         const firebaseConfig = {
@@ -674,6 +745,18 @@
         // Limpia texto antes de insertarlo como HTML (bloquea XSS)
         function escapeHTML(v) {
             return String(v === undefined || v === null ? '' : v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+
+        // Actualiza el globo y el aviso de solicitudes pendientes del administrador
+        function updatePendingBadge(n) {
+            const badge = document.getElementById('adminPendingBadge');
+            const banner = document.getElementById('pendingBanner');
+            const text = document.getElementById('pendingBannerText');
+            if (!badge || !banner) return;
+            badge.textContent = n > 9 ? '9+' : String(n);
+            badge.classList.toggle('hidden', n === 0);
+            banner.classList.toggle('hidden', n === 0);
+            if (text) text.textContent = n === 1 ? 'Tienes 1 solicitud de acceso por aceptar o rechazar.' : 'Tienes ' + n + ' solicitudes de acceso por aceptar o rechazar.';
         }
 
         const ADMIN_EMAIL = "dhermes73@gmail.com";
@@ -1079,6 +1162,7 @@
 
             try {
                 const snapshot = await db.collection("usuarios").where("approved", "==", false).get();
+                updatePendingBadge(snapshot.size);
                 if (snapshot.empty) {
                     container.innerHTML = '<p class="text-xs text-slate-400 text-center py-8">No hay solicitudes de acceso pendientes.</p>';
                     return;
@@ -1699,6 +1783,78 @@
                 })(t0);
             }).observe(el, { childList: true, characterData: true, subtree: true });
         });
+    })();
+    </script>
+
+    <script>
+    /* Tasa BCV automática + aviso del administrador (no modifica funciones existentes) */
+    (function () {
+        var KEY = 'kolaboradorf_bcv', MIN_KEY = 'kolaboradorf_bcv_min';
+        var URL = 'https://ve.dolarapi.com/v1/dolares/oficial', EVERY = 10 * 60 * 1000;
+        var $ = function (id) { return document.getElementById(id); };
+        var w = $('bcvWidget'); if (!w) return;
+        var rateEl = $('bcvRate'), miniEl = $('bcvMini'), updEl = $('bcvUpdated'), dot = $('bcvDot'), btnR = $('bcvRefresh'), tog = $('bcvToggle');
+        var last = null, busy = false, off = false;
+
+        function fmt(n) { return Number(n).toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+        function ago(ts) {
+            var m = Math.round((Date.now() - ts) / 60000);
+            if (m < 1) return 'hace un momento';
+            if (m < 60) return 'hace ' + m + ' min';
+            var h = Math.round(m / 60);
+            return h < 24 ? 'hace ' + h + ' h' : 'hace ' + Math.round(h / 24) + ' d';
+        }
+        function paint() {
+            if (!last) return;
+            rateEl.textContent = fmt(last.rate);
+            miniEl.textContent = fmt(last.rate);
+            updEl.textContent = (off ? 'Sin conexión · dato ' : 'Actualizado ') + ago(last.fetched);
+            dot.classList.toggle('kv-off', off);
+        }
+        try { var c = JSON.parse(localStorage.getItem(KEY) || 'null'); if (c && c.rate > 0) { last = c; paint(); } } catch (e) {}
+        try { if (localStorage.getItem(MIN_KEY) === '1') w.classList.add('kv-collapsed'); } catch (e) {}
+
+        async function load() {
+            if (busy) return; busy = true; btnR.classList.add('kv-spin');
+            try {
+                var r = await fetch(URL, { cache: 'no-store' });
+                if (!r.ok) throw new Error('http ' + r.status);
+                var j = await r.json();
+                var v = parseFloat(j.promedio != null ? j.promedio : (j.venta != null ? j.venta : j.compra));
+                if (!(v > 0)) throw new Error('dato inválido');
+                var changed = !last || last.rate !== v;
+                last = { rate: v, fetched: Date.now() };
+                off = false;
+                try { localStorage.setItem(KEY, JSON.stringify(last)); } catch (e) {}
+                paint();
+                if (changed) { rateEl.classList.remove('kv-flash'); void rateEl.offsetWidth; rateEl.classList.add('kv-flash'); }
+            } catch (e) {
+                off = true;
+                if (last) paint(); else { updEl.textContent = 'No disponible por ahora'; dot.classList.add('kv-off'); }
+            }
+            busy = false; btnR.classList.remove('kv-spin');
+        }
+
+        tog.addEventListener('click', function () {
+            var min = w.classList.toggle('kv-collapsed');
+            try { localStorage.setItem(MIN_KEY, min ? '1' : '0'); } catch (e) {}
+        });
+        btnR.addEventListener('click', load);
+        document.addEventListener('visibilitychange', function () { if (!document.hidden && (!last || Date.now() - last.fetched > 5 * 60 * 1000)) load(); });
+        setInterval(load, EVERY);
+        setInterval(paint, 60000);
+        load();
+
+        // Aviso de solicitudes pendientes: se refresca solo cada minuto para el administrador
+        setInterval(function () {
+            try {
+                if (typeof currentUser !== 'undefined' && currentUser && currentUser.isAdmin && !document.hidden) {
+                    db.collection('usuarios').where('approved', '==', false).get()
+                        .then(function (snap) { updatePendingBadge(snap.size); })
+                        .catch(function () {});
+                }
+            } catch (e) {}
+        }, 60000);
     })();
     </script>
 </body>
