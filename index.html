@@ -890,7 +890,7 @@
                 try {
                     await firebase.auth().signInWithEmailAndPassword(email, pass);
                 } catch (error) {
-                    alert("Credenciales incorrectas para el Administrador Supremo.");
+                    alert("No se pudo iniciar sesión como Administrador.\nCódigo de error: " + (error.code || error.message));
                     return;
                 }
                 currentUser = { 
