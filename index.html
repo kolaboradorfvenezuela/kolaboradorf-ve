@@ -287,7 +287,7 @@
             <form id="forgotForm" onsubmit="handleForgotRequest(event)" class="space-y-5 hidden">
                 <div class="text-center bg-slate-950 p-5 rounded-2xl border border-slate-800 shadow-inner">
                     <h3 class="text-sm font-bold text-white">Recuperar Contraseña</h3>
-                    <p class="text-xs text-slate-400 mt-1 leading-relaxed">Ingrese su correo registrado para recibir el código seguro de restablecimiento.</p>
+                    <p class="text-xs text-slate-400 mt-1 leading-relaxed">Ingrese su correo registrado para recibir un enlace seguro de restablecimiento.</p>
                 </div>
                 <div>
                     <label class="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-2">Correo Electrónico</label>
@@ -296,7 +296,7 @@
                 <div class="flex justify-between items-center text-xs">
                     <button type="button" onclick="switchAuthMode('login')" class="text-red-400 hover:underline">← Volver al Inicio</button>
                 </div>
-                <button type="submit" class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-xl transition text-sm shadow-lg shadow-red-600/30 uppercase tracking-wider">Enviar Código por EmailJS</button>
+                <button type="submit" class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-xl transition text-sm shadow-lg shadow-red-600/30 uppercase tracking-wider">Enviar enlace de recuperación</button>
             </form>
 
             <!-- Paso 2 Recuperación -->
@@ -675,10 +675,11 @@
                 if (savedSession) {
                     try {
                         currentUser = JSON.parse(savedSession);
-                        if (currentUser.isAdmin) {
+                        {
                             const unsub = firebase.auth().onAuthStateChanged(u => {
                                 unsub();
-                                if (u && u.email && u.email.toLowerCase() === ADMIN_EMAIL) {
+                                const okUser = u && u.email && u.email.toLowerCase() === String(currentUser.email).toLowerCase();
+                                if (okUser && (!currentUser.isAdmin || u.email.toLowerCase() === ADMIN_EMAIL)) {
                                     showLoginLegalNoticeModal();
                                 } else {
                                     localStorage.removeItem('kolaboradorf_session');
@@ -689,8 +690,6 @@
                             });
                             return;
                         }
-                        showLoginLegalNoticeModal();
-                        return;
                     } catch (e) { localStorage.removeItem('kolaboradorf_session'); }
                 }
                 document.getElementById('authView').classList.remove('hidden');
@@ -748,7 +747,7 @@
             } else if (mode === 'forgot') {
                 document.getElementById('forgotForm').classList.remove('hidden');
                 document.getElementById('authTitle').innerText = 'Recuperar Contraseña';
-                document.getElementById('authSubtitle').innerText = 'Reciba su código de restablecimiento seguro';
+                document.getElementById('authSubtitle').innerText = 'Reciba un enlace seguro de restablecimiento';
             } else if (mode === 'reset') {
                 document.getElementById('resetPassForm').classList.remove('hidden');
                 document.getElementById('authTitle').innerText = 'Restablecer Clave';
@@ -903,22 +902,40 @@
                 };
             } else {
                 try {
+                    let signedIn = false;
+                    try {
+                        await firebase.auth().signInWithEmailAndPassword(email, pass);
+                        signedIn = true;
+                    } catch (authErr) {
+                        const legacy = ['auth/user-not-found', 'auth/invalid-credential', 'auth/invalid-login-credentials', 'auth/wrong-password'];
+                        if (!legacy.includes(authErr.code)) throw authErr;
+                    }
+
                     const docRef = db.collection("usuarios").doc(email);
                     const doc = await docRef.get();
-                    
+
                     if (!doc.exists) {
+                        if (signedIn) await firebase.auth().signOut();
                         alert("El correo electrónico no se encuentra registrado.");
                         return;
                     }
 
                     const userData = doc.data();
-                    if (userData.approved === false) {
-                        alert("Su cuenta aún está pendiente de aprobación por el Administrador Supremo.");
-                        return;
+
+                    if (!signedIn) {
+                        // Migración de cuentas antiguas: se crea la cuenta segura y se borra la clave en texto plano
+                        if (userData.password && userData.password === pass) {
+                            await firebase.auth().createUserWithEmailAndPassword(email, pass);
+                            await docRef.update({ password: firebase.firestore.FieldValue.delete() });
+                        } else {
+                            alert("Contraseña incorrecta. Por favor, verifique sus datos.");
+                            return;
+                        }
                     }
 
-                    if (userData.password && userData.password !== pass) {
-                        alert("Contraseña incorrecta. Por favor, verifique sus datos.");
+                    if (userData.approved === false) {
+                        await firebase.auth().signOut();
+                        alert("Su cuenta aún está pendiente de aprobación por el Administrador Supremo.");
                         return;
                     }
 
@@ -931,7 +948,7 @@
                         fechaIngreso: userData.fechaIngreso || "2026-01-01"
                     };
                 } catch (error) { 
-                    alert("Error al iniciar sesión: " + error.message); 
+                    alert("Error al iniciar sesión: " + (error.code || error.message)); 
                     return;
                 }
             }
@@ -1009,10 +1026,10 @@
 
             try {
                 const userEmail = pendingVerificationData.email.trim().toLowerCase();
+                await firebase.auth().createUserWithEmailAndPassword(userEmail, pendingVerificationData.pass);
                 await db.collection("usuarios").doc(userEmail).set({
                     name: pendingVerificationData.name,
                     email: userEmail,
-                    password: pendingVerificationData.pass,
                     role: pendingVerificationData.role,
                     fechaIngreso: pendingVerificationData.fechaIngreso,
                     approved: false,
@@ -1023,7 +1040,7 @@
                 document.getElementById('authView').classList.add('hidden');
                 document.getElementById('pendingView').classList.remove('hidden');
             } catch (error) {
-                alert("Error al guardar en la base de datos: " + error.message);
+                alert(error.code === 'auth/email-already-in-use' ? "Este correo ya está registrado. Inicie sesión." : error.code === 'auth/weak-password' ? "La contraseña debe tener al menos 6 caracteres." : "Error al crear la cuenta: " + (error.code || error.message));
             }
         }
 
@@ -1084,36 +1101,12 @@
             if (!email) { alert("Ingrese su correo."); return; }
 
             try {
-                const userDocRef = db.collection("usuarios").doc(email);
-                const userDoc = await userDocRef.get();
-
-                if (!userDoc.exists) {
-                    alert("⚠️ Este correo no se encuentra registrado en nuestra base de datos. Debe registrarse primero.");
-                    return;
-                }
-
-                pendingResetEmail = email;
-                recoveryCode = Math.floor(100000 + Math.random() * 900000).toString();
-
-                const templateParams = {
-                    email: email,
-                    to_email: email,
-                    name: email,
-                    colaborador_nombre: email,
-                    cargo_colaborador: "Recuperación de Contraseña",
-                    anos_servicio: "N/A",
-                    fecha: new Date().toISOString().split('T')[0],
-                    nro_ruta: "RECUPERACIÓN",
-                    total_entregado: `CÓDIGO DE RECUPERACIÓN: ${recoveryCode}`,
-                    productos_pendientes: "Ingrese este código en la aplicación para establecer su nueva contraseña."
-                };
-
-                await emailjs.send('service_p63esgd', 'template_dl48xbt', templateParams);
-                alert("¡Código de recuperación enviado con éxito a " + email + "!");
-                switchAuthMode('reset');
-
+                await firebase.auth().sendPasswordResetEmail(email);
+                alert("Si el correo está registrado, recibirá un enlace seguro para crear una nueva contraseña. Revise también la carpeta de spam.");
+                document.getElementById('forgotEmail').value = '';
+                switchAuthMode('login');
             } catch (error) {
-                alert("Error al verificar el correo en la base de datos: " + (error.text || error.message || JSON.stringify(error)));
+                alert("Error al enviar el correo de recuperación: " + (error.code || error.message));
             }
         }
 
@@ -1528,6 +1521,7 @@
                 } catch (e) {
                     console.error("Error al limpiar datos de la cuenta en Firestore:", e);
                 }
+                try { if (firebase.auth().currentUser) await firebase.auth().currentUser.delete(); } catch (e) {}
             }
             logoutApp();
         }
