@@ -580,6 +580,10 @@
                                 <span class="text-xs font-bold text-slate-300 uppercase tracking-wider">Total Incentivo de la Semana:</span>
                                 <span id="globalIncentivoSemanalBadge" class="text-xl font-black text-emerald-400">$0.00</span>
                             </div>
+
+                            <button type="button" onclick="generateWeeklyIncentive()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl transition text-xs shadow-lg shadow-emerald-600/30 uppercase tracking-wider flex items-center justify-center gap-2"><i class="kv-i kv-i-save"></i> Generar incentivo de la semana</button>
+                            <h4 class="text-[11px] font-extrabold text-slate-300 uppercase tracking-wider pt-2">Mis incentivos generados</h4>
+                            <div id="cierreResult" class="space-y-2 max-h-72 overflow-y-auto pr-1"></div>
                         </div>
 
                         <div class="flex justify-end pt-2">
@@ -656,6 +660,15 @@
                             <div><label class="text-[10px] font-bold text-slate-400 uppercase">1200 - 1299 ($):</label><input type="number" step="0.01" id="ayu_1200" value="14.23" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-white font-bold mt-1"></div>
                         </div>
                         <button onclick="saveAyudanteConfig()" class="w-full bg-red-600 hover:bg-red-500 text-white text-xs font-bold py-3 rounded-xl transition shadow-lg shadow-red-600/30 uppercase tracking-wider"><i class="kv-i kv-i-save"></i> Guardar Montos Ayudantes</button>
+                    </div>
+
+                    <div class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-4 lg:col-span-2 shadow-xl">
+                        <h4 class="text-sm font-extrabold text-red-400 border-b border-slate-800 pb-3 flex items-center gap-2">Bono de Efectividad Semanal (USD): se paga con 97% o más</h4>
+                        <div class="text-xs bg-slate-950 p-4 rounded-xl border border-slate-800 shadow-inner">
+                            <label class="text-[10px] font-bold text-slate-400 uppercase">Monto único para Entregadores y Ayudantes ($):</label>
+                            <input type="number" step="0.01" min="0" id="efe_monto" value="0.00" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-white font-bold mt-1">
+                        </div>
+                        <button onclick="saveEfectividadConfig()" class="w-full bg-red-600 hover:bg-red-500 text-white text-xs font-bold py-3 rounded-xl transition shadow-lg shadow-red-600/30 uppercase tracking-wider"><i class="kv-i kv-i-save"></i> Guardar Bono de Efectividad</button>
                     </div>
                 </div>
             </div>
@@ -847,6 +860,9 @@
             banner.classList.toggle('hidden', n === 0);
             if (text) text.textContent = n === 1 ? 'Tienes 1 solicitud de acceso por aceptar o rechazar.' : 'Tienes ' + n + ' solicitudes de acceso por aceptar o rechazar.';
         }
+
+        // Día de cobro del incentivo (semana siguiente): 1 = lunes ... 5 = viernes ... 7 = domingo
+        const INCENTIVE_PAY_WEEKDAY = 4;
 
         const ADMIN_EMAIL = "dhermes73@gmail.com";
         let currentUser = null;
@@ -1353,9 +1369,11 @@
             }
 
             await loadIncentiveConfig();
+            await loadEfectividadConfig();
             await loadGlobalPublicidad();
             calculateAntiquity();
             await loadUserHistory();
+            await loadCierres();
             calculateRealTime();
         }
 
@@ -1613,6 +1631,7 @@
         }
 
         function updateWeeklyCardFromHistory(records) {
+            if (typeof recordsSinceLastClose === 'function' && records === cachedUserRecords) records = recordsSinceLastClose();
             const badge = document.getElementById('globalEfectividadBadge');
             const label = document.getElementById('globalEfectividadLabel');
             const incBadge = document.getElementById('globalIncentivoSemanalBadge');
@@ -1726,6 +1745,161 @@
                 try { if (firebase.auth().currentUser) await firebase.auth().currentUser.delete(); } catch (e) {}
             }
             logoutApp();
+        }
+
+        // ===== INCENTIVO SEMANAL: generar, guardar y mostrar fecha de cobro =====
+        let cachedCierres = [];
+
+        function ymdLocal(d) {
+            return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        }
+
+        // Semana de lunes a domingo: se cobra en la semana siguiente, el día configurado
+        function payDateFor(ymd) {
+            const [y, m, d] = ymd.split('-').map(Number);
+            const dow = (new Date(y, m - 1, d).getDay() + 6) % 7; // 0 = lunes
+            const nextMonday = new Date(y, m - 1, d - dow + 7);
+            return ymdLocal(new Date(nextMonday.getFullYear(), nextMonday.getMonth(), nextMonday.getDate() + (INCENTIVE_PAY_WEEKDAY - 1)));
+        }
+
+        function fmtLongDate(ymd) {
+            const [y, m, d] = String(ymd).split('-').map(Number);
+            return new Date(y, m - 1, d).toLocaleDateString('es-VE', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+        }
+
+        async function loadCierres() {
+            if (!currentUser || !currentUser.email) return;
+            try {
+                const doc = await db.collection("historial_jornadas").doc(currentUser.email).get();
+                cachedCierres = (doc.exists && doc.data().cierres) ? doc.data().cierres : [];
+            } catch (e) { cachedCierres = []; }
+            renderCierres();
+            updateWeeklyCardFromHistory(cachedUserRecords);
+        }
+
+        // Solo cuentan los registros posteriores al último incentivo generado
+        function recordsSinceLastClose() {
+            const last = cachedCierres.length ? cachedCierres[0].generadoEn : null;
+            return cachedUserRecords.filter(r => !last || !r.timestamp || r.timestamp > last);
+        }
+
+        function fmtBs(n) { return Number(n).toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+
+        async function loadEfectividadConfig() {
+            try {
+                const doc = await db.collection("config").doc("incentivos").get();
+                if (doc.exists) {
+                    const d = doc.data();
+                    if (d.efe_monto !== undefined && document.getElementById('efe_monto')) document.getElementById('efe_monto').value = d.efe_monto;
+                }
+            } catch (e) {}
+        }
+
+        async function saveEfectividadConfig() {
+            try {
+                await db.collection("config").doc("incentivos").set({
+                    efe_monto: parseFloat(document.getElementById('efe_monto').value) || 0
+                }, { merge: true });
+                alert("¡Bono de efectividad guardado exitosamente!");
+            } catch (error) { alert("Error al guardar: " + error.message); }
+        }
+
+        function renderCierres() {
+            const box = document.getElementById('cierreResult');
+            if (!box) return;
+            if (!cachedCierres.length) {
+                box.innerHTML = '<p class="text-[11px] text-slate-400 text-center py-1">Aún no has generado ningún incentivo semanal.</p>';
+                return;
+            }
+            box.innerHTML = cachedCierres.map((c, i) => `
+                <div class="bg-slate-950 p-3 rounded-xl border ${i === 0 ? 'border-emerald-500/40' : 'border-slate-800'} text-xs space-y-1 shadow-inner">
+                    <div class="flex justify-between items-center">
+                        <strong class="text-white">Semana ${escapeHTML(c.desde)} al ${escapeHTML(c.hasta)}</strong>
+                        <span class="text-[10px] font-bold ${c.califica ? 'text-emerald-400' : 'text-red-400'}">${c.califica ? 'Califica' : 'No califica'}</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-1 text-slate-300 text-[11px]">
+                        <span>Incentivo acumulado: <strong class="text-white">$${escapeHTML(Number(c.totalAcumulado || 0).toFixed(2))}</strong></span>
+                        <span>Bono efectividad: <strong class="text-white">$${escapeHTML(Number(c.bonoEfectividad || 0).toFixed(2))}</strong></span>
+                        <span>Efectividad: <strong class="text-blue-400">${escapeHTML(c.efectividadPromedio)}%</strong></span>
+                        <span>Total (USD): <strong class="text-emerald-400">$${escapeHTML(Number(c.montoACobrar).toFixed(2))}</strong></span>
+                    </div>
+                    ${c.montoBs ? `<div class="text-[11px] text-slate-300">Equivale a <strong class="text-emerald-300">Bs. ${escapeHTML(fmtBs(c.montoBs))}</strong> <span class="text-slate-500">(tasa BCV ${escapeHTML(fmtBs(c.tasaBCV))})</span></div>` : ''}
+                    <div class="text-[11px] text-amber-300"><i class="kv-i kv-i-clock"></i> Cobras el <strong>${escapeHTML(fmtLongDate(c.fechaCobro))}</strong></div>
+                </div>`).join('');
+        }
+
+        async function generateWeeklyIncentive() {
+            if (!currentUser || !currentUser.email) return;
+            const recs = recordsSinceLastClose();
+            if (recs.length === 0) {
+                alert("No hay registros nuevos para generar el incentivo. Guarda tus jornadas primero.");
+                return;
+            }
+
+            let total = 0, sumEf = 0;
+            const fechas = [];
+            recs.forEach(r => {
+                total += parseFloat(r.incentivoDiarioUSD) || 0;
+                sumEf += parseFloat(r.efectividad) || 0;
+                if (r.fecha) fechas.push(r.fecha);
+            });
+            fechas.sort();
+            const promedio = sumEf / recs.length;
+            const califica = promedio >= 97.0;
+            const desde = fechas[0] || ymdLocal(new Date());
+            const hasta = fechas[fechas.length - 1] || desde;
+
+            // Bono de efectividad definido por el administrador (monto único)
+            let bono = 0;
+            try {
+                const cfg = await db.collection("config").doc("incentivos").get();
+                const d = cfg.exists ? cfg.data() : {};
+                bono = parseFloat(d.efe_monto) || 0;
+            } catch (e) {}
+            const bonoAplicado = califica ? bono : 0;
+            const totalUSD = total + bonoAplicado;
+
+            // Tasa BCV actual (widget)
+            try { if (window.kvRefreshRate) await window.kvRefreshRate(); } catch (e) {}
+            const tasa = window.kvGetRate ? window.kvGetRate() : null;
+            const totalBs = tasa ? totalUSD * tasa : null;
+
+            const resumen = `Semana ${desde} al ${hasta} (${recs.length} registro(s)).\nIncentivo acumulado: $${total.toFixed(2)}\nEfectividad promedio: ${promedio.toFixed(1)}%\n` +
+                (califica ? `Bono de efectividad: $${bonoAplicado.toFixed(2)}` : `No califica (menos de 97%): sin bono de efectividad`) +
+                `\nTotal a cobrar: $${totalUSD.toFixed(2)} USD` +
+                (totalBs ? `\nEquivale a Bs. ${fmtBs(totalBs)} (tasa BCV ${fmtBs(tasa)})` : `\nTasa BCV no disponible en este momento`) +
+                `\nFecha de cobro: ${fmtLongDate(payDateFor(hasta))}\n\n¿Generar mi incentivo de la semana?`;
+            if (!(await kvConfirm(resumen))) return;
+
+            const cierre = {
+                generadoEn: new Date().toISOString(),
+                desde, hasta,
+                registros: recs.length,
+                totalAcumulado: Number(total.toFixed(2)),
+                efectividadPromedio: promedio.toFixed(1),
+                califica,
+                bonoEfectividad: Number(bonoAplicado.toFixed(2)),
+                montoACobrar: Number(totalUSD.toFixed(2)),
+                moneda: "USD",
+                tasaBCV: tasa || null,
+                montoBs: totalBs ? Number(totalBs.toFixed(2)) : null,
+                fechaCobro: payDateFor(hasta),
+                rol: currentUser.role || 'Ayudante'
+            };
+
+            try {
+                const docRef = db.collection("historial_jornadas").doc(currentUser.email);
+                const doc = await docRef.get();
+                const previos = (doc.exists && doc.data().cierres) ? doc.data().cierres : [];
+                previos.unshift(cierre);
+                await docRef.set({ cierres: previos }, { merge: true });
+                cachedCierres = previos;
+                renderCierres();
+                updateWeeklyCardFromHistory(cachedUserRecords);
+                alert("¡Incentivo de la semana generado con éxito! Cobras el " + fmtLongDate(cierre.fechaCobro) + ".");
+            } catch (error) {
+                alert("Error al guardar el incentivo de la semana.");
+            }
         }
 
         async function exportWeeklyReportPDF() {
@@ -1933,6 +2107,9 @@
         setInterval(load, EVERY);
         setInterval(paint, 60000);
         load();
+
+        window.kvGetRate = function () { return last ? last.rate : null; };
+        window.kvRefreshRate = load;
 
         // Aviso de solicitudes pendientes: se refresca solo cada minuto para el administrador
         setInterval(function () {
