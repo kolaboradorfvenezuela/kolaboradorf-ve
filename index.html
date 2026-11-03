@@ -800,6 +800,21 @@
                 <input type="password" id="pwNew2" autocomplete="new-password" placeholder="Confirmar nueva contraseña" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-600">
                 <button onclick="changePassword()" class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider"><i class="kv-i kv-i-key"></i> Actualizar contraseña</button>
             </div>
+            <div class="space-y-3 bg-slate-950 p-4 rounded-2xl border border-slate-800 shadow-inner">
+                <h4 class="text-[11px] font-extrabold text-red-400 uppercase tracking-wider">Cambiar correo electrónico</h4>
+                <p id="mailAdminNote" class="hidden text-[11px] text-amber-300">El correo del administrador no se puede cambiar desde aquí.</p>
+                <div id="mailStep1" class="space-y-3">
+                    <input type="email" id="mailNew" autocomplete="email" placeholder="Nuevo correo electrónico" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-600">
+                    <input type="password" id="mailPass" autocomplete="current-password" placeholder="Tu contraseña actual" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-600">
+                    <button onclick="sendMailCode()" class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider"><i class="kv-i kv-i-mail"></i> Enviar código al nuevo correo</button>
+                </div>
+                <div id="mailStep2" class="hidden space-y-3">
+                    <p class="text-[11px] text-slate-400">Escribe el código de 6 dígitos enviado a <strong id="mailSentTo" class="text-white break-all"></strong>. Vence en 10 minutos.</p>
+                    <input type="text" id="mailCode" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="Ej. 482910" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-lg text-white text-center tracking-widest font-mono focus:outline-none focus:border-red-600">
+                    <button onclick="confirmMailChange()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider">Verificar y cambiar correo</button>
+                    <div class="text-center"><button type="button" onclick="cancelMailChange()" class="text-xs text-slate-400 hover:underline">Cancelar</button></div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -2297,6 +2312,91 @@
         var orig = window.launchAppSession;
         window.launchAppSession = async function (a) { await orig(a); await loadExtras(); await ensureEmpresa(); };
         fill(); loadExtras();
+    })();
+    </script>
+
+    <script>
+    /* Cambio de correo con verificación por código (EmailJS). No modifica funciones existentes */
+    (function () {
+        var $ = function (id) { return document.getElementById(id); };
+        var pend = null;
+        function validMail(m) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(m); }
+        function reset() {
+            pend = null;
+            $('mailStep1').classList.remove('hidden'); $('mailStep2').classList.add('hidden');
+            ['mailNew', 'mailPass', 'mailCode'].forEach(function (i) { $(i).value = ''; });
+        }
+        window.cancelMailChange = reset;
+
+        var baseOpen = window.openSettings;
+        window.openSettings = async function () {
+            await baseOpen(); reset();
+            var adm = !!(currentUser && currentUser.isAdmin);
+            $('mailAdminNote').classList.toggle('hidden', !adm); $('mailStep1').classList.toggle('hidden', adm);
+        };
+
+        window.sendMailCode = async function () {
+            if (!currentUser || currentUser.isAdmin) { alert('El correo del administrador no se puede cambiar desde aquí.'); return; }
+            var nuevo = $('mailNew').value.trim().toLowerCase(), pass = $('mailPass').value;
+            if (!validMail(nuevo)) { alert('Escriba un correo electrónico válido.'); return; }
+            if (nuevo === String(currentUser.email).toLowerCase()) { alert('Ese ya es su correo actual.'); return; }
+            if (!pass) { alert('Escriba su contraseña actual para continuar.'); return; }
+            try {
+                var u = firebase.auth().currentUser; if (!u) throw { code: 'auth/requires-recent-login' };
+                await u.reauthenticateWithCredential(firebase.auth.EmailAuthProvider.credential(u.email, pass));
+                var code = Math.floor(100000 + Math.random() * 900000).toString();
+                await emailjs.send('service_p63esgd', 'template_dl48xbt', {
+                    email: nuevo, to_email: nuevo, name: currentUser.name, colaborador_nombre: currentUser.name,
+                    cargo_colaborador: 'Cambio de correo', anos_servicio: 'N/A', fecha: new Date().toISOString().split('T')[0],
+                    nro_ruta: 'CAMBIO DE CORREO', total_entregado: 'CÓDIGO DE VERIFICACIÓN: ' + code,
+                    productos_pendientes: 'Ingrese este código de 6 dígitos para confirmar su nuevo correo.'
+                });
+                pend = { email: nuevo, code: code, exp: Date.now() + 10 * 60 * 1000, tries: 0, pass: pass };
+                $('mailSentTo').textContent = nuevo;
+                $('mailStep1').classList.add('hidden'); $('mailStep2').classList.remove('hidden');
+                alert('¡Código de verificación enviado con éxito a su nuevo correo!');
+            } catch (e) {
+                var c = e.code || '';
+                alert(/wrong-password|invalid-credential|invalid-login/.test(c) ? 'La contraseña actual es incorrecta.' : 'Error al enviar el código: ' + (c || e.text || e.message));
+            }
+        };
+
+        window.confirmMailChange = async function () {
+            if (!pend) { alert('Primero solicite el código de verificación.'); return; }
+            if (Date.now() > pend.exp) { reset(); alert('El código venció. Solicite uno nuevo.'); return; }
+            if ($('mailCode').value.trim() !== pend.code) {
+                pend.tries++;
+                if (pend.tries >= 5) { reset(); alert('Demasiados intentos incorrectos. Solicite un código nuevo.'); } else alert('Código incorrecto.');
+                return;
+            }
+            var old = currentUser.email, nuevo = pend.email, pass = pend.pass, u = firebase.auth().currentUser;
+            var oldUser = db.collection('usuarios').doc(old), oldHist = db.collection('historial_jornadas').doc(old);
+            var authChanged = false;
+            try {
+                await u.reauthenticateWithCredential(firebase.auth.EmailAuthProvider.credential(u.email, pass));
+                var ud = await oldUser.get(), hd = await oldHist.get();
+                if (!ud.exists) throw { code: 'perfil-no-encontrado' };
+                await oldUser.update({ cambioEmail: nuevo });
+                try { await u.updateEmail(nuevo); authChanged = true; }
+                catch (e) { await oldUser.update({ cambioEmail: firebase.firestore.FieldValue.delete() }).catch(function () {}); throw e; }
+                await u.getIdToken(true);
+                var data = ud.data(); delete data.cambioEmail; data.email = nuevo; data.migradoDe = old;
+                await db.collection('usuarios').doc(nuevo).set(data);
+                if (hd.exists) await db.collection('historial_jornadas').doc(nuevo).set(hd.data());
+                await oldHist.delete().catch(function () {});
+                await oldUser.delete().catch(function () {});
+                currentUser.email = nuevo;
+                try { localStorage.setItem('kolaboradorf_session', JSON.stringify(currentUser)); } catch (e2) {}
+                calculateAntiquity(); $('setEmail').textContent = nuevo; reset();
+                alert('¡Correo actualizado con éxito! Desde ahora inicie sesión con ' + nuevo + '.');
+            } catch (e) {
+                var c = e.code || '';
+                if (c === 'auth/operation-not-allowed') alert('Error: Firebase bloquea el cambio de correo. En la consola de Firebase, Authentication > Configuración > Acciones del usuario, desactive "Protección de enumeración de correo electrónico" y vuelva a intentarlo.');
+                else if (c === 'auth/email-already-in-use') { reset(); alert('Error: ese correo ya está registrado en el sistema.'); }
+                else if (authChanged) alert('Error: su correo cambió pero no se copiaron todos los datos (' + (c || e.message) + '). Contacte al administrador antes de cerrar sesión.');
+                else alert('Error al cambiar el correo: ' + (c || e.message));
+            }
+        };
     })();
     </script>
 </body>
