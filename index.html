@@ -246,6 +246,10 @@
         #settingsModal:not(.hidden), #empresaModal:not(.hidden) { animation: kvFade .25s ease-out backwards; }
         #settingsModal:not(.hidden) > div, #empresaModal:not(.hidden) > div { animation: kvPop .35s var(--kv-ease) backwards; }
 
+        .kv-i-edit { --ic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z'/%3E%3C/svg%3E"); }
+        #recEditModal:not(.hidden) { animation: kvFade .25s ease-out backwards; }
+        #recEditModal:not(.hidden) > div { animation: kvPop .35s var(--kv-ease) backwards; }
+
         /* Accesibilidad: sin movimiento si el usuario lo pide */
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
@@ -565,6 +569,19 @@
                                     <button onclick="clearAllHistory()" class="text-[10px] bg-red-600/20 hover:bg-red-600/40 text-red-300 px-3 py-1 rounded-lg border border-red-500/30 font-semibold transition shadow"><i class="kv-i kv-i-trash"></i> Borrar Histórico</button>
                                 </div>
                             </div>
+                            <div class="flex flex-wrap items-center gap-2 text-[11px]">
+                                <select id="histFilter" onchange="applyHistFilter()" class="bg-slate-950 border border-slate-800 rounded-lg px-2 py-1 text-white focus:outline-none focus:border-red-600" aria-label="Filtrar histórico">
+                                    <option value="all">Todo el histórico</option>
+                                    <option value="week">Esta semana</option>
+                                    <option value="last">Semana pasada</option>
+                                    <option value="range">Rango de fechas</option>
+                                </select>
+                                <span id="histRange" class="hidden items-center gap-1 text-slate-400">
+                                    <input type="date" id="histFrom" onchange="applyHistFilter()" class="bg-slate-950 border border-slate-800 rounded-lg px-2 py-1 text-white" aria-label="Desde">
+                                    <span>a</span>
+                                    <input type="date" id="histTo" onchange="applyHistFilter()" class="bg-slate-950 border border-slate-800 rounded-lg px-2 py-1 text-white" aria-label="Hasta">
+                                </span>
+                            </div>
                             <div id="todayHistoryContainer" class="space-y-2 max-h-48 overflow-y-auto pr-1">
                                 <p class="text-xs text-slate-400 text-center py-4">No hay registros guardados en el historial.</p>
                             </div>
@@ -826,6 +843,33 @@
             <p class="text-xs text-slate-400">Este dato es obligatorio para continuar. Selecciónala de la lista.</p>
             <select id="empModalSel" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-red-600"><option value="">Seleccione su empresa</option></select>
             <button onclick="saveEmpresaModal()" class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider">Guardar y continuar</button>
+        </div>
+    </div>
+
+    <!-- MODAL: EDITAR UN REGISTRO DEL HISTÓRICO -->
+    <div id="recEditModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-slate-900 rounded-3xl max-w-md w-full p-6 border border-slate-800 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="text-base font-black text-white flex items-center gap-2"><i class="kv-i kv-i-edit"></i> Editar registro</h3>
+                <button onclick="closeRecEdit()" class="text-slate-400 hover:text-white text-xl leading-none px-2" aria-label="Cerrar">&times;</button>
+            </div>
+            <p id="reNote" class="hidden text-[11px] text-amber-300 bg-amber-500/10 border border-amber-500/30 rounded-xl p-3">Este registro es anterior a esta función: la carga inicial aparece en F1. Vuelva a escribir F2, G1, G2, devueltas y pepitos si aplican.</p>
+            <div class="grid grid-cols-2 gap-3">
+                <div><label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">Número de Ruta *</label><input type="text" id="reRuta" maxlength="20" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-600"></div>
+                <div><label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">Fecha</label><input type="date" id="reFecha" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-2 text-xs text-white focus:outline-none focus:border-red-600"></div>
+                <div><label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">F1</label><input type="number" id="reF1" min="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-600"></div>
+                <div><label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">F2</label><input type="number" id="reF2" min="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-600"></div>
+                <div><label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">G1</label><input type="number" id="reG1" min="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-600"></div>
+                <div><label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">G2</label><input type="number" id="reG2" min="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-600"></div>
+                <div><label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">Devueltas</label><input type="number" id="reDev" min="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-600"></div>
+                <div><label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">Pepitos (Snacks)</label><input type="number" id="rePep" min="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-600"></div>
+            </div>
+            <div><label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">Productos pendientes</label><textarea id="rePend" rows="2" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-600 resize-none"></textarea></div>
+            <p class="text-[11px] text-slate-400">El incentivo y la efectividad se recalculan solos con las mismas reglas.</p>
+            <div class="flex gap-2">
+                <button onclick="closeRecEdit()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider border border-slate-700">Cancelar</button>
+                <button onclick="saveRecEdit()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider"><i class="kv-i kv-i-save"></i> Guardar cambios</button>
+            </div>
         </div>
     </div>
 
@@ -1768,6 +1812,14 @@
                 efectividad: metrics.efectividad.toFixed(1),
                 isQualified: metrics.efectividad >= 97,
                 colaboradorNombre: currentUser ? currentUser.name : 'KOLABORADORF',
+                entradas: {
+                    f1: parseInt(document.getElementById('inputF1').value) || 0,
+                    f2: parseInt(document.getElementById('inputF2').value) || 0,
+                    g1: parseInt(document.getElementById('inputG1').value) || 0,
+                    g2: parseInt(document.getElementById('inputG2').value) || 0,
+                    dev: parseInt(document.getElementById('inputDev').value) || 0,
+                    pep: parseInt(document.getElementById('inputPep').value) || 0
+                },
                 timestamp: new Date().toISOString()
             };
 
@@ -2396,6 +2448,97 @@
                 else if (authChanged) alert('Error: su correo cambió pero no se copiaron todos los datos (' + (c || e.message) + '). Contacte al administrador antes de cerrar sesión.');
                 else alert('Error al cambiar el correo: ' + (c || e.message));
             }
+        };
+    })();
+    </script>
+
+    <script>
+    /* Histórico: filtrar, editar y borrar registros individuales (no modifica funciones existentes) */
+    (function () {
+        var $ = function (id) { return document.getElementById(id); };
+        var cur = null;
+
+        function pd(ymd) { var a = String(ymd || '').split('-').map(Number); return a.length === 3 && a[0] ? new Date(a[0], a[1] - 1, a[2]) : null; }
+        function mondayOf(d) { var x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return x; }
+        function pass(r) {
+            var m = $('histFilter') ? $('histFilter').value : 'all'; if (m === 'all') return true;
+            var d = pd(r.fecha); if (!d) return false;
+            var mon = mondayOf(new Date()), t = d.getTime();
+            if (m === 'week') { var e = new Date(mon); e.setDate(e.getDate() + 7); return t >= mon.getTime() && t < e.getTime(); }
+            if (m === 'last') { var s = new Date(mon); s.setDate(s.getDate() - 7); return t >= s.getTime() && t < mon.getTime(); }
+            var f = pd($('histFrom').value), to = pd($('histTo').value);
+            return (!f || t >= f.getTime()) && (!to || t <= to.getTime());
+        }
+        function isClosed(r) { return cachedCierres && cachedCierres.length && r.timestamp && r.timestamp <= cachedCierres[0].generadoEn; }
+        function rerender() { renderAccumulatedHistory(cachedUserRecords); renderScreenDashboardChart(cachedUserRecords); updateWeeklyCardFromHistory(cachedUserRecords); }
+        function save(arr) { return db.collection('historial_jornadas').doc(currentUser.email).set({ registros: arr }, { merge: true }); }
+
+        // Filtro + botones por registro (envuelve la función existente)
+        var base = window.renderAccumulatedHistory;
+        window.renderAccumulatedHistory = function (records) {
+            var all = records || [], idx = [], list = [];
+            all.forEach(function (r, i) { if (pass(r)) { idx.push(i); list.push(r); } });
+            base(list);
+            var box = $('todayHistoryContainer');
+            if (!list.length) { if (all.length) box.innerHTML = '<p class="text-xs text-slate-400 text-center py-4">No hay registros en el filtro seleccionado.</p>'; return; }
+            if (all !== cachedUserRecords) return;
+            Array.prototype.forEach.call(box.children, function (card, k) {
+                var i = idx[k], r = all[i]; if (!r) return;
+                var bar = document.createElement('div'); bar.className = 'flex justify-end items-center gap-2 pt-1';
+                bar.innerHTML = isClosed(r)
+                    ? '<span class="text-[10px] text-slate-500">Semana cerrada</span>'
+                    : '<button type="button" data-i="' + i + '" onclick="editRecord(this.dataset.i)" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded-lg border border-slate-700 font-semibold"><i class="kv-i kv-i-edit"></i> Editar</button><button type="button" data-i="' + i + '" onclick="deleteRecord(this.dataset.i)" class="text-[10px] bg-red-600/20 hover:bg-red-600/40 text-red-300 px-2.5 py-1 rounded-lg border border-red-500/30 font-semibold"><i class="kv-i kv-i-trash"></i> Borrar</button>';
+                card.appendChild(bar);
+            });
+        };
+        // Al cargar los incentivos generados, se redibuja para marcar las semanas cerradas
+        var baseRC = window.renderCierres;
+        window.renderCierres = function () { baseRC(); renderAccumulatedHistory(cachedUserRecords); };
+
+        window.applyHistFilter = function () {
+            $('histRange').classList.toggle('hidden', $('histFilter').value !== 'range');
+            renderAccumulatedHistory(cachedUserRecords);
+        };
+
+        window.editRecord = function (i) {
+            var r = cachedUserRecords[+i]; if (!r) return;
+            if (isClosed(r)) { alert('No se pudo modificar: ese registro pertenece a una semana ya cerrada.'); return; }
+            cur = +i; var e = r.entradas;
+            $('reRuta').value = r.ruta || ''; $('reFecha').value = r.fecha || '';
+            $('reF1').value = e ? e.f1 : (r.cargaInicial || 0); $('reF2').value = e ? e.f2 : 0; $('reG1').value = e ? e.g1 : 0; $('reG2').value = e ? e.g2 : 0;
+            $('reDev').value = e ? e.dev : 0; $('rePep').value = e ? e.pep : 0;
+            $('rePend').value = r.productosPendientes || '';
+            $('reNote').classList.toggle('hidden', !!e);
+            $('recEditModal').classList.remove('hidden');
+        };
+        window.closeRecEdit = function () { $('recEditModal').classList.add('hidden'); cur = null; };
+
+        window.saveRecEdit = async function () {
+            var r = cachedUserRecords[cur]; if (!r) return;
+            var ruta = $('reRuta').value.trim();
+            if (!ruta) { alert('El Número de Ruta es obligatorio.'); return; }
+            var n = function (id) { return Math.max(0, parseInt($(id).value) || 0); };
+            var f1 = n('reF1'), f2 = n('reF2'), g1 = n('reG1'), g2 = n('reG2'), dev = n('reDev'), pep = n('rePep');
+            var ini = f1 + f2 + g1 + g2, net = Math.max(0, ini - dev - pep);
+            var inc = getIncentiveByRole(net, r.userRole || currentUser.role || 'Ayudante');
+            var ef = ini > 0 ? (Math.max(0, net + pep) / ini) * 100 : 100; ef = Math.min(100, Math.max(0, ef));
+            var upd = Object.assign({}, r, {
+                ruta: ruta, fecha: $('reFecha').value || r.fecha, productosPendientes: $('rePend').value.trim(),
+                cargaInicial: ini, cargaNetaDia: net, incentivoDiarioUSD: inc.toFixed(2), efectividad: ef.toFixed(1), isQualified: ef >= 97,
+                entradas: { f1: f1, f2: f2, g1: g1, g2: g2, dev: dev, pep: pep }
+            });
+            var copy = cachedUserRecords.slice(); copy[cur] = upd;
+            try { await save(copy); cachedUserRecords = copy; closeRecEdit(); rerender(); alert('¡Registro actualizado con éxito!'); }
+            catch (e) { alert('Error al guardar los cambios del registro.'); }
+        };
+
+        window.deleteRecord = async function (i) {
+            var r = cachedUserRecords[+i]; if (!r) return;
+            if (isClosed(r)) { alert('No se pudo borrar: ese registro pertenece a una semana ya cerrada.'); return; }
+            if (!(await kvConfirm('¿Borrar el registro de la ruta ' + r.ruta + ' del ' + r.fecha + '?'))) return;
+            var copy = cachedUserRecords.slice(); copy.splice(+i, 1);
+            try { await save(copy); cachedUserRecords = copy; rerender(); alert('Registro borrado con éxito.'); }
+            catch (e) { alert('Error al borrar el registro.'); }
         };
     })();
     </script>
