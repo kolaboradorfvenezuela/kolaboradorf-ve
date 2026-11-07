@@ -1804,12 +1804,14 @@
             let sumaEf = 0;
             let totalIncentivoSemana = 0;
 
+            let diasReparto = 0;
             records.forEach(r => {
-                sumaEf += parseFloat(r.efectividad) || 0;
+                if ((parseFloat(r.cargaInicial) || 0) > 0) { sumaEf += parseFloat(r.efectividad) || 0; diasReparto++; }
                 totalIncentivoSemana += parseFloat(r.incentivoDiarioUSD) || 0;
             });
 
-            const promedioSemanal = sumaEf / records.length;
+            // Los días Exprés (sin carga) no cuentan en el promedio de efectividad
+            const promedioSemanal = diasReparto > 0 ? sumaEf / diasReparto : 100;
 
             badge.innerText = `${promedioSemanal.toFixed(1)}%`;
             incBadge.innerText = `$${totalIncentivoSemana.toFixed(2)}`;
@@ -1999,16 +2001,17 @@
                 return;
             }
 
-            let total = 0, sumEf = 0;
+            let total = 0, sumEf = 0, dias = 0;
             const fechas = [];
             recs.forEach(r => {
                 total += parseFloat(r.incentivoDiarioUSD) || 0;
-                sumEf += parseFloat(r.efectividad) || 0;
+                // Los días Exprés (sin carga) no suman ni restan en la efectividad
+                if ((parseFloat(r.cargaInicial) || 0) > 0) { sumEf += parseFloat(r.efectividad) || 0; dias++; }
                 if (r.fecha) fechas.push(r.fecha);
             });
             fechas.sort();
-            const promedio = sumEf / recs.length;
-            const califica = promedio >= 97.0;
+            const promedio = dias > 0 ? sumEf / dias : 0;
+            const califica = dias > 0 && promedio >= 97.0;
             const desde = fechas[0] || ymdLocal(new Date());
             const hasta = fechas[fechas.length - 1] || desde;
 
@@ -2034,7 +2037,7 @@
             const tasa = window.kvGetRate ? window.kvGetRate() : null;
             const totalBs = tasa ? totalUSD * tasa : null;
 
-            const resumen = `Semana ${desde} al ${hasta} (${recs.length} registro(s)).\nIncentivo acumulado: $${total.toFixed(2)}\nEfectividad promedio: ${promedio.toFixed(1)}%\n` +
+            const resumen = `Semana ${desde} al ${hasta} (${recs.length} registro(s)).\nIncentivo acumulado: $${total.toFixed(2)}\nEfectividad promedio: ${promedio.toFixed(1)}% (${dias} día(s) de reparto; los días Exprés no cuentan)\n` +
                 (califica ? `Bono de efectividad: $${bonoAplicado.toFixed(2)}` : `No califica (menos de 97%): sin bono de efectividad`) +
                 `\nTotal a cobrar: $${totalUSD.toFixed(2)} USD` +
                 (totalBs ? `\nEquivale a Bs. ${fmtBs(totalBs)} (tasa BCV ${fmtBs(tasa)})` : `\nTasa BCV no disponible en este momento`) +
@@ -2045,6 +2048,8 @@
                 generadoEn: new Date().toISOString(),
                 desde, hasta,
                 registros: recs.length,
+                diasReparto: dias,
+                cobrado: false,
                 totalAcumulado: Number(total.toFixed(2)),
                 efectividadPromedio: promedio.toFixed(1),
                 califica,
@@ -2108,6 +2113,8 @@
                 `;
             });
 
+            const kvResumenPDF = (typeof kvResumenIncentivoPDF === 'function') ? kvResumenIncentivoPDF() : '';
+
             reportDiv.innerHTML = `
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #dc2626; padding-bottom: 20px; margin-bottom: 25px;">
                     <div style="display: flex; align-items: center; gap: 12px;">
@@ -2143,6 +2150,7 @@
                         </tbody>
                     </table>
                 </div>
+                ${kvResumenPDF}
             `;
 
             document.body.appendChild(reportDiv);
@@ -2699,6 +2707,76 @@
         if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) {
             window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
         }
+    })();
+    </script>
+
+    <script>
+    /* Cobrado, recordatorio del viernes y resumen en el PDF (no modifica funciones existentes) */
+    (function () {
+        var $ = function (id) { return document.getElementById(id); };
+        var esc = function (v) { return escapeHTML(v); };
+
+        window.kvResumenIncentivoPDF = function () {
+            var cs = (typeof cachedCierres !== 'undefined' && cachedCierres) ? cachedCierres.slice(0, 4) : [];
+            if (!cs.length) return '';
+            var td = 'padding:8px;font-size:10px;color:#111827;';
+            var rows = cs.map(function (c) {
+                return '<tr style="border-bottom:1px solid #e5e7eb;"><td style="' + td + '">' + esc(c.desde) + ' al ' + esc(c.hasta) + '</td><td style="' + td + '">' + esc(c.efectividadPromedio) + '%</td><td style="' + td + '">$' + esc(Number(c.totalAcumulado || 0).toFixed(2)) + '</td><td style="' + td + '">$' + esc(Number(c.bonoEfectividad || 0).toFixed(2)) + '</td><td style="' + td + 'font-weight:bold;color:#16a34a;">$' + esc(Number(c.montoACobrar || 0).toFixed(2)) + '</td><td style="' + td + '">' + (c.montoBs ? 'Bs. ' + esc(fmtBs(c.montoBs)) : '-') + '</td><td style="' + td + '">' + esc(c.fechaCobro) + '</td><td style="' + td + '">' + (c.cobrado ? 'Cobrado' : 'Por cobrar') + '</td></tr>';
+            }).join('');
+            var th = 'padding:8px;font-size:9px;font-weight:800;color:#374151;';
+            return '<div style="margin-bottom:25px;"><h4 style="font-size:12px;font-weight:800;color:#111827;text-transform:uppercase;margin-bottom:10px;border-left:4px solid #dc2626;padding-left:8px;">Incentivo semanal generado</h4><table style="width:100%;border-collapse:collapse;text-align:left;"><thead><tr style="background-color:#f3f4f6;border-bottom:2px solid #d1d5db;"><th style="' + th + '">SEMANA</th><th style="' + th + '">EFECTIVIDAD</th><th style="' + th + '">INCENTIVO</th><th style="' + th + '">BONO</th><th style="' + th + '">TOTAL USD</th><th style="' + th + '">TOTAL BS</th><th style="' + th + '">COBRO</th><th style="' + th + '">ESTADO</th></tr></thead><tbody>' + rows + '</tbody></table></div>';
+        };
+
+        window.toggleCobrado = async function (i) {
+            var c = cachedCierres[+i]; if (!c) return;
+            var marcar = !c.cobrado;
+            if (!(await kvConfirm(marcar ? '¿Marcar este incentivo como cobrado?' : '¿Volver a marcarlo como por cobrar?'))) return;
+            var copy = cachedCierres.map(function (x, k) { return k === +i ? Object.assign({}, x, { cobrado: marcar, fechaCobrado: marcar ? ymdLocal(new Date()) : null }) : x; });
+            try {
+                await db.collection('historial_jornadas').doc(currentUser.email).set({ cierres: copy }, { merge: true });
+                cachedCierres = copy; renderCierres();
+                alert(marcar ? '¡Incentivo marcado como cobrado con éxito!' : 'Incentivo marcado como por cobrar.');
+            } catch (e) { alert('Error al actualizar el incentivo.'); }
+        };
+
+        function updateReminder() {
+            var ws = $('workerSection'); if (!ws) return;
+            var b = $('kvReminder');
+            if (!b) {
+                b = document.createElement('div'); b.id = 'kvReminder';
+                b.className = 'hidden flex flex-col sm:flex-row items-center justify-between gap-3 bg-emerald-500/10 border border-emerald-500/40 rounded-2xl px-5 py-3 text-emerald-200 text-xs font-bold shadow-lg';
+                b.setAttribute('role', 'status');
+                b.innerHTML = '<span><i class="kv-i kv-i-bell"></i> <span id="kvReminderTx"></span></span><button type="button" id="kvReminderBtn" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-[11px] font-black px-4 py-1.5 rounded-lg uppercase tracking-wider">Ir a generar</button>';
+                ws.insertBefore(b, ws.firstChild);
+                $('kvReminderBtn').onclick = function () { var g = document.querySelector('button[onclick="generateWeeklyIncentive()"]'); if (g) g.scrollIntoView({ behavior: 'smooth', block: 'center' }); };
+            }
+            var d = new Date().getDay();
+            var pend = (typeof recordsSinceLastClose === 'function') ? recordsSinceLastClose().length : 0;
+            var show = pend > 0 && (d === 5 || d === 6 || d === 0 || d === 1);
+            b.classList.toggle('hidden', !show);
+            if (show) $('kvReminderTx').textContent = d === 5 ? 'Es viernes: genera tu incentivo de la semana.' : 'Tienes jornadas sin cerrar: genera tu incentivo de la semana.';
+        }
+
+        // Estado de cada incentivo generado (por cobrar / cobrado)
+        var rc = window.renderCierres;
+        window.renderCierres = function () {
+            rc();
+            var box = $('cierreResult');
+            if (box && cachedCierres.length) {
+                var hoy = ymdLocal(new Date());
+                Array.prototype.forEach.call(box.children, function (card, i) {
+                    var c = cachedCierres[i]; if (!c) return;
+                    var bar = document.createElement('div'); bar.className = 'flex flex-wrap items-center justify-between gap-2 pt-1';
+                    bar.innerHTML = (c.cobrado ? '<span class="text-[11px] font-bold text-emerald-400">Cobrado el ' + esc(c.fechaCobrado || '') + '</span>' : (hoy >= c.fechaCobro ? '<span class="text-[11px] font-bold text-emerald-300">Ya llegó tu fecha de cobro</span>' : '<span class="text-[11px] text-slate-500">Por cobrar</span>')) +
+                        '<button type="button" data-i="' + i + '" onclick="toggleCobrado(this.dataset.i)" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded-lg border border-slate-700 font-semibold">' + (c.cobrado ? 'Deshacer' : 'Marcar como cobrado') + '</button>';
+                    card.appendChild(bar);
+                });
+            }
+            updateReminder();
+        };
+        var rh = window.renderAccumulatedHistory;
+        window.renderAccumulatedHistory = function (r) { rh(r); updateReminder(); };
+        setInterval(updateReminder, 5 * 60 * 1000);
     })();
     </script>
 </body>
