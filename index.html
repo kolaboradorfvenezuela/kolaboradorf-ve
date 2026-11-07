@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kolaboradorf VE - Control Operativo de Distribución</title>
+    <meta name="theme-color" content="#b91c1c">
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="apple-touch-icon" href="icon-192.png">
     
     <!-- FAVICON CORPORATIVO -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23dc2626'/><text x='50%' y='58%' font-size='65' font-weight='900' fill='%23ffffff' font-family='Inter, sans-serif' text-anchor='middle' dominant-baseline='middle'>K</text></svg>">
@@ -249,6 +252,10 @@
         .kv-i-edit { --ic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z'/%3E%3C/svg%3E"); }
         #recEditModal:not(.hidden) { animation: kvFade .25s ease-out backwards; }
         #recEditModal:not(.hidden) > div { animation: kvPop .35s var(--kv-ease) backwards; }
+
+        #colabModal:not(.hidden) { animation: kvFade .25s ease-out backwards; }
+        #colabModal:not(.hidden) > div { animation: kvPop .35s var(--kv-ease) backwards; }
+        #colabList > div { animation: kvIn .35s var(--kv-ease) backwards; }
 
         /* Accesibilidad: sin movimiento si el usuario lo pide */
         @media (prefers-reduced-motion: reduce) {
@@ -702,6 +709,22 @@
                         <div class="flex gap-2"><input type="text" id="empNueva" maxlength="60" placeholder="Nombre de la empresa" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-600"><button onclick="addEmpresa()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-4 rounded-xl">Agregar</button></div>
                         <div id="empChips" class="flex flex-wrap gap-2"></div>
                     </div>
+
+                    <div class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-4 lg:col-span-2 shadow-xl">
+                        <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 border-b border-slate-800 pb-3">
+                            <h4 class="text-sm font-extrabold text-white flex items-center gap-2"><i class="kv-i kv-i-users"></i> Colaboradores <span id="colabCount" class="text-[10px] text-slate-400 font-bold"></span></h4>
+                            <button onclick="loadColabs()" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1 rounded-lg border border-slate-700 font-semibold">Actualizar lista</button>
+                        </div>
+                        <div class="flex flex-col sm:flex-row gap-2">
+                            <input type="text" id="colabSearch" oninput="renderColabs()" placeholder="Buscar por nombre, correo o empresa" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-600">
+                            <select id="colabFilter" onchange="renderColabs()" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-600">
+                                <option value="active">Activos</option>
+                                <option value="suspended">Suspendidos</option>
+                                <option value="all">Todos</option>
+                            </select>
+                        </div>
+                        <div id="colabList" class="space-y-2 max-h-96 overflow-y-auto pr-1"><p class="text-xs text-slate-400 text-center py-4">Abre esta sección para cargar los colaboradores.</p></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -870,6 +893,17 @@
                 <button onclick="closeRecEdit()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider border border-slate-700">Cancelar</button>
                 <button onclick="saveRecEdit()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider"><i class="kv-i kv-i-save"></i> Guardar cambios</button>
             </div>
+        </div>
+    </div>
+
+    <!-- MODAL: HISTORIAL DE UN COLABORADOR (solo administrador) -->
+    <div id="colabModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-slate-900 rounded-3xl max-w-2xl w-full p-6 border border-slate-800 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 id="colabTitle" class="text-base font-black text-white">Colaborador</h3>
+                <button onclick="closeColab()" class="text-slate-400 hover:text-white text-xl leading-none px-2" aria-label="Cerrar">&times;</button>
+            </div>
+            <div id="colabBody" class="space-y-4 text-xs text-slate-300"></div>
         </div>
     </div>
 
@@ -1263,6 +1297,12 @@
                         }
                     }
 
+                    if (userData.suspendido === true) {
+                        await firebase.auth().signOut();
+                        alert("Su cuenta está suspendida. Comuníquese con el administrador.");
+                        return;
+                    }
+
                     if (userData.approved === false) {
                         await firebase.auth().signOut();
                         alert("Su cuenta aún está pendiente de aprobación por el Administrador Supremo.");
@@ -1381,14 +1421,15 @@
 
             try {
                 const snapshot = await db.collection("usuarios").where("approved", "==", false).get();
-                updatePendingBadge(snapshot.size);
-                if (snapshot.empty) {
+                const pend = snapshot.docs.filter(d => !d.data().suspendido);
+                updatePendingBadge(pend.length);
+                if (!pend.length) {
                     container.innerHTML = '<p class="text-xs text-slate-400 text-center py-8">No hay solicitudes de acceso pendientes.</p>';
                     return;
                 }
 
                 container.innerHTML = '';
-                snapshot.forEach(doc => {
+                pend.forEach(doc => {
                     const user = doc.data();
                     const userEmailId = doc.id;
                     const card = document.createElement('div');
@@ -2245,7 +2286,7 @@
             try {
                 if (typeof currentUser !== 'undefined' && currentUser && currentUser.isAdmin && !document.hidden) {
                     db.collection('usuarios').where('approved', '==', false).get()
-                        .then(function (snap) { updatePendingBadge(snap.size); })
+                        .then(function (snap) { updatePendingBadge(snap.docs.filter(function (d) { return !d.data().suspendido; }).length); })
                         .catch(function () {});
                 }
             } catch (e) {}
@@ -2540,6 +2581,124 @@
             try { await save(copy); cachedUserRecords = copy; rerender(); alert('Registro borrado con éxito.'); }
             catch (e) { alert('Error al borrar el registro.'); }
         };
+    })();
+    </script>
+
+    <script>
+    /* Administrador: lista de colaboradores, historial y suspensión (no modifica funciones existentes) */
+    (function () {
+        var $ = function (id) { return document.getElementById(id); };
+        var list = [];
+
+        window.kvSetColabs = function (l) { list = l; renderColabs(); };
+
+        window.loadColabs = async function () {
+            if (!currentUser || !currentUser.isAdmin) return;
+            $('colabList').innerHTML = '<p class="text-xs text-slate-400 text-center py-4">Cargando colaboradores...</p>';
+            try {
+                var a = await db.collection('usuarios').where('approved', '==', true).get();
+                var b = await db.collection('usuarios').where('suspendido', '==', true).get();
+                var map = {};
+                a.forEach(function (d) { map[d.id] = Object.assign({ id: d.id, suspendido: false }, d.data()); });
+                b.forEach(function (d) { map[d.id] = Object.assign({ id: d.id }, d.data(), { suspendido: true }); });
+                list = Object.keys(map).map(function (k) { return map[k]; }).sort(function (x, y) { return String(x.name || x.id).localeCompare(String(y.name || y.id), 'es'); });
+                renderColabs();
+            } catch (e) { $('colabList').innerHTML = '<p class="text-xs text-amber-400 text-center py-4">No se pudo cargar la lista de colaboradores.</p>'; }
+        };
+
+        window.renderColabs = function () {
+            var q = ($('colabSearch').value || '').trim().toLowerCase(), f = $('colabFilter').value;
+            var rows = list.filter(function (u) {
+                if (f === 'active' && u.suspendido) return false;
+                if (f === 'suspended' && !u.suspendido) return false;
+                return !q || [u.name, u.id, u.empresa].join(' ').toLowerCase().indexOf(q) >= 0;
+            });
+            $('colabCount').textContent = '(' + rows.length + ' de ' + list.length + ')';
+            if (!rows.length) { $('colabList').innerHTML = '<p class="text-xs text-slate-400 text-center py-4">No hay colaboradores con ese criterio.</p>'; return; }
+            $('colabList').innerHTML = rows.map(function (u) {
+                var em = escapeHTML(u.id);
+                return '<div class="bg-slate-950 p-3 rounded-xl border ' + (u.suspendido ? 'border-red-900/50' : 'border-slate-800') + ' text-xs flex flex-col sm:flex-row justify-between sm:items-center gap-2 shadow-inner">' +
+                    '<div class="min-w-0"><strong class="text-white">' + escapeHTML(u.name || 'Sin nombre') + '</strong>' + (u.suspendido ? ' <span class="text-[10px] font-bold text-red-400">Suspendido</span>' : '') +
+                    '<p class="text-[11px] text-slate-400 break-all">' + em + ' · <span class="text-red-400 uppercase font-bold">' + escapeHTML(u.role || '') + '</span></p>' +
+                    '<p class="text-[11px] text-slate-500">Empresa: ' + escapeHTML(u.empresa || 'Sin registrar') + ' · Ingreso: ' + escapeHTML(u.fechaIngreso || '-') + '</p></div>' +
+                    '<div class="flex gap-2 flex-none"><button type="button" data-email="' + em + '" onclick="viewColab(this.dataset.email)" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 font-semibold">Ver historial</button>' +
+                    '<button type="button" data-email="' + em + '" onclick="toggleColab(this.dataset.email)" class="text-[10px] ' + (u.suspendido ? 'bg-emerald-600 hover:bg-emerald-500 text-white' : 'bg-red-600/20 hover:bg-red-600/40 text-red-300 border border-red-500/30') + ' px-3 py-1.5 rounded-lg font-semibold">' + (u.suspendido ? 'Reactivar' : 'Suspender') + '</button></div></div>';
+            }).join('');
+        };
+
+        window.toggleColab = async function (email) {
+            var u = list.filter(function (x) { return x.id === email; })[0]; if (!u) return;
+            var susp = !u.suspendido;
+            if (!(await kvConfirm(susp ? '¿Suspender a ' + (u.name || email) + '? No podrá iniciar sesión hasta que lo reactives.' : '¿Reactivar a ' + (u.name || email) + '?'))) return;
+            try {
+                await db.collection('usuarios').doc(email).update(susp ? { approved: false, suspendido: true } : { approved: true, suspendido: firebase.firestore.FieldValue.delete() });
+                u.suspendido = susp; renderColabs();
+                alert(susp ? 'Colaborador suspendido con éxito.' : 'Colaborador reactivado con éxito.');
+            } catch (e) { alert('Error al actualizar el colaborador: ' + (e.code || e.message)); }
+        };
+
+        window.viewColab = async function (email) {
+            var u = list.filter(function (x) { return x.id === email; })[0] || { id: email };
+            $('colabTitle').textContent = u.name || email;
+            $('colabBody').innerHTML = '<p class="text-slate-400">Cargando historial...</p>';
+            $('colabModal').classList.remove('hidden');
+            var h = {};
+            try { var d = await db.collection('historial_jornadas').doc(email).get(); h = d.exists ? d.data() : {}; }
+            catch (e) { $('colabBody').innerHTML = '<p class="text-amber-400">No se pudo cargar el historial.</p>'; return; }
+            var recs = (h.registros || []).slice(0, 10), cie = (h.cierres || []).slice(0, 6);
+            var head = '<div class="bg-slate-950 p-3 rounded-xl border border-slate-800 break-all"><strong class="text-white">' + escapeHTML(u.name || email) + '</strong><br>' + escapeHTML(email) + '<br>Empresa: ' + escapeHTML(u.empresa || 'Sin registrar') + ' · ' + escapeHTML(u.role || '') + '</div>';
+            var c = cie.length ? cie.map(function (x) {
+                return '<div class="bg-slate-950 p-2 rounded-lg border border-slate-800 flex flex-wrap justify-between gap-1"><span>' + escapeHTML(x.desde) + ' al ' + escapeHTML(x.hasta) + '</span><span>Efectividad ' + escapeHTML(x.efectividadPromedio) + '%</span><strong class="text-emerald-400">$' + escapeHTML(Number(x.montoACobrar || 0).toFixed(2)) + '</strong>' + (x.montoBs ? '<span>Bs. ' + escapeHTML(fmtBs(x.montoBs)) + '</span>' : '') + '<span class="text-amber-300">Cobra: ' + escapeHTML(x.fechaCobro) + '</span></div>';
+            }).join('') : '<p class="text-slate-500">Sin incentivos generados.</p>';
+            var r = recs.length ? recs.map(function (x) {
+                return '<div class="bg-slate-950 p-2 rounded-lg border border-slate-800 flex flex-wrap justify-between gap-1"><span>' + escapeHTML(x.fecha) + '</span><span>Ruta ' + escapeHTML(x.ruta) + '</span><span>Neta ' + escapeHTML(x.cargaNetaDia) + '</span><span>' + escapeHTML(x.efectividad) + '%</span><strong class="text-emerald-400">$' + escapeHTML(x.incentivoDiarioUSD) + '</strong></div>';
+            }).join('') : '<p class="text-slate-500">Sin registros.</p>';
+            $('colabBody').innerHTML = head + '<div><h4 class="text-[11px] font-extrabold text-red-400 uppercase tracking-wider mb-2">Incentivos generados</h4><div class="space-y-1">' + c + '</div></div><div><h4 class="text-[11px] font-extrabold text-red-400 uppercase tracking-wider mb-2">Últimos registros</h4><div class="space-y-1">' + r + '</div></div>';
+        };
+        window.closeColab = function () { $('colabModal').classList.add('hidden'); };
+
+        // Al abrir la pestaña del administrador se carga la lista
+        var baseTab = window.switchAppTab;
+        window.switchAppTab = function (t) { baseTab(t); if (t === 'admin') window.loadColabs(); };
+    })();
+    </script>
+
+    <script>
+    /* Medidor de fuerza de contraseña + app instalable (no modifica funciones existentes) */
+    (function () {
+        function score(p) {
+            var s = 0;
+            if (p.length >= 6) s++; if (p.length >= 10) s++;
+            if (/[a-z]/.test(p) && /[A-Z]/.test(p)) s++;
+            if (/\d/.test(p)) s++; if (/[^A-Za-z0-9]/.test(p)) s++;
+            return s;
+        }
+        function attach(id) {
+            var inp = document.getElementById(id); if (!inp) return;
+            var box = document.createElement('div');
+            box.style.cssText = 'display:none;margin-top:6px';
+            box.innerHTML = '<div style="height:4px;border-radius:4px;background:#1e293b;overflow:hidden"><div class="kv-pw-fill" style="height:100%;width:0;border-radius:4px;transition:width .25s ease,background-color .25s ease"></div></div><div class="kv-pw-txt" style="font-size:10px;font-weight:700;margin-top:3px"></div>';
+            inp.parentNode.insertBefore(box, inp.nextSibling);
+            var fill = box.querySelector('.kv-pw-fill'), txt = box.querySelector('.kv-pw-txt');
+            inp.addEventListener('input', function () {
+                var v = inp.value;
+                if (!v) { box.style.display = 'none'; return; }
+                box.style.display = 'block';
+                var sc = score(v), lvl;
+                if (v.length < 6) lvl = ['Muy corta (mínimo 6 caracteres)', '#ef4444', 15];
+                else if (sc <= 2) lvl = ['Débil', '#f97316', 40];
+                else if (sc === 3) lvl = ['Media', '#f59e0b', 65];
+                else if (sc === 4) lvl = ['Buena', '#84cc16', 85];
+                else lvl = ['Fuerte', '#22c55e', 100];
+                fill.style.width = lvl[2] + '%'; fill.style.backgroundColor = lvl[1];
+                txt.textContent = 'Seguridad: ' + lvl[0]; txt.style.color = lvl[1];
+            });
+        }
+        ['regPass', 'pwNew'].forEach(attach);
+
+        if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) {
+            window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
+        }
     })();
     </script>
 </body>
