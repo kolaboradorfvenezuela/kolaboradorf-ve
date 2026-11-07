@@ -257,6 +257,10 @@
         #colabModal:not(.hidden) > div { animation: kvPop .35s var(--kv-ease) backwards; }
         #colabList > div { animation: kvIn .35s var(--kv-ease) backwards; }
 
+        /* Fondo propio (si existe fondo.jpg en el repositorio, se usa en lugar de la imagen externa) */
+        body.kv-bg-local { background-image: linear-gradient(to bottom, rgba(3, 7, 18, 0.88), rgba(3, 7, 18, 0.94)), url('fondo.jpg'); }
+        body.light-mode.kv-bg-local { background-image: linear-gradient(to bottom, rgba(248, 250, 252, 0.88), rgba(248, 250, 252, 0.94)), url('fondo.jpg'); }
+
         /* Accesibilidad: sin movimiento si el usuario lo pide */
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
@@ -741,7 +745,7 @@
             <h3 class="text-base font-black text-white border-b border-slate-800 pb-3">Políticas de Privacidad, Términos y Condiciones Generales de Uso</h3>
             
             <div id="termsScrollContainer" onscroll="checkTermsScroll()" class="space-y-4 text-xs text-slate-300 leading-relaxed overflow-y-auto pr-2 max-h-[50vh] bg-slate-950 p-4 rounded-xl border border-slate-800 shadow-inner">
-                <p><strong>Última actualización:</strong> 20 de octubre de 2026<br>
+                <p><strong>Última actualización:</strong> 7 de noviembre de 2026<br>
                 <strong>Aplicación:</strong> KOLABORADORF VE<br>
                 <strong>Desarrollador / Titular:</strong> DFPfantasy CorVe (DFPFANTASY)<br>
                 <strong>Jurisdicción Base:</strong> República Bolivariana de Venezuela<br>
@@ -763,7 +767,7 @@
 
                 <p><strong>Artículo 2.2 — Inconsistencias en Nómina, Pagos o Comisiones</strong><br>
                 La Aplicación ejecuta cálculos automatizados basados únicamente en la información ingresada directamente por el Usuario.<br>
-                1. Falta de Valor Legal: Los reportes, sumatorias, contabilidad interna o métricas generadas por KOLABORADORF VE não constituyen comprobantes de nómina, recibos de pago ni documentos probatorios con validez mercantil o laboral frente a terceros.<br>
+                1. Falta de Valor Legal: Los reportes, sumatorias, contabilidad interna o métricas generadas por KOLABORADORF VE no constituyen comprobantes de nómina, recibos de pago ni documentos probatorios con validez mercantil o laboral frente a terceros.<br>
                 2. Procedimiento ante Discrepancias: En caso de que el Usuario observe diferencias o inconsistencias entre los datos calculados por la Aplicación y sus pagos reales, cómputos de nómina o liquidaciones, el Usuario se compromete de manera expresa a no presentar reclamos ni demandas contra la Aplicación ni sus desarrolladores. Debe dirigir cualquier aclaratoria directamente al supervisor, gerencia de operaciones o departamento de Recursos Humanos de su empresa contratante.</p>
 
                 <h4 class="font-bold text-white uppercase mt-3">CAPÍTULO III: ORIGEN DE LOS DATOS Y RESPONSABILIDAD DE CARGA</h4>
@@ -771,7 +775,7 @@
                 KOLABORADORF VE es una plataforma que se alimenta de la información suministrada voluntaria e independientemente por el Usuario. La Aplicación no almacena por cuenta propia, no verifica, no audita ni valida la veracidad, exactitud o legalidad de los datos introducidos (tales como cantidad de cajas, tarifas, rutas, montos recopilados o nombres de clientes).</p>
 
                 <p><strong>Artículo 3.2 — Uso Inadecuado de Marcas, Imagen y Propiedad Intelectual</strong><br>
-                Queda estrictamente prohibido al Usuario ingresar imágenes, logotipos, registros fotográficos o información confidencial de terceros o empresas sin contar con la autorización correspondiente. DFPfantasy CorVe não responderá bajo ningún concepto por demandas, sanciones o reclamos derivados del uso indebido de imagen, marcas registradas o secretos comerciales ingresados por los usuarios en la plataforma.</p>
+                Queda estrictamente prohibido al Usuario ingresar imágenes, logotipos, registros fotográficos o información confidencial de terceros o empresas sin contar con la autorización correspondiente. DFPfantasy CorVe no responderá bajo ningún concepto por demandas, sanciones o reclamos derivados del uso indebido de imagen, marcas registradas o secretos comerciales ingresados por los usuarios en la plataforma.</p>
 
                 <h4 class="font-bold text-white uppercase mt-3">CAPÍTULO IV: INFRAESTRUCTURA TÉCNICA, GRATUIDAD Y ACTUALIZACIONES</h4>
                 <p><strong>Artículo 4.1 — Modelo de Servicio Gratuito y Modificaciones</strong><br>
@@ -780,7 +784,7 @@
                 - Suspender o discontinuar el servicio temporal o definitivamente sin que ello genere derecho a indemnización alguna a favor del Usuario.</p>
 
                 <p><strong>Artículo 4.2 — Almacenamiento en Base de Datos Segura</strong><br>
-                La plataforma utiliza soluciones de almacenamiento e infraestructura de bases de datos respaldadas en tecnologías de Google (tales como Firebase / Google Cloud Platform), garantizando altos estándares internacionales de encriptación y seguridad digital.</p>
+                La plataforma utiliza soluciones de almacenamiento e infraestructura de bases de datos respaldadas en tecnologías de Google (tales como Firebase / Google Cloud Platform), aplicando medidas de seguridad y cifrado reconocidas internacionalmente. Aun así, ningún sistema es infalible y no es posible garantizar una seguridad absoluta.</p>
 
                 <h4 class="font-bold text-white uppercase mt-3">CAPÍTULO V: JURISDICCIÓN Y MARCO LEGAL APLICABLE</h4>
                 <p>Este contrato se rige íntegramente por las leyes de la República Bolivariana de Venezuela y los estándares internacionales de comercio electrónico. Para cualquier controversia, las partes se someten expresamente a la jurisdicción de los Tribunales Ordinarios de la República Bolivariana de Venezuela.</p>
@@ -806,7 +810,7 @@
                 <p>Estimado <strong class="text-white">KOLABORADORF</strong>:</p>
                 <p>Es de vital importancia que sepas que esta aplicación <strong class="text-white">no es una aplicación oficial</strong> de la empresa en la que laboras. Los resultados que aquí se muestran son procesados con base en los datos ingresados por ti, pero aún así <strong class="text-amber-400">no son los resultados oficiales de la empresa</strong>.</p>
                 <p>Recuerda que ante cualquier inconsistencia y tus dudas debes comunicarte directamente con tu departamento de <strong class="text-white">Recursos Humanos</strong>.</p>
-                <p>Toda la información suministrada en la presente aplicación está totalmente segura y encriptada, pero de igual manera <strong class="text-white">no representa la versión final</strong> que tu compañía te va a dar como resultado de liquidación o pago.</p>
+                <p>Toda la información suministrada en la presente aplicación se almacena con medidas de seguridad y cifrado, aunque ningún sistema es infalible. De igual manera, <strong class="text-white">no representa la versión final</strong> que tu compañía te va a dar como resultado de liquidación o pago.</p>
             </div>
 
             <div class="pt-2 text-center">
@@ -2231,7 +2235,12 @@
     /* Tasa BCV automática + aviso del administrador (no modifica funciones existentes) */
     (function () {
         var KEY = 'kolaboradorf_bcv', MIN_KEY = 'kolaboradorf_bcv_min';
-        var URL = 'https://ve.dolarapi.com/v1/dolares/oficial', EVERY = 10 * 60 * 1000;
+        var EVERY = 10 * 60 * 1000;
+        // Dos fuentes: si la primera falla, se usa la segunda
+        var SOURCES = [
+            { u: 'https://ve.dolarapi.com/v1/dolares/oficial', p: function (j) { return parseFloat(j.promedio != null ? j.promedio : (j.venta != null ? j.venta : j.compra)); } },
+            { u: 'https://pydolarvenezuela-api.vercel.app/api/v1/dollar?page=bcv', p: function (j) { var m = j && j.monitors && j.monitors.usd; return m ? parseFloat(m.price) : NaN; } }
+        ];
         var $ = function (id) { return document.getElementById(id); };
         var w = $('bcvWidget'); if (!w) return;
         var rateEl = $('bcvRate'), miniEl = $('bcvMini'), updEl = $('bcvUpdated'), dot = $('bcvDot'), btnR = $('bcvRefresh'), tog = $('bcvToggle');
@@ -2258,11 +2267,15 @@
         async function load() {
             if (busy) return; busy = true; btnR.classList.add('kv-spin');
             try {
-                var r = await fetch(URL, { cache: 'no-store' });
-                if (!r.ok) throw new Error('http ' + r.status);
-                var j = await r.json();
-                var v = parseFloat(j.promedio != null ? j.promedio : (j.venta != null ? j.venta : j.compra));
-                if (!(v > 0)) throw new Error('dato inválido');
+                var v = NaN;
+                for (var k = 0; k < SOURCES.length && !(v > 0); k++) {
+                    try {
+                        var r = await fetch(SOURCES[k].u, { cache: 'no-store' });
+                        if (!r.ok) continue;
+                        v = SOURCES[k].p(await r.json());
+                    } catch (e2) {}
+                }
+                if (!(v > 0)) throw new Error('sin fuente disponible');
                 var changed = !last || last.rate !== v;
                 last = { rate: v, fetched: Date.now() };
                 off = false;
@@ -2566,6 +2579,9 @@
             var r = cachedUserRecords[cur]; if (!r) return;
             var ruta = $('reRuta').value.trim();
             if (!ruta) { alert('El Número de Ruta es obligatorio.'); return; }
+            var nf = $('reFecha').value || r.fecha;
+            var dupe = cachedUserRecords.filter(function (x, k) { return k !== cur && x.fecha === nf; })[0];
+            if (dupe) { alert('No se pudo guardar: ya existe otro registro con la fecha ' + nf + '. Todo el día se registra en una sola carga.'); return; }
             var n = function (id) { return Math.max(0, parseInt($(id).value) || 0); };
             var f1 = n('reF1'), f2 = n('reF2'), g1 = n('reG1'), g2 = n('reG2'), dev = n('reDev'), pep = n('rePep');
             var ini = f1 + f2 + g1 + g2, net = Math.max(0, ini - dev - pep);
@@ -2777,6 +2793,27 @@
         var rh = window.renderAccumulatedHistory;
         window.renderAccumulatedHistory = function (r) { rh(r); updateReminder(); };
         setInterval(updateReminder, 5 * 60 * 1000);
+    })();
+    </script>
+
+    <script>
+    /* Un solo registro por día + fondo propio opcional (no modifica funciones existentes) */
+    (function () {
+        var sd = window.saveDailyRecord;
+        window.saveDailyRecord = async function () {
+            var inp = document.getElementById('inputFechaJornada');
+            var f = (inp && inp.value) || new Date().toISOString().split('T')[0];
+            var dup = (typeof cachedUserRecords !== 'undefined' ? cachedUserRecords : []).filter(function (r) { return r.fecha === f; })[0];
+            if (dup) {
+                alert('No se pudo guardar: ya tienes un registro con la fecha ' + f + ' (ruta ' + dup.ruta + '). Todo el día se registra en una sola carga: edítalo desde el histórico o cambia la fecha.');
+                return;
+            }
+            return sd.apply(this, arguments);
+        };
+
+        var im = new Image();
+        im.onload = function () { document.body.classList.add('kv-bg-local'); };
+        im.src = 'fondo.jpg';
     })();
     </script>
 </body>
