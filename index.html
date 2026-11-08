@@ -261,6 +261,265 @@
         body.kv-bg-local { background-image: linear-gradient(to bottom, rgba(3, 7, 18, 0.88), rgba(3, 7, 18, 0.94)), url('fondo.jpg'); }
         body.light-mode.kv-bg-local { background-image: linear-gradient(to bottom, rgba(248, 250, 252, 0.88), rgba(248, 250, 252, 0.94)), url('fondo.jpg'); }
 
+        :root { --kv-axis: #94a3b8; --kv-grid: #1e293b; --kv-track: #1e293b; }
+        body.light-mode { --kv-axis: #475569; --kv-grid: #cbd5e1; --kv-track: #e2e8f0; }
+
+        /* Camión de reparto animado */
+        @keyframes kvRoadMove { to { stroke-dashoffset: -52; } }
+        @keyframes kvWheelSpin { to { transform: rotate(360deg); } }
+        @keyframes kvTruckBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-1.5px); } }
+        .kv-truck-wrap { width: 220px; max-width: 70%; margin-left: auto; margin-right: auto; }
+        .kv-truck { width: 100%; height: auto; display: block; overflow: visible; }
+        .kv-dash { animation: kvRoadMove .7s linear infinite; }
+        .kv-wheel { transform-box: fill-box; transform-origin: center; animation: kvWheelSpin .6s linear infinite; }
+        .kv-bob { animation: kvTruckBob .5s ease-in-out infinite; }
+        #loadingSessionView .animate-spin, #logoutProgressView .animate-spin { display: none; }
+
+        /* Resumen semanal */
+        #wkGauge circle.kv-g-fill { transition: stroke-dashoffset .8s var(--kv-ease), stroke .4s ease; }
+
+        /* Modo claro completo */
+        body.light-mode main .bg-slate-900\/90,
+        body.light-mode main .bg-slate-900\/80,
+        body.light-mode main .bg-slate-900,
+        body.light-mode footer .bg-slate-900\/90,
+        body.light-mode footer .bg-slate-900\/80,
+        body.light-mode footer .bg-slate-900,
+        body.light-mode #termsModal .bg-slate-900\/90,
+        body.light-mode #termsModal .bg-slate-900\/80,
+        body.light-mode #termsModal .bg-slate-900,
+        body.light-mode #loginLegalNoticeModal .bg-slate-900\/90,
+        body.light-mode #loginLegalNoticeModal .bg-slate-900\/80,
+        body.light-mode #loginLegalNoticeModal .bg-slate-900,
+        body.light-mode #settingsModal .bg-slate-900\/90,
+        body.light-mode #settingsModal .bg-slate-900\/80,
+        body.light-mode #settingsModal .bg-slate-900,
+        body.light-mode #empresaModal .bg-slate-900\/90,
+        body.light-mode #empresaModal .bg-slate-900\/80,
+        body.light-mode #empresaModal .bg-slate-900,
+        body.light-mode #recEditModal .bg-slate-900\/90,
+        body.light-mode #recEditModal .bg-slate-900\/80,
+        body.light-mode #recEditModal .bg-slate-900,
+        body.light-mode #colabModal .bg-slate-900\/90,
+        body.light-mode #colabModal .bg-slate-900\/80,
+        body.light-mode #colabModal .bg-slate-900 { background-color:rgba(255,255,255,.94) !important }
+        body.light-mode main .bg-slate-950,
+        body.light-mode main .bg-slate-950\/80,
+        body.light-mode footer .bg-slate-950,
+        body.light-mode footer .bg-slate-950\/80,
+        body.light-mode #termsModal .bg-slate-950,
+        body.light-mode #termsModal .bg-slate-950\/80,
+        body.light-mode #loginLegalNoticeModal .bg-slate-950,
+        body.light-mode #loginLegalNoticeModal .bg-slate-950\/80,
+        body.light-mode #settingsModal .bg-slate-950,
+        body.light-mode #settingsModal .bg-slate-950\/80,
+        body.light-mode #empresaModal .bg-slate-950,
+        body.light-mode #empresaModal .bg-slate-950\/80,
+        body.light-mode #recEditModal .bg-slate-950,
+        body.light-mode #recEditModal .bg-slate-950\/80,
+        body.light-mode #colabModal .bg-slate-950,
+        body.light-mode #colabModal .bg-slate-950\/80 { background-color:#f1f5f9 !important }
+        body.light-mode main .bg-slate-800,
+        body.light-mode footer .bg-slate-800,
+        body.light-mode #termsModal .bg-slate-800,
+        body.light-mode #loginLegalNoticeModal .bg-slate-800,
+        body.light-mode #settingsModal .bg-slate-800,
+        body.light-mode #empresaModal .bg-slate-800,
+        body.light-mode #recEditModal .bg-slate-800,
+        body.light-mode #colabModal .bg-slate-800 { background-color:#e2e8f0 !important }
+        body.light-mode main .hover\:bg-slate-700:hover,
+        body.light-mode footer .hover\:bg-slate-700:hover,
+        body.light-mode #termsModal .hover\:bg-slate-700:hover,
+        body.light-mode #loginLegalNoticeModal .hover\:bg-slate-700:hover,
+        body.light-mode #settingsModal .hover\:bg-slate-700:hover,
+        body.light-mode #empresaModal .hover\:bg-slate-700:hover,
+        body.light-mode #recEditModal .hover\:bg-slate-700:hover,
+        body.light-mode #colabModal .hover\:bg-slate-700:hover { background-color:#cbd5e1 !important }
+        body.light-mode main .text-white,
+        body.light-mode footer .text-white,
+        body.light-mode #termsModal .text-white,
+        body.light-mode #loginLegalNoticeModal .text-white,
+        body.light-mode #settingsModal .text-white,
+        body.light-mode #empresaModal .text-white,
+        body.light-mode #recEditModal .text-white,
+        body.light-mode #colabModal .text-white { color:#0f172a !important }
+        body.light-mode main .text-slate-100,
+        body.light-mode main .text-slate-200,
+        body.light-mode footer .text-slate-100,
+        body.light-mode footer .text-slate-200,
+        body.light-mode #termsModal .text-slate-100,
+        body.light-mode #termsModal .text-slate-200,
+        body.light-mode #loginLegalNoticeModal .text-slate-100,
+        body.light-mode #loginLegalNoticeModal .text-slate-200,
+        body.light-mode #settingsModal .text-slate-100,
+        body.light-mode #settingsModal .text-slate-200,
+        body.light-mode #empresaModal .text-slate-100,
+        body.light-mode #empresaModal .text-slate-200,
+        body.light-mode #recEditModal .text-slate-100,
+        body.light-mode #recEditModal .text-slate-200,
+        body.light-mode #colabModal .text-slate-100,
+        body.light-mode #colabModal .text-slate-200 { color:#1e293b !important }
+        body.light-mode main .text-slate-300,
+        body.light-mode footer .text-slate-300,
+        body.light-mode #termsModal .text-slate-300,
+        body.light-mode #loginLegalNoticeModal .text-slate-300,
+        body.light-mode #settingsModal .text-slate-300,
+        body.light-mode #empresaModal .text-slate-300,
+        body.light-mode #recEditModal .text-slate-300,
+        body.light-mode #colabModal .text-slate-300 { color:#334155 !important }
+        body.light-mode main .text-slate-400,
+        body.light-mode footer .text-slate-400,
+        body.light-mode #termsModal .text-slate-400,
+        body.light-mode #loginLegalNoticeModal .text-slate-400,
+        body.light-mode #settingsModal .text-slate-400,
+        body.light-mode #empresaModal .text-slate-400,
+        body.light-mode #recEditModal .text-slate-400,
+        body.light-mode #colabModal .text-slate-400 { color:#475569 !important }
+        body.light-mode main .text-slate-500,
+        body.light-mode footer .text-slate-500,
+        body.light-mode #termsModal .text-slate-500,
+        body.light-mode #loginLegalNoticeModal .text-slate-500,
+        body.light-mode #settingsModal .text-slate-500,
+        body.light-mode #empresaModal .text-slate-500,
+        body.light-mode #recEditModal .text-slate-500,
+        body.light-mode #colabModal .text-slate-500 { color:#64748b !important }
+        body.light-mode main .text-red-200,
+        body.light-mode main .text-red-300,
+        body.light-mode main .text-red-400,
+        body.light-mode footer .text-red-200,
+        body.light-mode footer .text-red-300,
+        body.light-mode footer .text-red-400,
+        body.light-mode #termsModal .text-red-200,
+        body.light-mode #termsModal .text-red-300,
+        body.light-mode #termsModal .text-red-400,
+        body.light-mode #loginLegalNoticeModal .text-red-200,
+        body.light-mode #loginLegalNoticeModal .text-red-300,
+        body.light-mode #loginLegalNoticeModal .text-red-400,
+        body.light-mode #settingsModal .text-red-200,
+        body.light-mode #settingsModal .text-red-300,
+        body.light-mode #settingsModal .text-red-400,
+        body.light-mode #empresaModal .text-red-200,
+        body.light-mode #empresaModal .text-red-300,
+        body.light-mode #empresaModal .text-red-400,
+        body.light-mode #recEditModal .text-red-200,
+        body.light-mode #recEditModal .text-red-300,
+        body.light-mode #recEditModal .text-red-400,
+        body.light-mode #colabModal .text-red-200,
+        body.light-mode #colabModal .text-red-300,
+        body.light-mode #colabModal .text-red-400 { color:#b91c1c !important }
+        body.light-mode main .text-red-200\/80,
+        body.light-mode footer .text-red-200\/80,
+        body.light-mode #termsModal .text-red-200\/80,
+        body.light-mode #loginLegalNoticeModal .text-red-200\/80,
+        body.light-mode #settingsModal .text-red-200\/80,
+        body.light-mode #empresaModal .text-red-200\/80,
+        body.light-mode #recEditModal .text-red-200\/80,
+        body.light-mode #colabModal .text-red-200\/80 { color:#7f1d1d !important }
+        body.light-mode main .text-emerald-300,
+        body.light-mode main .text-emerald-400,
+        body.light-mode footer .text-emerald-300,
+        body.light-mode footer .text-emerald-400,
+        body.light-mode #termsModal .text-emerald-300,
+        body.light-mode #termsModal .text-emerald-400,
+        body.light-mode #loginLegalNoticeModal .text-emerald-300,
+        body.light-mode #loginLegalNoticeModal .text-emerald-400,
+        body.light-mode #settingsModal .text-emerald-300,
+        body.light-mode #settingsModal .text-emerald-400,
+        body.light-mode #empresaModal .text-emerald-300,
+        body.light-mode #empresaModal .text-emerald-400,
+        body.light-mode #recEditModal .text-emerald-300,
+        body.light-mode #recEditModal .text-emerald-400,
+        body.light-mode #colabModal .text-emerald-300,
+        body.light-mode #colabModal .text-emerald-400 { color:#047857 !important }
+        body.light-mode main .text-blue-400,
+        body.light-mode footer .text-blue-400,
+        body.light-mode #termsModal .text-blue-400,
+        body.light-mode #loginLegalNoticeModal .text-blue-400,
+        body.light-mode #settingsModal .text-blue-400,
+        body.light-mode #empresaModal .text-blue-400,
+        body.light-mode #recEditModal .text-blue-400,
+        body.light-mode #colabModal .text-blue-400 { color:#1d4ed8 !important }
+        body.light-mode main .text-amber-200,
+        body.light-mode main .text-amber-300,
+        body.light-mode main .text-amber-400,
+        body.light-mode footer .text-amber-200,
+        body.light-mode footer .text-amber-300,
+        body.light-mode footer .text-amber-400,
+        body.light-mode #termsModal .text-amber-200,
+        body.light-mode #termsModal .text-amber-300,
+        body.light-mode #termsModal .text-amber-400,
+        body.light-mode #loginLegalNoticeModal .text-amber-200,
+        body.light-mode #loginLegalNoticeModal .text-amber-300,
+        body.light-mode #loginLegalNoticeModal .text-amber-400,
+        body.light-mode #settingsModal .text-amber-200,
+        body.light-mode #settingsModal .text-amber-300,
+        body.light-mode #settingsModal .text-amber-400,
+        body.light-mode #empresaModal .text-amber-200,
+        body.light-mode #empresaModal .text-amber-300,
+        body.light-mode #empresaModal .text-amber-400,
+        body.light-mode #recEditModal .text-amber-200,
+        body.light-mode #recEditModal .text-amber-300,
+        body.light-mode #recEditModal .text-amber-400,
+        body.light-mode #colabModal .text-amber-200,
+        body.light-mode #colabModal .text-amber-300,
+        body.light-mode #colabModal .text-amber-400 { color:#b45309 !important }
+        body.light-mode main .border-slate-800,
+        body.light-mode footer .border-slate-800,
+        body.light-mode #termsModal .border-slate-800,
+        body.light-mode #loginLegalNoticeModal .border-slate-800,
+        body.light-mode #settingsModal .border-slate-800,
+        body.light-mode #empresaModal .border-slate-800,
+        body.light-mode #recEditModal .border-slate-800,
+        body.light-mode #colabModal .border-slate-800 { border-color:#e2e8f0 !important }
+        body.light-mode main .border-slate-700,
+        body.light-mode footer .border-slate-700,
+        body.light-mode #termsModal .border-slate-700,
+        body.light-mode #loginLegalNoticeModal .border-slate-700,
+        body.light-mode #settingsModal .border-slate-700,
+        body.light-mode #empresaModal .border-slate-700,
+        body.light-mode #recEditModal .border-slate-700,
+        body.light-mode #colabModal .border-slate-700 { border-color:#cbd5e1 !important }
+        body.light-mode main .bg-gradient-to-br,
+        body.light-mode main .bg-gradient-to-r:not(#loginProgressBar),
+        body.light-mode footer .bg-gradient-to-br,
+        body.light-mode footer .bg-gradient-to-r:not(#loginProgressBar),
+        body.light-mode #termsModal .bg-gradient-to-br,
+        body.light-mode #termsModal .bg-gradient-to-r:not(#loginProgressBar),
+        body.light-mode #loginLegalNoticeModal .bg-gradient-to-br,
+        body.light-mode #loginLegalNoticeModal .bg-gradient-to-r:not(#loginProgressBar),
+        body.light-mode #settingsModal .bg-gradient-to-br,
+        body.light-mode #settingsModal .bg-gradient-to-r:not(#loginProgressBar),
+        body.light-mode #empresaModal .bg-gradient-to-br,
+        body.light-mode #empresaModal .bg-gradient-to-r:not(#loginProgressBar),
+        body.light-mode #recEditModal .bg-gradient-to-br,
+        body.light-mode #recEditModal .bg-gradient-to-r:not(#loginProgressBar),
+        body.light-mode #colabModal .bg-gradient-to-br,
+        body.light-mode #colabModal .bg-gradient-to-r:not(#loginProgressBar) { background-image:linear-gradient(135deg,#ffffff,#fee2e2) !important }
+        body.light-mode main .text-white[class*="bg-red-"],
+        body.light-mode main .text-white[class*="bg-emerald-"],
+        body.light-mode main .text-white[class*="bg-amber-"],
+        body.light-mode footer .text-white[class*="bg-red-"],
+        body.light-mode footer .text-white[class*="bg-emerald-"],
+        body.light-mode footer .text-white[class*="bg-amber-"],
+        body.light-mode #termsModal .text-white[class*="bg-red-"],
+        body.light-mode #termsModal .text-white[class*="bg-emerald-"],
+        body.light-mode #termsModal .text-white[class*="bg-amber-"],
+        body.light-mode #loginLegalNoticeModal .text-white[class*="bg-red-"],
+        body.light-mode #loginLegalNoticeModal .text-white[class*="bg-emerald-"],
+        body.light-mode #loginLegalNoticeModal .text-white[class*="bg-amber-"],
+        body.light-mode #settingsModal .text-white[class*="bg-red-"],
+        body.light-mode #settingsModal .text-white[class*="bg-emerald-"],
+        body.light-mode #settingsModal .text-white[class*="bg-amber-"],
+        body.light-mode #empresaModal .text-white[class*="bg-red-"],
+        body.light-mode #empresaModal .text-white[class*="bg-emerald-"],
+        body.light-mode #empresaModal .text-white[class*="bg-amber-"],
+        body.light-mode #recEditModal .text-white[class*="bg-red-"],
+        body.light-mode #recEditModal .text-white[class*="bg-emerald-"],
+        body.light-mode #recEditModal .text-white[class*="bg-amber-"],
+        body.light-mode #colabModal .text-white[class*="bg-red-"],
+        body.light-mode #colabModal .text-white[class*="bg-emerald-"],
+        body.light-mode #colabModal .text-white[class*="bg-amber-"] { color:#ffffff !important }
+
         /* Accesibilidad: sin movimiento si el usuario lo pide */
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
@@ -298,6 +557,7 @@
         <div id="loadingSessionView" class="text-center py-20 space-y-6">
             <div class="inline-block p-8 rounded-3xl bg-slate-900/80 border border-slate-800 shadow-2xl backdrop-blur-xl">
                 <h2 class="text-4xl sm:text-5xl font-black text-white brand-heavy tracking-tight drop-shadow-lg mb-3">Kolaboradorf <span class="text-red-500">VE</span></h2>
+                <div class="kv-truck-wrap my-3"><svg class="kv-truck" viewBox="0 0 240 80" role="img" aria-label="Camión de reparto en ruta"><line x1="0" y1="68" x2="240" y2="68" stroke="#475569" stroke-width="2"/><line class="kv-dash" x1="0" y1="74" x2="240" y2="74" stroke="#dc2626" stroke-width="3" stroke-dasharray="14 12"/><g class="kv-bob"><rect x="46" y="20" width="96" height="40" rx="5" fill="#dc2626"/><rect x="46" y="38" width="96" height="6" fill="#fff" opacity=".85"/><path d="M142 30h26l16 16v14h-42z" fill="#b91c1c"/><path d="M150 35h14l10 11h-24z" fill="#bfdbfe"/><rect x="180" y="52" width="6" height="4" rx="1" fill="#fde68a"/><g class="kv-wheel"><circle cx="72" cy="62" r="8" fill="#0f172a" stroke="#e5e7eb" stroke-width="2"/><path d="M72 56v12M66 62h12" stroke="#e5e7eb" stroke-width="2"/></g><g class="kv-wheel"><circle cx="118" cy="62" r="8" fill="#0f172a" stroke="#e5e7eb" stroke-width="2"/><path d="M118 56v12M112 62h12" stroke="#e5e7eb" stroke-width="2"/></g><g class="kv-wheel"><circle cx="164" cy="62" r="8" fill="#0f172a" stroke="#e5e7eb" stroke-width="2"/><path d="M164 56v12M158 62h12" stroke="#e5e7eb" stroke-width="2"/></g></g></svg></div>
                 <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-red-600 border-t-transparent my-4 shadow-lg shadow-red-600/20"></div>
                 <p class="text-xs text-slate-400 font-semibold tracking-wider uppercase">Cargando sistema logístico y restaurando sesión...</p>
             </div>
@@ -308,6 +568,7 @@
             <div class="inline-block p-8 rounded-3xl bg-slate-900/90 border border-red-900/40 shadow-2xl backdrop-blur-xl max-w-lg w-full mx-auto shadow-red-950/30">
                 <h2 class="text-3xl sm:text-4xl font-black text-white brand-heavy tracking-tight drop-shadow-lg leading-none mb-1.5">Kolaboradorf <span class="text-red-500">VE</span></h2>
                 <p class="text-[10px] text-red-300 font-extrabold tracking-widest uppercase mb-4">DFPfantasy CorVe C.A ®</p>
+                <div class="kv-truck-wrap my-2"><svg class="kv-truck" viewBox="0 0 240 80" role="img" aria-label="Camión de reparto en ruta"><line x1="0" y1="68" x2="240" y2="68" stroke="#475569" stroke-width="2"/><line class="kv-dash" x1="0" y1="74" x2="240" y2="74" stroke="#dc2626" stroke-width="3" stroke-dasharray="14 12"/><g class="kv-bob"><rect x="46" y="20" width="96" height="40" rx="5" fill="#dc2626"/><rect x="46" y="38" width="96" height="6" fill="#fff" opacity=".85"/><path d="M142 30h26l16 16v14h-42z" fill="#b91c1c"/><path d="M150 35h14l10 11h-24z" fill="#bfdbfe"/><rect x="180" y="52" width="6" height="4" rx="1" fill="#fde68a"/><g class="kv-wheel"><circle cx="72" cy="62" r="8" fill="#0f172a" stroke="#e5e7eb" stroke-width="2"/><path d="M72 56v12M66 62h12" stroke="#e5e7eb" stroke-width="2"/></g><g class="kv-wheel"><circle cx="118" cy="62" r="8" fill="#0f172a" stroke="#e5e7eb" stroke-width="2"/><path d="M118 56v12M112 62h12" stroke="#e5e7eb" stroke-width="2"/></g><g class="kv-wheel"><circle cx="164" cy="62" r="8" fill="#0f172a" stroke="#e5e7eb" stroke-width="2"/><path d="M164 56v12M158 62h12" stroke="#e5e7eb" stroke-width="2"/></g></g></svg></div>
                 <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-red-600 border-t-transparent my-2 shadow-lg shadow-red-600/20"></div>
                 <p class="text-xs text-slate-400 font-medium tracking-wide mt-2">Guardando configuraciones y cerrando entorno seguro...</p>
             </div>
@@ -319,6 +580,7 @@
                 <h2 class="text-3xl font-black text-white brand-heavy tracking-tight drop-shadow mb-2">Kolaboradorf <span class="text-red-500">VE</span></h2>
                 <p class="text-xs text-slate-400 font-medium tracking-wide uppercase">Autenticando credenciales corporativas...</p>
             </div>
+            <div class="kv-truck-wrap "><svg class="kv-truck" viewBox="0 0 240 80" role="img" aria-label="Camión de reparto en ruta"><line x1="0" y1="68" x2="240" y2="68" stroke="#475569" stroke-width="2"/><line class="kv-dash" x1="0" y1="74" x2="240" y2="74" stroke="#dc2626" stroke-width="3" stroke-dasharray="14 12"/><g class="kv-bob"><rect x="46" y="20" width="96" height="40" rx="5" fill="#dc2626"/><rect x="46" y="38" width="96" height="6" fill="#fff" opacity=".85"/><path d="M142 30h26l16 16v14h-42z" fill="#b91c1c"/><path d="M150 35h14l10 11h-24z" fill="#bfdbfe"/><rect x="180" y="52" width="6" height="4" rx="1" fill="#fde68a"/><g class="kv-wheel"><circle cx="72" cy="62" r="8" fill="#0f172a" stroke="#e5e7eb" stroke-width="2"/><path d="M72 56v12M66 62h12" stroke="#e5e7eb" stroke-width="2"/></g><g class="kv-wheel"><circle cx="118" cy="62" r="8" fill="#0f172a" stroke="#e5e7eb" stroke-width="2"/><path d="M118 56v12M112 62h12" stroke="#e5e7eb" stroke-width="2"/></g><g class="kv-wheel"><circle cx="164" cy="62" r="8" fill="#0f172a" stroke="#e5e7eb" stroke-width="2"/><path d="M164 56v12M158 62h12" stroke="#e5e7eb" stroke-width="2"/></g></g></svg></div>
             <div class="space-y-2">
                 <div class="flex justify-between text-xs font-bold text-slate-300">
                     <span>Progreso</span>
@@ -333,6 +595,7 @@
 
         <!-- 1. VISTA DE AUTENTICACIÓN -->
         <section id="authView" class="max-w-md mx-auto bg-slate-900/90 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-slate-800 mt-6 hidden shadow-red-950/20">
+            <div class="kv-truck-wrap mb-4"><svg class="kv-truck" viewBox="0 0 240 80" role="img" aria-label="Camión de reparto en ruta"><line x1="0" y1="68" x2="240" y2="68" stroke="#475569" stroke-width="2"/><line class="kv-dash" x1="0" y1="74" x2="240" y2="74" stroke="#dc2626" stroke-width="3" stroke-dasharray="14 12"/><g class="kv-bob"><rect x="46" y="20" width="96" height="40" rx="5" fill="#dc2626"/><rect x="46" y="38" width="96" height="6" fill="#fff" opacity=".85"/><path d="M142 30h26l16 16v14h-42z" fill="#b91c1c"/><path d="M150 35h14l10 11h-24z" fill="#bfdbfe"/><rect x="180" y="52" width="6" height="4" rx="1" fill="#fde68a"/><g class="kv-wheel"><circle cx="72" cy="62" r="8" fill="#0f172a" stroke="#e5e7eb" stroke-width="2"/><path d="M72 56v12M66 62h12" stroke="#e5e7eb" stroke-width="2"/></g><g class="kv-wheel"><circle cx="118" cy="62" r="8" fill="#0f172a" stroke="#e5e7eb" stroke-width="2"/><path d="M118 56v12M112 62h12" stroke="#e5e7eb" stroke-width="2"/></g><g class="kv-wheel"><circle cx="164" cy="62" r="8" fill="#0f172a" stroke="#e5e7eb" stroke-width="2"/><path d="M164 56v12M158 62h12" stroke="#e5e7eb" stroke-width="2"/></g></g></svg></div>
             <div class="text-center mb-8">
                 <div class="w-12 h-12 bg-red-600/10 rounded-2xl border border-red-500/30 flex items-center justify-center mx-auto mb-3 text-red-500 text-xl font-bold"><i class="kv-i kv-i-lock"></i></div>
                 <h2 id="authTitle" class="text-xl font-extrabold text-white tracking-tight">Acceso al Sistema</h2>
@@ -484,6 +747,16 @@
 
             <!-- Panel Operativo -->
             <div id="workerSection" class="space-y-6">
+                <div id="weekSummary" class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 shadow-xl">
+                    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                        <div class="flex-1 space-y-4">
+                            <div><h3 id="wkGreeting" class="text-lg font-black text-white">Hola</h3><p id="wkDate" class="text-xs text-slate-400 capitalize"></p></div>
+                            <div id="wkDays" class="flex gap-2 sm:gap-3"></div>
+                            <p id="wkTx" class="text-xs text-slate-300"></p>
+                        </div>
+                        <div class="flex items-center gap-4"><div id="wkGauge"></div><div class="text-xs text-slate-300 space-y-1"><div class="font-extrabold text-white uppercase tracking-wider text-[11px]">Efectividad de la semana</div><div id="wkEfTx"></div><div class="text-slate-400">Meta: 97%</div></div></div>
+                    </div>
+                </div>
                 <div class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-5 shadow-xl">
                     <div class="flex items-center gap-4">
                         <div class="w-12 h-12 rounded-2xl bg-red-600/10 border border-red-500/30 flex items-center justify-center text-red-500 font-black text-base shadow-inner">DP</div>
@@ -562,12 +835,30 @@
                             <div class="bg-slate-900/90 backdrop-blur-xl p-4 rounded-2xl border border-slate-800 text-center shadow-lg"><span class="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">Efectividad Diaria</span><h4 id="statEfectividadSemanal" class="text-2xl font-black text-blue-400 mt-1.5">100.0%</h4></div>
                         </div>
 
+                        <div id="lvlPanel" class="bg-slate-900/90 backdrop-blur-xl p-4 rounded-2xl border border-slate-800 shadow-lg space-y-2">
+                            <div class="flex justify-between items-center"><span class="text-[10px] font-extrabold text-red-400 uppercase tracking-wider">Siguiente nivel de incentivo</span><span id="lvlAmt" class="text-xs font-black text-emerald-400"></span></div>
+                            <div class="w-full bg-slate-950 rounded-full h-3 overflow-hidden border border-slate-800"><div id="lvlBar" class="h-full rounded-full" style="width:0%;background:linear-gradient(90deg,#dc2626,#f87171);transition:width .5s ease"></div></div>
+                            <p id="lvlTx" class="text-[11px] text-slate-300"></p>
+                        </div>
+
                         <!-- GRÁFICO ESTADÍSTICO VISUAL EN PANTALLA -->
                         <div class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-3 shadow-xl">
                             <h4 class="text-sm font-extrabold text-white flex items-center gap-2 border-b border-slate-800 pb-3">Rendimiento Reciente</h4>
                             <div id="screenDashboardChart" class="flex items-end justify-between h-40 gap-3 pt-6 px-2 bg-slate-950 rounded-xl border border-slate-800 shadow-inner">
                                 <p class="text-xs text-slate-400 m-auto">Cargando gráfico estadístico...</p>
                             </div>
+                        </div>
+
+                        <div class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-3 shadow-xl">
+                            <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 border-b border-slate-800 pb-3">
+                                <h4 class="text-sm font-extrabold text-white">Efectividad diaria vs. meta del 97%</h4>
+                                <select id="effRange" onchange="kvRenderEff(cachedUserRecords)" class="bg-slate-950 border border-slate-800 rounded-lg px-2 py-1 text-[11px] text-white focus:outline-none focus:border-red-600" aria-label="Rango del gráfico">
+                                    <option value="last">Últimos 7 días de reparto</option>
+                                    <option value="week">Esta semana</option>
+                                </select>
+                            </div>
+                            <div id="effChart"></div>
+                            <p id="effCaption" class="text-[11px] text-slate-400 text-center min-h-[16px]">Toca un punto para ver su detalle.</p>
                         </div>
 
                         <!-- HISTÓRICO ACUMULADO GENERAL DE JORNADAS -->
@@ -2872,6 +3163,122 @@
             if (idle >= LIMIT) { last = Date.now(); warned = false; kvToast('Sesión cerrada por inactividad.', 'warn'); logoutApp(); }
             else if (idle >= WARN && !warned) { warned = true; kvToast('Tu sesión se cerrará en 15 segundos por inactividad. Mueve el mouse o toca la pantalla para continuar.', 'warn'); }
         }, 3000);
+    })();
+    </script>
+
+    <script>
+    /* Etapa 1: resumen semanal, siguiente nivel y gráfico de efectividad (no modifica funciones existentes) */
+    (function () {
+        var $ = function (id) { return document.getElementById(id); };
+        var TIERS = [300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200];
+        var DAYS = ['L', 'M', 'X', 'J', 'V'];
+        function pd(ymd) { var a = String(ymd || '').split('-').map(Number); return a.length === 3 && a[0] ? new Date(a[0], a[1] - 1, a[2]) : null; }
+        function mondayOf(d) { var x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return x; }
+        function ymd(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+        function recs() { return (typeof cachedUserRecords !== 'undefined' && cachedUserRecords) ? cachedUserRecords : []; }
+        function worked(r) { return (parseFloat(r.cargaInicial) || 0) > 0; }
+        function efColor(v) { return v >= 97 ? '#22c55e' : (v >= 90 ? '#f59e0b' : '#ef4444'); }
+
+        // ---- 1) Resumen de la semana ----
+        function gauge(ef, has) {
+            var C = 2 * Math.PI * 44, off = C * (1 - Math.min(100, Math.max(0, has ? ef : 0)) / 100), col = has ? efColor(ef) : '#64748b';
+            var ang = (97 / 100) * 360 - 90, rad = ang * Math.PI / 180;
+            var x1 = 60 + 38 * Math.cos(rad), y1 = 60 + 38 * Math.sin(rad), x2 = 60 + 52 * Math.cos(rad), y2 = 60 + 52 * Math.sin(rad);
+            return '<svg viewBox="0 0 120 120" width="120" height="120" role="img" aria-label="Efectividad semanal"><circle cx="60" cy="60" r="44" fill="none" style="stroke:var(--kv-track)" stroke-width="10"/>' +
+                '<circle class="kv-g-fill" cx="60" cy="60" r="44" fill="none" stroke="' + col + '" stroke-width="10" stroke-linecap="round" stroke-dasharray="' + C.toFixed(2) + '" stroke-dashoffset="' + off.toFixed(2) + '" transform="rotate(-90 60 60)"/>' +
+                '<line x1="' + x1.toFixed(1) + '" y1="' + y1.toFixed(1) + '" x2="' + x2.toFixed(1) + '" y2="' + y2.toFixed(1) + '" stroke="#f59e0b" stroke-width="3" stroke-linecap="round"/>' +
+                '<text x="60" y="64" text-anchor="middle" font-size="20" font-weight="900" font-family="Inter,sans-serif" style="fill:' + col + '">' + (has ? ef.toFixed(1) + '%' : '--') + '</text></svg>';
+        }
+        window.kvRenderWeek = function () {
+            if (!$('weekSummary') || typeof currentUser === 'undefined' || !currentUser) return;
+            var now = new Date(), h = now.getHours();
+            var nm = String(currentUser.name || '').trim().split(/\s+/)[0] || '';
+            nm = nm.charAt(0).toUpperCase() + nm.slice(1).toLowerCase();
+            $('wkGreeting').textContent = (h < 12 ? 'Buenos días' : (h < 19 ? 'Buenas tardes' : 'Buenas noches')) + (nm ? ', ' + nm : '');
+            $('wkDate').textContent = now.toLocaleDateString('es-VE', { weekday: 'long', day: 'numeric', month: 'long' });
+            var mon = mondayOf(now), today = ymd(now), all = recs(), html = '', done = 0, sumEf = 0, nEf = 0, inc = 0;
+            var week = all.filter(function (r) { var d = pd(r.fecha); return d && d >= mon && d < new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + 7); });
+            week.forEach(function (r) { inc += parseFloat(r.incentivoDiarioUSD) || 0; if (worked(r)) { sumEf += parseFloat(r.efectividad) || 0; nEf++; } });
+            for (var i = 0; i < 5; i++) {
+                var d = new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + i), key = ymd(d);
+                var r = week.filter(function (x) { return x.fecha === key; })[0], st, inner = DAYS[i];
+                if (r && worked(r)) { st = 'background:#059669;color:#fff;border:2px solid #059669'; inner = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>'; done++; }
+                else if (r) { st = 'background:#1d4ed8;color:#fff;border:2px solid #1d4ed8'; inner = 'E'; done++; }
+                else if (key === today) st = 'background:transparent;color:#f87171;border:2px dashed #f87171';
+                else if (key < today) st = 'background:transparent;color:#94a3b8;border:2px solid #64748b';
+                else st = 'background:transparent;color:#94a3b8;border:2px solid #475569;opacity:.55';
+                html += '<div class="flex flex-col items-center gap-1"><div class="w-11 h-11 rounded-full flex items-center justify-center font-black text-sm" style="' + st + '" title="' + key + '">' + inner + '</div><span class="text-[10px] font-bold text-slate-400">' + DAYS[i] + '</span></div>';
+            }
+            $('wkDays').innerHTML = html;
+            var ef = nEf ? sumEf / nEf : 0;
+            $('wkGauge').innerHTML = gauge(ef, nEf > 0);
+            $('wkEfTx').textContent = nEf ? (ef >= 97 ? 'Vas calificando para el bono' : 'Por debajo de la meta') : 'Sin días de reparto todavía';
+            $('wkTx').textContent = done + ' de 5 días registrados · Incentivo de la semana: $' + inc.toFixed(2);
+        };
+
+        // ---- 2) Siguiente nivel de incentivo ----
+        function amt(t) { var pre = (currentUser && currentUser.role === 'Entregador') ? 'ent_' : 'ayu_'; var e = $(pre + t); return parseFloat(e && e.value) || 0; }
+        window.kvLevel = function (cajas) {
+            if (!$('lvlPanel')) return;
+            cajas = Math.max(0, parseInt(cajas) || 0);
+            var exp = $('noLoadCheck') && $('noLoadCheck').checked;
+            if (exp) { $('lvlBar').style.width = '0%'; $('lvlAmt').textContent = ''; $('lvlTx').textContent = 'Día Exprés: sin carga, no suma ni resta en tu efectividad.'; return; }
+            var idx = -1; TIERS.forEach(function (t, i) { if (cajas >= t) idx = i; });
+            var cur = idx >= 0 ? amt(TIERS[idx]) : 0;
+            $('lvlAmt').textContent = 'Nivel actual: $' + cur.toFixed(2);
+            if (idx === TIERS.length - 1) { $('lvlBar').style.width = '100%'; $('lvlTx').textContent = 'Llevas ' + cajas + ' cajas netas: ¡nivel máximo alcanzado!'; return; }
+            var next = TIERS[idx + 1], from = idx >= 0 ? TIERS[idx] : 0, nAmt = amt(next);
+            $('lvlBar').style.width = Math.min(100, Math.max(0, ((cajas - from) / (next - from)) * 100)).toFixed(0) + '%';
+            $('lvlTx').textContent = 'Llevas ' + cajas + ' cajas netas. Te faltan ' + (next - cajas) + ' para subir de $' + cur.toFixed(2) + ' a $' + nAmt.toFixed(2) + '.';
+        };
+
+        // ---- 5) Gráfico de efectividad con la meta del 97 % ----
+        window.kvRenderEff = function (records) {
+            var box = $('effChart'); if (!box) return;
+            var mode = $('effRange') ? $('effRange').value : 'last';
+            var data = (records || []).filter(worked);
+            if (mode === 'week') { var mon = mondayOf(new Date()), end = new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + 7); data = data.filter(function (r) { var d = pd(r.fecha); return d && d >= mon && d < end; }); }
+            else data = data.slice(0, 7);
+            data = data.slice().sort(function (a, b) { return String(a.fecha).localeCompare(String(b.fecha)) || String(a.timestamp || '').localeCompare(String(b.timestamp || '')); });
+            if (!data.length) { box.innerHTML = '<p class="text-xs text-slate-400 text-center py-8">Aún no hay días de reparto para graficar.</p>'; return; }
+            var W = 600, H = 236, pl = 44, pr = 18, pt = 30, pb = 36;
+            var efs = data.map(function (r) { return parseFloat(r.efectividad) || 0; });
+            var yMin = Math.max(0, Math.floor(Math.min.apply(null, efs.concat([97])) - 3)), yMax = 100;
+            var X = function (i) { return data.length === 1 ? pl + (W - pl - pr) / 2 : pl + i * (W - pl - pr) / (data.length - 1); };
+            var Y = function (v) { return pt + (yMax - v) / (yMax - yMin) * (H - pt - pb); };
+            var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" role="img" aria-label="Efectividad diaria frente a la meta del 97%" style="max-height:260px">';
+            [yMin, 100].forEach(function (v) { svg += '<line x1="' + pl + '" y1="' + Y(v) + '" x2="' + (W - pr) + '" y2="' + Y(v) + '" style="stroke:var(--kv-grid)" stroke-width="1"/><text x="' + (pl - 6) + '" y="' + (Y(v) + 4) + '" text-anchor="end" font-size="11" style="fill:var(--kv-axis)">' + v + '%</text>'; });
+            svg += '<line x1="' + pl + '" y1="' + Y(97) + '" x2="' + (W - pr) + '" y2="' + Y(97) + '" stroke="#f59e0b" stroke-width="2" stroke-dasharray="6 5"/><text x="' + (W - pr) + '" y="' + (Y(97) - 6) + '" text-anchor="end" font-size="11" font-weight="700" fill="#f59e0b">Meta 97%</text>';
+            svg += '<polyline fill="none" stroke="#f87171" stroke-width="2.5" stroke-linejoin="round" points="' + data.map(function (r, i) { return X(i).toFixed(1) + ',' + Y(efs[i]).toFixed(1); }).join(' ') + '"/>';
+            data.forEach(function (r, i) {
+                var v = efs[i], tip = 'Ruta ' + r.ruta + ' · ' + r.fecha + ' · Efectividad ' + v.toFixed(1) + '%' + (v >= 97 ? ' (cumple)' : ' (por debajo de la meta)') + (r.ticket ? ' · Ticket #' + String(r.ticket).padStart(6, '0') : '');
+                var dd = String(r.fecha).split('-'); 
+                svg += '<g><circle cx="' + X(i).toFixed(1) + '" cy="' + Y(v).toFixed(1) + '" r="7" fill="' + efColor(v) + '" stroke="#ffffff" stroke-width="2" data-tip="' + escapeHTML(tip) + '" style="cursor:pointer"><title>' + escapeHTML(tip) + '</title></circle>' +
+                    '<text x="' + X(i).toFixed(1) + '" y="' + (Y(v) - 12).toFixed(1) + '" text-anchor="middle" font-size="11" font-weight="700" style="fill:' + efColor(v) + '">' + v.toFixed(1) + '</text>' +
+                    '<text x="' + X(i).toFixed(1) + '" y="' + (H - 12) + '" text-anchor="middle" font-size="11" style="fill:var(--kv-axis)">' + (dd.length === 3 ? dd[2] + '/' + dd[1] : '') + '</text></g>';
+            });
+            box.innerHTML = svg + '</svg>';
+        };
+        document.addEventListener('click', function (e) {
+            var t = e.target && e.target.closest ? e.target.closest('#effChart circle[data-tip]') : null;
+            if (t && $('effCaption')) { $('effCaption').textContent = t.getAttribute('data-tip'); return; }
+            var col = e.target && e.target.closest ? e.target.closest('#screenDashboardChart > div[title]') : null;
+            if (col && $('barCaption')) $('barCaption').textContent = col.getAttribute('title');
+        });
+
+        // Texto de detalle para las barras (sirve también al tocar en el celular)
+        var chartBox = $('screenDashboardChart');
+        if (chartBox && !$('barCaption')) { var cap = document.createElement('p'); cap.id = 'barCaption'; cap.className = 'text-[11px] text-slate-400 text-center min-h-[16px]'; cap.textContent = 'Toca una barra para ver su detalle.'; chartBox.parentNode.appendChild(cap); }
+
+        // ---- Enganches a las funciones existentes ----
+        var rs = window.renderScreenDashboardChart;
+        window.renderScreenDashboardChart = function (r) { rs(r); kvRenderEff(r); kvRenderWeek(); };
+        var cr = window.calculateRealTime;
+        window.calculateRealTime = function () { var m = cr.apply(this, arguments); kvLevel(m ? m.cargaNetaDia : 0); return m; };
+        var la = window.launchAppSession;
+        window.launchAppSession = async function (a) { await la(a); kvRenderEff(recs()); kvRenderWeek(); kvLevel(parseInt(($('statCargaNetaDia') || {}).textContent) || 0); };
+        setInterval(function () { kvRenderWeek(); }, 60000);
+        kvLevel(0);
     })();
     </script>
 </body>
