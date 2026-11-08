@@ -520,6 +520,31 @@
         body.light-mode #colabModal .text-white[class*="bg-emerald-"],
         body.light-mode #colabModal .text-white[class*="bg-amber-"] { color:#ffffff !important }
 
+        .kv-i-dollar { --ic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 2v20M17 6H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6'/%3E%3C/svg%3E"); }
+        .kv-i-sun { --ic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='4'/%3E%3Cpath d='M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4'/%3E%3C/svg%3E"); }
+        .kv-i-moon { --ic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z'/%3E%3C/svg%3E"); }
+        .kv-i-umbrella { --ic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 2a10 10 0 0 0-10 10h20A10 10 0 0 0 12 2zM12 12v7a2 2 0 0 0 4 0'/%3E%3C/svg%3E"); }
+        .kv-i-eye { --ic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3C/svg%3E"); }
+        .kv-i-eyeoff { --ic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M17.9 17.9A10.1 10.1 0 0 1 12 19c-6.5 0-10-7-10-7a18 18 0 0 1 5.1-5.9M9.9 5.2A9.7 9.7 0 0 1 12 5c6.5 0 10 7 10 7a18 18 0 0 1-2.2 3.2M1 1l22 22'/%3E%3C/svg%3E"); }
+        /* Estados vacíos y carga con brillo */
+        @keyframes kvSkel { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+        .kv-skel { height: 14px; border-radius: 8px; background: linear-gradient(90deg, var(--kv-track) 25%, rgba(148,163,184,.3) 50%, var(--kv-track) 75%); background-size: 200% 100%; animation: kvSkel 1.4s linear infinite; }
+        .kv-empty { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 18px 8px; text-align: center; margin: auto; }
+        .kv-empty-ic { width: 46px; height: 46px; border-radius: 14px; display: flex; align-items: center; justify-content: center; background: rgba(220,38,38,.1); border: 1px solid rgba(239,68,68,.3); color: #f87171; font-size: 20px; }
+        .kv-empty b { font-size: 12px; font-weight: 800; }
+        .kv-empty span { font-size: 11px; opacity: .7; }
+        #operationalContainer > div > * { scroll-margin-top: 84px; }
+
+        /* Navegación inferior (celular) */
+        #kvNav { display: none; }
+        @media (max-width: 640px) {
+            #kvNav.kv-on { display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 36; justify-content: space-around; padding: 6px 8px calc(6px + env(safe-area-inset-bottom)); background: rgba(15,23,42,.94); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); border-top: 1px solid rgba(255,255,255,.12); }
+            #kvNav button { display: flex; flex-direction: column; align-items: center; gap: 2px; flex: 1; background: none; border: 0; color: #cbd5e1; font: 700 10px Inter, sans-serif; padding: 4px 0; cursor: pointer; }
+            #kvNav button .kv-i { width: 22px; height: 22px; }
+            body.kv-has-nav main { padding-bottom: 96px; }
+            body.kv-has-nav .kv-glass { bottom: 78px; }
+        }
+
         /* Accesibilidad: sin movimiento si el usuario lo pide */
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
@@ -539,7 +564,7 @@
             </div>
             <div class="flex items-center gap-3">
                 <button onclick="toggleThemeMode()" id="themeToggleBtn" class="bg-slate-950/40 hover:bg-slate-950/60 text-white text-xs px-3 py-1.5 rounded-xl transition border border-red-600/30 font-semibold shadow flex items-center gap-1.5" title="Cambiar Modo Claro / Oscuro">
-                    <span id="themeIcon">☀️</span> <span id="themeText" class="hidden sm:inline">Modo Claro</span>
+                    <span id="themeIcon"><i class="kv-i kv-i-sun"></i></span> <span id="themeText" class="hidden sm:inline">Modo Claro</span>
                 </button>
                 <div id="authHeaderControls" class="hidden flex items-center gap-3 bg-slate-950/30 px-4 py-2 rounded-2xl border border-red-600/30 backdrop-blur-md">
                     <span id="userHeaderBadge" class="text-xs bg-red-600/30 text-red-200 px-3 py-1 rounded-xl font-semibold border border-red-500/30"></span>
@@ -612,7 +637,7 @@
                     <label class="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-2">Contraseña</label>
                     <div class="relative">
                         <input type="password" id="loginPass" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white pr-12 focus:outline-none focus:border-red-600 transition shadow-inner">
-                        <button type="button" onclick="togglePassword('loginPass', 'eyeLogin')" class="absolute right-4 top-3.5 text-slate-400 hover:text-white text-sm font-bold transition" id="eyeLogin">👁️</button>
+                        <button type="button" onclick="togglePassword('loginPass', 'eyeLogin')" class="absolute right-4 top-3.5 text-slate-400 hover:text-white text-sm font-bold transition" id="eyeLogin"><i class="kv-i kv-i-eye"></i></button>
                     </div>
                 </div>
                 <div class="flex justify-between items-center text-xs pt-1">
@@ -640,8 +665,8 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1.5">Empresa en la que labora *</label>
-                    <select id="regEmpresa" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-red-600 transition shadow-inner"><option value="">Seleccione su empresa</option></select>
+                    <label class="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1.5">Rubro en el que labora *</label>
+                    <select id="regEmpresa" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-red-600 transition shadow-inner"><option value="">Seleccione su rubro</option></select>
                 </div>
                 <div>
                     <label class="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1.5">Fecha de Ingreso a la Empresa</label>
@@ -769,7 +794,7 @@
                         <span class="text-slate-400 font-semibold text-[10px] uppercase">Activo:</span> <strong id="activeRoleBadge" class="text-red-400 uppercase font-black">Ayudante</strong>
                     </div>
                     <div>
-                        <button id="btnVacationToggle" onclick="toggleVacationMode()" class="bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold px-5 py-2.5 rounded-xl transition shadow-lg shadow-amber-600/20 uppercase tracking-wider">🌴 Estoy de vacaciones</button>
+                        <button id="btnVacationToggle" onclick="toggleVacationMode()" class="bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold px-5 py-2.5 rounded-xl transition shadow-lg shadow-amber-600/20 uppercase tracking-wider"><i class="kv-i kv-i-umbrella"></i> Estoy de vacaciones</button>
                     </div>
                 </div>
 
@@ -1006,19 +1031,12 @@
                     </div>
 
                     <div class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-4 lg:col-span-2 shadow-xl">
-                        <h4 class="text-sm font-extrabold text-red-400 border-b border-slate-800 pb-3">Empresas del sector (lista que ven los colaboradores)</h4>
-                        <p class="text-xs text-slate-400">Las empresas que agregues aquí aparecen en la lista de empresas venezolanas. Los colaboradores solo pueden elegir, no escribir.</p>
-                        <div class="flex gap-2"><input type="text" id="empNueva" maxlength="60" placeholder="Nombre de la empresa" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-600"><button onclick="addEmpresa()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-4 rounded-xl">Agregar</button></div>
-                        <div id="empChips" class="flex flex-wrap gap-2"></div>
-                    </div>
-
-                    <div class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-4 lg:col-span-2 shadow-xl">
                         <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 border-b border-slate-800 pb-3">
                             <h4 class="text-sm font-extrabold text-white flex items-center gap-2"><i class="kv-i kv-i-users"></i> Colaboradores <span id="colabCount" class="text-[10px] text-slate-400 font-bold"></span></h4>
                             <button onclick="loadColabs()" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1 rounded-lg border border-slate-700 font-semibold">Actualizar lista</button>
                         </div>
                         <div class="flex flex-col sm:flex-row gap-2">
-                            <input type="text" id="colabSearch" oninput="renderColabs()" placeholder="Buscar por nombre, correo o empresa" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-600">
+                            <input type="text" id="colabSearch" oninput="renderColabs()" placeholder="Buscar por nombre, correo o rubro" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-600">
                             <select id="colabFilter" onchange="renderColabs()" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-600">
                                 <option value="active">Activos</option>
                                 <option value="suspended">Suspendidos</option>
@@ -1127,7 +1145,7 @@
             <div class="space-y-3 bg-slate-950 p-4 rounded-2xl border border-slate-800 shadow-inner">
                 <h4 class="text-[11px] font-extrabold text-red-400 uppercase tracking-wider">Mis datos</h4>
                 <div><label class="block text-[10px] font-bold text-slate-300 uppercase tracking-wider mb-1">Nombre completo</label><input type="text" id="setName" maxlength="80" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-600"></div>
-                <div><label class="block text-[10px] font-bold text-slate-300 uppercase tracking-wider mb-1">Empresa en la que laboras *</label><select id="setEmpresa" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-600"><option value="">Seleccione su empresa</option></select></div>
+                <div><label class="block text-[10px] font-bold text-slate-300 uppercase tracking-wider mb-1">Rubro en el que laboras *</label><select id="setEmpresa" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-600"><option value="">Seleccione su rubro</option></select></div>
                 <div class="grid grid-cols-2 gap-3 text-[11px] text-slate-300">
                     <div><span class="block text-[10px] font-bold text-slate-400 uppercase">Correo</span><strong id="setEmail" class="break-all"></strong></div>
                     <div><span class="block text-[10px] font-bold text-slate-400 uppercase">Cargo</span><strong id="setRole"></strong></div>
@@ -1164,9 +1182,9 @@
     <div id="empresaModal" class="fixed inset-0 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
         <div class="bg-slate-900 rounded-3xl max-w-md w-full p-8 border border-red-900/50 shadow-2xl space-y-4 text-center">
             <div class="w-12 h-12 bg-red-600/10 rounded-2xl border border-red-500/30 flex items-center justify-center mx-auto text-red-500 text-xl"><i class="kv-i kv-i-users"></i></div>
-            <h3 class="text-lg font-black text-white">Coloca la empresa en la que trabajas</h3>
-            <p class="text-xs text-slate-400">Este dato es obligatorio para continuar. Selecciónala de la lista.</p>
-            <select id="empModalSel" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-red-600"><option value="">Seleccione su empresa</option></select>
+            <h3 class="text-lg font-black text-white">Selecciona tu rubro de trabajo</h3>
+            <p class="text-xs text-slate-400">Este dato es obligatorio para continuar. Selecciónalo de la lista.</p>
+            <select id="empModalSel" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-red-600"><option value="">Seleccione su rubro</option></select>
             <button onclick="saveEmpresaModal()" class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider">Guardar y continuar</button>
         </div>
     </div>
@@ -1208,6 +1226,14 @@
             <div id="colabBody" class="space-y-4 text-xs text-slate-300"></div>
         </div>
     </div>
+
+    <!-- NAVEGACIÓN INFERIOR (solo celular) -->
+    <nav id="kvNav" aria-label="Navegación principal">
+        <button type="button" data-t="reg"><i class="kv-i kv-i-clip"></i><span>Registro</span></button>
+        <button type="button" data-t="hist"><i class="kv-i kv-i-file"></i><span>Histórico</span></button>
+        <button type="button" data-t="inc"><i class="kv-i kv-i-dollar"></i><span>Incentivo</span></button>
+        <button type="button" data-t="cfg"><i class="kv-i kv-i-gear"></i><span>Config.</span></button>
+    </nav>
 
     <!-- WIDGET FLOTANTE ESTILO GLASS: TASA OFICIAL BCV (se actualiza sola) -->
     <aside id="bcvWidget" class="kv-glass" aria-live="polite">
@@ -2621,10 +2647,7 @@
     /* Perfil: configuración, contraseña y empresa obligatoria (no modifica funciones existentes) */
     (function () {
         var $ = function (id) { return document.getElementById(id); };
-        var NAC = ['Coca-Cola FEMSA Venezuela', 'Pepsi-Cola Venezuela (Empresas Polar)', 'Empresas Polar', 'Hit de Venezuela'];
-        var INT = ['The Coca-Cola Company', 'PepsiCo', 'Keurig Dr Pepper', 'Coca-Cola FEMSA', 'Arca Continental', 'Coca-Cola Europacific Partners', 'Suntory Beverage & Food', 'Grupo AJE (Big Cola)', 'Postobón', 'Monster Beverage Corporation'];
-        var OTRA = 'Otra empresa del sector';
-        var extras = [];
+        var RUBRO = 'Distribución de bebidas gasificadas';
 
         function title(s) {
             return String(s).replace(/\s+/g, ' ').trim().toLocaleLowerCase('es')
@@ -2632,19 +2655,9 @@
                 .replace(/ (De|Del|La|Las|Los|Y|E|Da|Do|Van|Von)(?= )/g, function (m, w) { return ' ' + w.toLowerCase(); });
         }
         function opts(sel) {
-            var nac = NAC.concat(extras.filter(function (n) { return NAC.indexOf(n) < 0; })).sort(function (a, b) { return a.localeCompare(b, 'es'); });
-            var og = function (label, arr) { return '<optgroup label="' + label + '">' + arr.map(function (n) { return '<option value="' + escapeHTML(n) + '"' + (n === sel ? ' selected' : '') + '>' + escapeHTML(n) + '</option>'; }).join('') + '</optgroup>'; };
-            return '<option value="">Seleccione su empresa</option>' + og('Empresas venezolanas', nac) + og('Empresas internacionales', INT) + '<option value="' + OTRA + '"' + (sel === OTRA ? ' selected' : '') + '>' + OTRA + '</option>';
+            return '<option value="">Seleccione su rubro</option><option value="' + RUBRO + '"' + (sel === RUBRO ? ' selected' : '') + '>' + RUBRO + '</option>';
         }
         function fill() { ['regEmpresa', 'setEmpresa', 'empModalSel'].forEach(function (id) { var e = $(id); if (!e) return; var v = e.value; e.innerHTML = opts(v); e.value = v; }); }
-        function chips() {
-            var box = $('empChips'); if (!box) return;
-            box.innerHTML = extras.length ? extras.map(function (n) { return '<span class="inline-flex items-center gap-2 bg-slate-950 border border-slate-800 text-slate-200 text-[11px] font-semibold px-3 py-1 rounded-full">' + escapeHTML(n) + ' <button type="button" data-n="' + escapeHTML(n) + '" onclick="removeEmpresa(this.dataset.n)" class="text-red-400 hover:text-red-300" aria-label="Quitar">&times;</button></span>'; }).join('') : '<span class="text-[11px] text-slate-500">Aún no has agregado empresas propias.</span>';
-        }
-        async function loadExtras() {
-            try { var d = await db.collection('config').doc('empresas').get(); extras = (d.exists && d.data().lista) || []; } catch (e) {}
-            fill(); chips();
-        }
         function profRef() { return (currentUser && currentUser.isAdmin) ? db.collection('config').doc('adminPerfil') : db.collection('usuarios').doc(currentUser.email); }
         async function loadProf() { try { var d = await profRef().get(); return d.exists ? d.data() : {}; } catch (e) { return {}; } }
         async function writeProf(data) { var r = profRef(); if (currentUser.isAdmin) await r.set(data, { merge: true }); else await r.update(data); }
@@ -2665,7 +2678,7 @@
         window.saveProfile = async function () {
             var name = title($('setName').value), emp = $('setEmpresa').value;
             if (name.length < 3) { alert('Escriba su nombre completo.'); return; }
-            if (!emp) { alert('La empresa es obligatoria. Seleccione una de la lista.'); return; }
+            if (!emp) { alert('El rubro es obligatorio. Seleccione una opción de la lista.'); return; }
             try {
                 await writeProf({ name: name, empresa: emp });
                 currentUser.name = name; currentUser.empresa = emp; saveSession();
@@ -2694,40 +2707,27 @@
 
         window.saveEmpresaModal = async function () {
             var v = $('empModalSel').value;
-            if (!v) { alert('La empresa es obligatoria. Seleccione una de la lista.'); return; }
+            if (!v) { alert('El rubro es obligatorio. Seleccione una opción de la lista.'); return; }
             try {
                 await writeProf({ empresa: v });
                 currentUser.empresa = v; saveSession();
                 $('empresaModal').classList.add('hidden');
-                alert('¡Empresa guardada con éxito!');
-            } catch (e) { alert('Error al guardar la empresa: ' + (e.code || e.message)); }
-        };
-
-        window.addEmpresa = async function () {
-            var n = $('empNueva').value.replace(/\s+/g, ' ').trim();
-            if (n.length < 3) { alert('Escriba el nombre de la empresa.'); return; }
-            if (NAC.concat(INT, extras).some(function (x) { return x.toLowerCase() === n.toLowerCase(); })) { alert('Esa empresa ya está en la lista.'); return; }
-            try { extras.push(n); await db.collection('config').doc('empresas').set({ lista: extras }, { merge: true }); $('empNueva').value = ''; fill(); chips(); alert('¡Empresa agregada exitosamente!'); }
-            catch (e) { extras.pop(); alert('Error al agregar la empresa: ' + (e.code || e.message)); }
-        };
-        window.removeEmpresa = async function (n) {
-            if (!(await kvConfirm('¿Quitar "' + n + '" de la lista de empresas?'))) return;
-            try { extras = extras.filter(function (x) { return x !== n; }); await db.collection('config').doc('empresas').set({ lista: extras }, { merge: true }); fill(); chips(); }
-            catch (e) { alert('Error al quitar la empresa: ' + (e.code || e.message)); }
+                alert('¡Rubro guardado con éxito!');
+            } catch (e) { alert('Error al guardar el rubro: ' + (e.code || e.message)); }
         };
 
         async function ensureEmpresa() {
             if (!currentUser) return;
             var p = await loadProf();
             if (currentUser.isAdmin && p.name) { currentUser.name = p.name; calculateAntiquity(); }
-            if (p.empresa) { currentUser.empresa = p.empresa; return; }
+            if (p.empresa === RUBRO) { currentUser.empresa = RUBRO; return; }
             fill(); $('empresaModal').classList.remove('hidden');
         }
 
         // Al iniciar la sesión: carga la lista y exige la empresa si falta
         var orig = window.launchAppSession;
-        window.launchAppSession = async function (a) { await orig(a); await loadExtras(); await ensureEmpresa(); };
-        fill(); loadExtras();
+        window.launchAppSession = async function (a) { await orig(a); await ensureEmpresa(); };
+        fill();
     })();
     </script>
 
@@ -2844,6 +2844,7 @@
             all.forEach(function (r, i) { if (pass(r)) { idx.push(i); list.push(r); } });
             base(list);
             var box = $('todayHistoryContainer');
+            if (box.innerHTML.indexOf('📦') >= 0) box.innerHTML = box.innerHTML.split('📦').join('<i class="kv-i kv-i-box"></i>');
             if (!list.length) { if (all.length) box.innerHTML = '<p class="text-xs text-slate-400 text-center py-4">No hay registros en el filtro seleccionado.</p>'; return; }
             if (all !== cachedUserRecords) return;
             Array.prototype.forEach.call(box.children, function (card, k) {
@@ -2947,7 +2948,7 @@
                 return '<div class="bg-slate-950 p-3 rounded-xl border ' + (u.suspendido ? 'border-red-900/50' : 'border-slate-800') + ' text-xs flex flex-col sm:flex-row justify-between sm:items-center gap-2 shadow-inner">' +
                     '<div class="min-w-0"><strong class="text-white">' + escapeHTML(u.name || 'Sin nombre') + '</strong>' + (u.suspendido ? ' <span class="text-[10px] font-bold text-red-400">Suspendido</span>' : '') +
                     '<p class="text-[11px] text-slate-400 break-all">' + em + ' · <span class="text-red-400 uppercase font-bold">' + escapeHTML(u.role || '') + '</span></p>' +
-                    '<p class="text-[11px] text-slate-500">Empresa: ' + escapeHTML(u.empresa || 'Sin registrar') + ' · Ingreso: ' + escapeHTML(u.fechaIngreso || '-') + '</p></div>' +
+                    '<p class="text-[11px] text-slate-500">Rubro: ' + escapeHTML(u.empresa || 'Sin registrar') + ' · Ingreso: ' + escapeHTML(u.fechaIngreso || '-') + '</p></div>' +
                     '<div class="flex gap-2 flex-none"><button type="button" data-email="' + em + '" onclick="viewColab(this.dataset.email)" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 font-semibold">Ver historial</button>' +
                     '<button type="button" data-email="' + em + '" onclick="toggleColab(this.dataset.email)" class="text-[10px] ' + (u.suspendido ? 'bg-emerald-600 hover:bg-emerald-500 text-white' : 'bg-red-600/20 hover:bg-red-600/40 text-red-300 border border-red-500/30') + ' px-3 py-1.5 rounded-lg font-semibold">' + (u.suspendido ? 'Reactivar' : 'Suspender') + '</button></div></div>';
             }).join('');
@@ -2973,7 +2974,7 @@
             try { var d = await db.collection('historial_jornadas').doc(email).get(); h = d.exists ? d.data() : {}; }
             catch (e) { $('colabBody').innerHTML = '<p class="text-amber-400">No se pudo cargar el historial.</p>'; return; }
             var recs = (h.registros || []).slice(0, 10), cie = (h.cierres || []).slice(0, 6);
-            var head = '<div class="bg-slate-950 p-3 rounded-xl border border-slate-800 break-all"><strong class="text-white">' + escapeHTML(u.name || email) + '</strong><br>' + escapeHTML(email) + '<br>Empresa: ' + escapeHTML(u.empresa || 'Sin registrar') + ' · ' + escapeHTML(u.role || '') + '</div>';
+            var head = '<div class="bg-slate-950 p-3 rounded-xl border border-slate-800 break-all"><strong class="text-white">' + escapeHTML(u.name || email) + '</strong><br>' + escapeHTML(email) + '<br>Rubro: ' + escapeHTML(u.empresa || 'Sin registrar') + ' · ' + escapeHTML(u.role || '') + '</div>';
             var c = cie.length ? cie.map(function (x) {
                 return '<div class="bg-slate-950 p-2 rounded-lg border border-slate-800 flex flex-wrap justify-between gap-1"><span>' + escapeHTML(x.desde) + ' al ' + escapeHTML(x.hasta) + '</span><span>Efectividad ' + escapeHTML(x.efectividadPromedio) + '%</span><strong class="text-emerald-400">$' + escapeHTML(Number(x.montoACobrar || 0).toFixed(2)) + '</strong>' + (x.montoBs ? '<span>Bs. ' + escapeHTML(fmtBs(x.montoBs)) + '</span>' : '') + '<span class="text-amber-300">Cobra: ' + escapeHTML(x.fechaCobro) + '</span></div>';
             }).join('') : '<p class="text-slate-500">Sin incentivos generados.</p>';
@@ -3279,6 +3280,133 @@
         window.launchAppSession = async function (a) { await la(a); kvRenderEff(recs()); kvRenderWeek(); kvLevel(parseInt(($('statCargaNetaDia') || {}).textContent) || 0); };
         setInterval(function () { kvRenderWeek(); }, 60000);
         kvLevel(0);
+    })();
+    </script>
+
+    <script>
+    /* Etapa 2: navegación del celular, PDF profesional, íconos, estados vacíos y festejo (no modifica funciones existentes) */
+    (function () {
+        var $ = function (id) { return document.getElementById(id); };
+        var esc = function (v) { return escapeHTML(v); };
+
+        // ---- 8) Íconos en lugar de los emojis que cambia el código ----
+        function iconSync() {
+            var light = document.body.classList.contains('light-mode'), ti = $('themeIcon');
+            if (ti) ti.innerHTML = '<i class="kv-i kv-i-' + (light ? 'moon' : 'sun') + '"></i>';
+            var inp = $('loginPass'), eye = $('eyeLogin');
+            if (eye && inp) eye.innerHTML = '<i class="kv-i kv-i-' + (inp.type === 'password' ? 'eye' : 'eyeoff') + '"></i>';
+            var v = $('btnVacationToggle');
+            if (v) v.innerHTML = '<i class="kv-i kv-i-umbrella"></i> ' + (isVacation ? 'Ya regresé' : 'Estoy de vacaciones');
+        }
+        ['toggleThemeMode', 'togglePassword', 'toggleVacationMode'].forEach(function (n) {
+            var f = window[n]; window[n] = function () { var r = f.apply(this, arguments); iconSync(); return r; };
+        });
+        document.addEventListener('DOMContentLoaded', iconSync);
+
+        // ---- 9) Estados vacíos con diseño y carga con brillo ----
+        var EMPTY = {
+            todayHistoryContainer: ['clip', 'Aún no hay registros', 'Guarda tu primera jornada y aparecerá aquí.'],
+            screenDashboardChart: ['box', 'Sin datos para graficar', 'Registra al menos una jornada de reparto.'],
+            pendingApprovalsList: ['users', 'Sin solicitudes pendientes', 'Cuando alguien se registre, lo verás aquí.'],
+            cierreResult: ['save', 'Todavía no has generado incentivos', 'Tu primer incentivo semanal quedará guardado aquí.'],
+            colabList: ['users', 'No hay colaboradores para mostrar', 'Prueba con otro filtro o búsqueda.'],
+            effChart: ['clip', 'Aún no hay días de reparto', 'Tu efectividad diaria se graficará aquí.']
+        };
+        function decorate(id) {
+            var box = $(id); if (!box || box.querySelector('.kv-empty')) return;
+            var k = box.children;
+            if (k.length !== 1 || k[0].tagName !== 'P') return;
+            var t = (k[0].textContent || '').trim(), c = EMPTY[id];
+            if (/^Cargando/.test(t)) box.innerHTML = '<div class="kv-empty" style="width:100%;align-items:stretch"><div class="kv-skel" style="width:70%"></div><div class="kv-skel" style="width:90%"></div><div class="kv-skel" style="width:55%"></div></div>';
+            else if (/^(No hay|Aún no|Sin )/.test(t)) box.innerHTML = '<div class="kv-empty"><div class="kv-empty-ic"><i class="kv-i kv-i-' + c[0] + '"></i></div><b>' + c[1] + '</b><span>' + c[2] + '</span></div>';
+        }
+        Object.keys(EMPTY).forEach(function (id) {
+            var box = $(id); if (!box) return;
+            new MutationObserver(function () { decorate(id); }).observe(box, { childList: true });
+            decorate(id);
+        });
+
+        // ---- 6) Navegación inferior en el celular ----
+        function go(t) {
+            var el = null;
+            if (t === 'reg') el = document.querySelector('#operationalContainer > div:first-child');
+            else if (t === 'hist') el = $('todayHistoryContainer').closest('.rounded-2xl');
+            else if (t === 'inc') el = $('globalIncentivoSemanalBadge').closest('.rounded-2xl');
+            else if (t === 'cfg') { openSettings(); return; }
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        var nav = $('kvNav');
+        if (nav) nav.addEventListener('click', function (e) { var b = e.target.closest('button[data-t]'); if (b) go(b.getAttribute('data-t')); });
+        function navSync() {
+            var m = $('mainAppView'), w = $('workerSection');
+            var on = !!(m && !m.classList.contains('hidden') && w && !w.classList.contains('hidden'));
+            if (nav) nav.classList.toggle('kv-on', on);
+            document.body.classList.toggle('kv-has-nav', on);
+        }
+        setInterval(navSync, 700); navSync();
+
+        // ---- 10) Festejo al generar un incentivo que califica ----
+        window.kvConfetti = function () {
+            if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+            var c = document.createElement('canvas'); c.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:90';
+            c.width = innerWidth; c.height = innerHeight; document.body.appendChild(c);
+            var x = c.getContext('2d'), cols = ['#dc2626', '#f87171', '#ffffff', '#fbbf24', '#22c55e'], P = [], i;
+            for (i = 0; i < 140; i++) P.push({ x: Math.random() * c.width, y: -20 - Math.random() * c.height * .4, vx: (Math.random() - .5) * 4, vy: 2 + Math.random() * 4, s: 5 + Math.random() * 6, r: Math.random() * 6, vr: (Math.random() - .5) * .3, c: cols[i % 5] });
+            var t0 = performance.now();
+            (function f(t) {
+                x.clearRect(0, 0, c.width, c.height);
+                P.forEach(function (p) { p.x += p.vx; p.y += p.vy; p.vy += .05; p.r += p.vr; x.save(); x.translate(p.x, p.y); x.rotate(p.r); x.fillStyle = p.c; x.fillRect(-p.s / 2, -p.s / 2, p.s, p.s * .6); x.restore(); });
+                if (t - t0 < 3000) requestAnimationFrame(f); else c.remove();
+            })(t0);
+        };
+        var gw = window.generateWeeklyIncentive;
+        window.generateWeeklyIncentive = async function () {
+            var before = cachedCierres.length, r = await gw.apply(this, arguments);
+            if (cachedCierres.length > before && cachedCierres[0].califica) kvConfetti();
+            return r;
+        };
+
+        // ---- 7) PDF profesional: varias páginas, resumen y numeración ----
+        window.exportWeeklyReportPDF = async function () {
+            var recs = (typeof cachedUserRecords !== 'undefined' && cachedUserRecords) ? cachedUserRecords.slice(0, 160) : [];
+            if (!recs.length) { alert('No hay registros en el historial para exportar.'); return; }
+            var PER = 24, chunks = [], i;
+            for (i = 0; i < recs.length; i += PER) chunks.push(recs.slice(i, i + PER));
+            var cie = (typeof cachedCierres !== 'undefined' && cachedCierres) ? cachedCierres : [];
+            var resumen = cie.length ? kvResumenIncentivoPDF() : '';
+            var total = chunks.length + (resumen ? 1 : 0);
+            var u = currentUser || {}, hoy = new Date().toLocaleDateString('es-VE', { day: 'numeric', month: 'long', year: 'numeric' });
+            var wk = recs.filter(function (r) { return (parseFloat(r.cargaInicial) || 0) > 0; });
+            var ef = wk.length ? wk.reduce(function (a, r) { return a + (parseFloat(r.efectividad) || 0); }, 0) / wk.length : 0;
+            var inc = recs.reduce(function (a, r) { return a + (parseFloat(r.incentivoDiarioUSD) || 0); }, 0);
+            var head = '<div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #dc2626;padding-bottom:16px;margin-bottom:20px;"><div style="display:flex;align-items:center;gap:12px;"><div style="width:48px;height:48px;background:#dc2626;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:26px;font-weight:900;">K</div><div><div style="font-size:19px;font-weight:900;">KOLABORADORF <span style="color:#dc2626;">VE</span></div><div style="font-size:10px;font-weight:700;color:#dc2626;text-transform:uppercase;">DFPfantasy CorVe C.A ®</div></div></div><div style="text-align:right;font-size:11px;color:#4b5563;line-height:1.5;"><div style="font-size:14px;font-weight:800;color:#111827;">REPORTE DE JORNADAS</div><div><b>' + esc(u.name || '') + '</b> · ' + esc(u.role || '') + '</div><div>' + esc(u.email || '') + '</div>' + (u.empresa ? '<div>' + esc(u.empresa) + '</div>' : '') + '<div>Emitido el ' + esc(hoy) + '</div></div></div>';
+            var kpi = function (l, v) { return '<div style="flex:1;border:1px solid #e5e7eb;border-radius:10px;padding:10px 12px;background:#f9fafb;"><div style="font-size:9px;font-weight:800;color:#6b7280;text-transform:uppercase;">' + l + '</div><div style="font-size:18px;font-weight:900;color:#111827;margin-top:2px;">' + v + '</div></div>'; };
+            var kpis = '<div style="display:flex;gap:10px;margin-bottom:18px;">' + kpi('Registros', recs.length) + kpi('Días de reparto', wk.length) + kpi('Efectividad promedio', ef.toFixed(1) + '%') + kpi('Incentivo acumulado', '$' + inc.toFixed(2)) + '</div>';
+            var th = 'padding:9px;font-size:9px;font-weight:800;color:#374151;', td = 'padding:8px 9px;font-size:10px;color:#111827;';
+            function table(rows) {
+                return '<table style="width:100%;border-collapse:collapse;text-align:left;"><thead><tr style="background:#f3f4f6;border-bottom:2px solid #d1d5db;"><th style="' + th + '">TICKET</th><th style="' + th + '">RUTA</th><th style="' + th + '">FECHA</th><th style="' + th + '">C. INICIAL</th><th style="' + th + '">C. NETA</th><th style="' + th + '">EFECTIVIDAD</th><th style="' + th + '">INCENTIVO</th></tr></thead><tbody>' +
+                    rows.map(function (r, k) { return '<tr style="border-bottom:1px solid #e5e7eb;' + (k % 2 ? 'background:#fafafa;' : '') + '"><td style="' + td + 'color:#6b7280;">' + (r.ticket ? '#' + String(r.ticket).padStart(6, '0') : '-') + '</td><td style="' + td + 'font-weight:700;">' + esc(r.ruta) + '</td><td style="' + td + '">' + esc(r.fecha) + '</td><td style="' + td + '">' + esc(r.cargaInicial) + '</td><td style="' + td + 'font-weight:700;color:#16a34a;">' + esc(r.cargaNetaDia) + '</td><td style="' + td + 'color:#2563eb;">' + esc(r.efectividad) + '%</td><td style="' + td + 'font-weight:700;">$' + esc(r.incentivoDiarioUSD) + '</td></tr>'; }).join('') + '</tbody></table>';
+            }
+            function page(n, body) {
+                return '<div style="width:800px;height:1131px;box-sizing:border-box;padding:40px;background:#fff;color:#111827;font-family:Inter,sans-serif;position:relative;">' + head + body +
+                    '<div style="position:absolute;left:40px;right:40px;bottom:26px;display:flex;justify-content:space-between;font-size:9px;color:#6b7280;border-top:1px solid #e5e7eb;padding-top:8px;"><span>Documento informativo generado por Kolaboradorf VE. No es un comprobante de nómina ni un documento oficial de la empresa.</span><b>Página ' + n + ' de ' + total + '</b></div></div>';
+            }
+            var htmls = chunks.map(function (c, k) { return page(k + 1, (k === 0 ? kpis : '') + '<div style="font-size:12px;font-weight:800;text-transform:uppercase;margin-bottom:8px;border-left:4px solid #dc2626;padding-left:8px;">Detalle de jornadas</div>' + table(c)); });
+            if (resumen) htmls.push(page(total, resumen));
+            var holders = [];
+            try {
+                var pdf = new window.jspdf.jsPDF('p', 'mm', 'a4');
+                for (i = 0; i < htmls.length; i++) {
+                    var d = document.createElement('div'); d.style.cssText = 'position:absolute;left:-9999px;top:0;'; d.innerHTML = htmls[i]; document.body.appendChild(d); holders.push(d);
+                    var canvas = await html2canvas(d.firstChild, { scale: 2, useCORS: true });
+                    if (i > 0) pdf.addPage();
+                    pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, 210, 297);
+                }
+                pdf.save('Reporte_Kolaboradorf_VE_' + ymdLocal(new Date()) + '.pdf');
+                alert('¡Reporte PDF generado y descargado con éxito!');
+            } catch (e) { alert('Error al generar el PDF: ' + (e.message || e)); }
+            holders.forEach(function (h) { if (h.parentNode) h.parentNode.removeChild(h); });
+        };
     })();
     </script>
 </body>
