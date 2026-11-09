@@ -545,6 +545,14 @@
             body.kv-has-nav .kv-glass { bottom: 78px; }
         }
 
+        /* Días de la semana: activación al guardar */
+        @keyframes kvDayPop { 0% { transform: scale(.4); box-shadow: 0 0 0 0 rgba(34,197,94,.75); } 55% { transform: scale(1.2); } 100% { transform: scale(1); box-shadow: 0 0 0 16px rgba(34,197,94,0); } }
+        @keyframes kvDraw { to { stroke-dashoffset: 0; } }
+        @keyframes kvTodayPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(248,113,113,.55); } 50% { box-shadow: 0 0 0 8px rgba(248,113,113,0); } }
+        .kv-pop { animation: kvDayPop .9s cubic-bezier(.34,1.56,.64,1); }
+        .kv-pop svg path { stroke-dasharray: 24; stroke-dashoffset: 24; animation: kvDraw .5s .3s ease forwards; }
+        .kv-today { animation: kvTodayPulse 2s ease-in-out infinite; }
+
         /* Accesibilidad: sin movimiento si el usuario lo pide */
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
@@ -1146,11 +1154,12 @@
                 <h4 class="text-[11px] font-extrabold text-red-400 uppercase tracking-wider">Mis datos</h4>
                 <div><label class="block text-[10px] font-bold text-slate-300 uppercase tracking-wider mb-1">Nombre completo</label><input type="text" id="setName" maxlength="80" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-600"></div>
                 <div><label class="block text-[10px] font-bold text-slate-300 uppercase tracking-wider mb-1">Rubro en el que laboras *</label><select id="setEmpresa" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-600"><option value="">Seleccione su rubro</option></select></div>
-                <div class="grid grid-cols-2 gap-3 text-[11px] text-slate-300">
-                    <div><span class="block text-[10px] font-bold text-slate-400 uppercase">Correo</span><strong id="setEmail" class="break-all"></strong></div>
-                    <div><span class="block text-[10px] font-bold text-slate-400 uppercase">Cargo</span><strong id="setRole"></strong></div>
-                    <div><span class="block text-[10px] font-bold text-slate-400 uppercase">Ingreso</span><strong id="setIngreso"></strong></div>
+                <div class="text-[11px] text-slate-300"><span class="block text-[10px] font-bold text-slate-400 uppercase">Correo</span><strong id="setEmail" class="break-all"></strong></div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div><label class="block text-[10px] font-bold text-slate-300 uppercase tracking-wider mb-1">Cargo</label><select id="setRoleSel" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-600"><option value="Entregador">Entregador (Chófer)</option><option value="Ayudante">Ayudante de descarga</option></select></div>
+                    <div><label class="block text-[10px] font-bold text-slate-300 uppercase tracking-wider mb-1">Fecha de ingreso</label><input type="date" id="setIngresoDate" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-2.5 py-2 text-xs text-white focus:outline-none focus:border-red-600"></div>
                 </div>
+                <p class="text-[10px] text-slate-500">Si cambias de cargo, desde ese momento tus incentivos se calculan con los montos del nuevo cargo. Los registros anteriores no cambian.</p>
                 <button onclick="saveProfile()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider"><i class="kv-i kv-i-save"></i> Guardar datos</button>
             </div>
             <div class="space-y-3 bg-slate-950 p-4 rounded-2xl border border-slate-800 shadow-inner">
@@ -2668,8 +2677,9 @@
             var p = await loadProf(); fill();
             $('setName').value = p.name || currentUser.name || '';
             $('setEmpresa').value = p.empresa || '';
-            $('setEmail').textContent = currentUser.email; $('setRole').textContent = currentUser.role || '';
-            $('setIngreso').textContent = p.fechaIngreso || currentUser.fechaIngreso || '-';
+            $('setEmail').textContent = currentUser.email;
+            $('setRoleSel').value = p.role || currentUser.role || 'Ayudante';
+            $('setIngresoDate').value = p.fechaIngreso || currentUser.fechaIngreso || '';
             ['pwCur', 'pwNew', 'pwNew2'].forEach(function (i) { $(i).value = ''; });
             $('settingsModal').classList.remove('hidden');
         };
@@ -2677,13 +2687,21 @@
 
         window.saveProfile = async function () {
             var name = title($('setName').value), emp = $('setEmpresa').value;
+            var role = $('setRoleSel').value, ing = $('setIngresoDate').value;
             if (name.length < 3) { alert('Escriba su nombre completo.'); return; }
             if (!emp) { alert('El rubro es obligatorio. Seleccione una opción de la lista.'); return; }
+            if (role !== 'Entregador' && role !== 'Ayudante') { alert('Seleccione un cargo válido.'); return; }
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(ing) || ing > ymdLocal(new Date()) || ing < '1970-01-01') { alert('La fecha de ingreso no es válida: no puede estar vacía ni ser futura.'); return; }
+            var changed = role !== (currentUser.role || 'Ayudante');
+            if (changed && !(await kvConfirm('¿Cambiar tu cargo a ' + (role === 'Entregador' ? 'Entregador (Chófer)' : 'Ayudante de descarga') + '?\n\nDesde ahora tus incentivos se calcularán con los montos de ese cargo. Los registros anteriores no cambian.'))) { $('setRoleSel').value = currentUser.role || 'Ayudante'; return; }
             try {
-                await writeProf({ name: name, empresa: emp });
-                currentUser.name = name; currentUser.empresa = emp; saveSession();
+                await writeProf({ name: name, empresa: emp, role: role, fechaIngreso: ing });
+                currentUser.name = name; currentUser.empresa = emp; currentUser.role = role; currentUser.fechaIngreso = ing; saveSession();
                 $('setName').value = name; calculateAntiquity();
-                alert('¡Datos actualizados con éxito!');
+                var hb = $('userHeaderBadge'); if (hb && !currentUser.isAdmin) hb.innerText = 'KOLABORADORF (' + role.toUpperCase() + ')';
+                var sim = $('adminRoleSimulator'); if (sim && currentUser.isAdmin) sim.value = role;
+                calculateRealTime();
+                alert(changed ? '¡Datos actualizados con éxito! Tu nuevo cargo ya se aplica a tus próximos registros.' : '¡Datos actualizados con éxito!');
             } catch (e) { alert('Error al guardar los datos: ' + (e.code || e.message)); }
         };
 
@@ -2719,7 +2737,12 @@
         async function ensureEmpresa() {
             if (!currentUser) return;
             var p = await loadProf();
-            if (currentUser.isAdmin && p.name) { currentUser.name = p.name; calculateAntiquity(); }
+            if (currentUser.isAdmin) {
+                if (p.name) currentUser.name = p.name;
+                if (p.role) currentUser.role = p.role;
+                if (p.fechaIngreso) currentUser.fechaIngreso = p.fechaIngreso;
+                calculateAntiquity();
+            }
             if (p.empresa === RUBRO) { currentUser.empresa = RUBRO; return; }
             fill(); $('empresaModal').classList.remove('hidden');
         }
@@ -3200,6 +3223,7 @@
             var mon = mondayOf(now), today = ymd(now), all = recs(), html = '', done = 0, sumEf = 0, nEf = 0, inc = 0;
             var week = all.filter(function (r) { var d = pd(r.fecha); return d && d >= mon && d < new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + 7); });
             week.forEach(function (r) { inc += parseFloat(r.incentivoDiarioUSD) || 0; if (worked(r)) { sumEf += parseFloat(r.efectividad) || 0; nEf++; } });
+            var prevMap = window.__kvWk, nextMap = {}, popped = false;
             for (var i = 0; i < 5; i++) {
                 var d = new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + i), key = ymd(d);
                 var r = week.filter(function (x) { return x.fecha === key; })[0], st, inner = DAYS[i];
@@ -3208,23 +3232,51 @@
                 else if (key === today) st = 'background:transparent;color:#f87171;border:2px dashed #f87171';
                 else if (key < today) st = 'background:transparent;color:#94a3b8;border:2px solid #64748b';
                 else st = 'background:transparent;color:#94a3b8;border:2px solid #475569;opacity:.55';
-                html += '<div class="flex flex-col items-center gap-1"><div class="w-11 h-11 rounded-full flex items-center justify-center font-black text-sm" style="' + st + '" title="' + key + '">' + inner + '</div><span class="text-[10px] font-bold text-slate-400">' + DAYS[i] + '</span></div>';
+                var state = (r && worked(r)) ? 'done' : (r ? 'express' : (key === today ? 'today' : (key < today ? 'missed' : 'future')));
+                nextMap[key] = state;
+                var ch = prevMap && prevMap[key] && prevMap[key] !== state && (state === 'done' || state === 'express');
+                if (ch) popped = true;
+                html += '<button type="button" data-k="' + key + '" class="flex flex-col items-center gap-1" style="background:none;border:0;cursor:pointer" aria-label="' + key + '"><div class="w-11 h-11 rounded-full flex items-center justify-center font-black text-sm' + (ch ? ' kv-pop' : '') + (state === 'today' ? ' kv-today' : '') + '" style="' + st + '">' + inner + '</div><span class="text-[10px] font-bold text-slate-400">' + DAYS[i] + '</span></button>';
             }
             $('wkDays').innerHTML = html;
+            window.__kvWk = nextMap;
+            if (popped && $('wkDetail')) $('wkDetail').textContent = '¡Día registrado! Llevas ' + done + ' de 5.';
             var ef = nEf ? sumEf / nEf : 0;
             $('wkGauge').innerHTML = gauge(ef, nEf > 0);
             $('wkEfTx').textContent = nEf ? (ef >= 97 ? 'Vas calificando para el bono' : 'Por debajo de la meta') : 'Sin días de reparto todavía';
             $('wkTx').textContent = done + ' de 5 días registrados · Incentivo de la semana: $' + inc.toFixed(2);
         };
 
+        // Detalle y acciones al tocar un día
+        var wkTxEl = $('wkTx');
+        if (wkTxEl && !$('wkDetail')) { var wd = document.createElement('p'); wd.id = 'wkDetail'; wd.className = 'text-[11px] font-semibold text-emerald-400 min-h-[16px]'; wkTxEl.parentNode.insertBefore(wd, wkTxEl.nextSibling); }
+        if ($('wkDays')) $('wkDays').addEventListener('click', function (e) {
+            var b = e.target.closest ? e.target.closest('button[data-k]') : null; if (!b) return;
+            var k = b.getAttribute('data-k'), r = recs().filter(function (x) { return x.fecha === k; })[0], d = $('wkDetail');
+            var lbl = pd(k).toLocaleDateString('es-VE', { weekday: 'long', day: 'numeric', month: 'long' });
+            if (r) { d.textContent = lbl + ': ' + (worked(r) ? 'Ruta ' + r.ruta + ' · Efectividad ' + r.efectividad + '% · Incentivo $' + r.incentivoDiarioUSD : 'día Exprés (sin carga)') + (r.ticket ? ' · Ticket #' + String(r.ticket).padStart(6, '0') : ''); return; }
+            if (k > ymd(new Date())) { d.textContent = lbl + ': todavía no llega ese día.'; return; }
+            var f = $('inputFechaJornada'); if (f) f.value = k;
+            var form = document.querySelector('#operationalContainer > div:first-child'); if (form) form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            setTimeout(function () { var ru = $('inputRuta'); if (ru) ru.focus(); }, 450);
+            d.textContent = 'Registrando ' + lbl + '. Completa los datos y pulsa Guardar Registro.';
+        });
+
         // ---- 2) Siguiente nivel de incentivo ----
         function amt(t) { var pre = (currentUser && currentUser.role === 'Entregador') ? 'ent_' : 'ayu_'; var e = $(pre + t); return parseFloat(e && e.value) || 0; }
+        var lp = $('lvlPanel');
+        if (lp && !$('lvlSteps')) { var stp = document.createElement('div'); stp.id = 'lvlSteps'; stp.className = 'flex flex-wrap gap-1.5 pt-1'; lp.insertBefore(stp, $('lvlTx')); }
         window.kvLevel = function (cajas) {
             if (!$('lvlPanel')) return;
             cajas = Math.max(0, parseInt(cajas) || 0);
             var exp = $('noLoadCheck') && $('noLoadCheck').checked;
+            var idx = -1; if (!exp) TIERS.forEach(function (t, i) { if (cajas >= t) idx = i; });
+            var st = $('lvlSteps');
+            if (st) st.innerHTML = TIERS.map(function (t, i) {
+                var on = i <= idx, nx = !exp && i === idx + 1;
+                return '<span style="font-size:10px;font-weight:800;padding:3px 8px;border-radius:999px;border:1px solid ' + (on ? '#059669' : (nx ? '#f87171' : '#475569')) + ';background:' + (on ? '#059669' : 'transparent') + ';color:' + (on ? '#fff' : (nx ? '#f87171' : '#94a3b8')) + '" title="Desde ' + t + ' cajas netas">' + t + ' · $' + amt(t).toFixed(2) + '</span>';
+            }).join('');
             if (exp) { $('lvlBar').style.width = '0%'; $('lvlAmt').textContent = ''; $('lvlTx').textContent = 'Día Exprés: sin carga, no suma ni resta en tu efectividad.'; return; }
-            var idx = -1; TIERS.forEach(function (t, i) { if (cajas >= t) idx = i; });
             var cur = idx >= 0 ? amt(TIERS[idx]) : 0;
             $('lvlAmt').textContent = 'Nivel actual: $' + cur.toFixed(2);
             if (idx === TIERS.length - 1) { $('lvlBar').style.width = '100%'; $('lvlTx').textContent = 'Llevas ' + cajas + ' cajas netas: ¡nivel máximo alcanzado!'; return; }
