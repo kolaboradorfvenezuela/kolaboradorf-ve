@@ -553,6 +553,12 @@
         .kv-pop svg path { stroke-dasharray: 24; stroke-dashoffset: 24; animation: kvDraw .5s .3s ease forwards; }
         .kv-today { animation: kvTodayPulse 2s ease-in-out infinite; }
 
+        .kv-i-chart { --ic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 3v18h18M7 14l4-4 3 3 5-6'/%3E%3C/svg%3E"); }
+        #adminSection [data-sec] { scroll-margin-top: 84px; }
+        .mt-table th, .mt-table td { padding: 6px 8px; }
+        .mt-table input { margin-top: 0 !important; min-width: 92px; }
+        .sys-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex: none; }
+
         /* Accesibilidad: sin movimiento si el usuario lo pide */
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
@@ -957,7 +963,7 @@
             <div id="adminSection" class="hidden space-y-6">
                 <div id="pendingBanner" class="hidden flex flex-col sm:flex-row items-center justify-between gap-3 bg-amber-500/10 border border-amber-500/40 rounded-2xl px-5 py-3 text-amber-200 text-xs font-bold shadow-lg" role="status">
                     <span><i class="kv-i kv-i-bell"></i> <span id="pendingBannerText"></span></span>
-                    <button type="button" onclick="document.getElementById('pendingApprovalsList').scrollIntoView({behavior:'smooth',block:'center'})" class="bg-amber-500 hover:bg-amber-400 text-slate-950 text-[11px] font-black px-4 py-1.5 rounded-lg uppercase tracking-wider">Revisar ahora</button>
+                    <button type="button" onclick="admShow('colaboradores');setTimeout(function(){document.getElementById('pendingApprovalsList').scrollIntoView({behavior:'smooth',block:'center'})},80)" class="bg-amber-500 hover:bg-amber-400 text-slate-950 text-[11px] font-black px-4 py-1.5 rounded-lg uppercase tracking-wider">Revisar ahora</button>
                 </div>
                 <div class="bg-gradient-to-r from-red-950/60 via-red-900/30 to-red-950/60 border border-red-800/50 rounded-2xl p-6 shadow-2xl backdrop-blur-md">
                     <h3 class="text-lg font-black text-white flex items-center gap-2"><i class="kv-i kv-i-gear"></i> Centro de Mando Supremo (Administrador)</h3>
@@ -965,7 +971,7 @@
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="lg:col-span-2 bg-gradient-to-r from-slate-900 to-red-950/40 rounded-2xl p-5 border border-red-900/40 shadow-xl flex items-center justify-between gap-4">
+                    <div data-sec="resumen" class="lg:col-span-2 bg-gradient-to-r from-slate-900 to-red-950/40 rounded-2xl p-5 border border-red-900/40 shadow-xl flex items-center justify-between gap-4">
                         <div>
                             <span class="text-[10px] font-extrabold text-red-400 uppercase tracking-wider">Contador de tickets</span>
                             <p class="text-xs text-slate-400 mt-0.5">Tickets creados por todos los colaboradores. Se actualiza en vivo.</p>
@@ -973,7 +979,7 @@
                         <div class="text-right flex items-center gap-2"><span id="ticketTotal" class="text-4xl font-black text-white tabular-nums">0</span><span class="kv-live-dot" title="En vivo"></span></div>
                     </div>
                     <!-- GESTIÓN DE PUBLICIDAD EXCLUSIVA ADMIN -->
-                    <div class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-4 shadow-xl">
+                    <div data-sec="publicidad" class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-4 shadow-xl">
                         <h4 class="text-sm font-extrabold text-white border-b border-slate-800 pb-3 flex items-center gap-2"><i class="kv-i kv-i-mega"></i> Gestión de Publicidad Global</h4>
                         <p class="text-xs text-slate-400 leading-relaxed">Sube o cambia la imagen publicitaria corporativa. Si está vacía, no se mostrará ningún espacio publicitario a los usuarios.</p>
                         
@@ -988,14 +994,14 @@
                         </div>
                     </div>
 
-                    <div class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-4 shadow-xl">
+                    <div data-sec="colaboradores" class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-4 shadow-xl">
                         <h4 class="text-sm font-extrabold text-white border-b border-slate-800 pb-3"><i class="kv-i kv-i-users"></i> Solicitudes de Acceso Pendientes</h4>
                         <div id="pendingApprovalsList" class="space-y-3 max-h-80 overflow-y-auto pr-1">
                             <p class="text-xs text-slate-400 text-center py-6">Cargando solicitudes...</p>
                         </div>
                     </div>
 
-                    <div class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-4 shadow-xl">
+                    <div data-sec="legacy" class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-4 shadow-xl">
                         <h4 class="text-sm font-extrabold text-red-400 border-b border-slate-800 pb-3 flex items-center gap-2">Configuración Dólares: Entregadores (Chóferes)</h4>
                         <div class="grid grid-cols-2 gap-3 text-xs max-h-60 overflow-y-auto pr-1 bg-slate-950 p-4 rounded-xl border border-slate-800 shadow-inner">
                             <div><label class="text-[10px] font-bold text-slate-400 uppercase">300 - 399 ($):</label><input type="number" step="0.01" id="ent_300" value="3.80" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-white font-bold mt-1"></div>
@@ -1012,7 +1018,7 @@
                         <button onclick="saveEntregadorConfig()" class="w-full bg-red-600 hover:bg-red-500 text-white text-xs font-bold py-3 rounded-xl transition shadow-lg shadow-red-600/30 uppercase tracking-wider"><i class="kv-i kv-i-save"></i> Guardar Montos Entregadores</button>
                     </div>
 
-                    <div class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-4 lg:col-span-2 shadow-xl">
+                    <div data-sec="legacy" class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-4 lg:col-span-2 shadow-xl">
                         <h4 class="text-sm font-extrabold text-red-400 border-b border-slate-800 pb-3 flex items-center gap-2">Configuración Dólares: Ayudantes</h4>
                         <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 text-xs bg-slate-950 p-4 rounded-xl border border-slate-800 shadow-inner">
                             <div><label class="text-[10px] font-bold text-slate-400 uppercase">300 - 399 ($):</label><input type="number" step="0.01" id="ayu_300" value="3.13" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-white font-bold mt-1"></div>
@@ -1029,7 +1035,7 @@
                         <button onclick="saveAyudanteConfig()" class="w-full bg-red-600 hover:bg-red-500 text-white text-xs font-bold py-3 rounded-xl transition shadow-lg shadow-red-600/30 uppercase tracking-wider"><i class="kv-i kv-i-save"></i> Guardar Montos Ayudantes</button>
                     </div>
 
-                    <div class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-4 lg:col-span-2 shadow-xl">
+                    <div data-sec="legacy" class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-4 lg:col-span-2 shadow-xl">
                         <h4 class="text-sm font-extrabold text-red-400 border-b border-slate-800 pb-3 flex items-center gap-2">Bono de Efectividad Semanal (USD): se paga con 97% o más</h4>
                         <div class="text-xs bg-slate-950 p-4 rounded-xl border border-slate-800 shadow-inner">
                             <label class="text-[10px] font-bold text-slate-400 uppercase">Monto único para Entregadores y Ayudantes ($):</label>
@@ -1038,7 +1044,7 @@
                         <button onclick="saveEfectividadConfig()" class="w-full bg-red-600 hover:bg-red-500 text-white text-xs font-bold py-3 rounded-xl transition shadow-lg shadow-red-600/30 uppercase tracking-wider"><i class="kv-i kv-i-save"></i> Guardar Bono de Efectividad</button>
                     </div>
 
-                    <div class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-4 lg:col-span-2 shadow-xl">
+                    <div data-sec="colaboradores" class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-4 lg:col-span-2 shadow-xl">
                         <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 border-b border-slate-800 pb-3">
                             <h4 class="text-sm font-extrabold text-white flex items-center gap-2"><i class="kv-i kv-i-users"></i> Colaboradores <span id="colabCount" class="text-[10px] text-slate-400 font-bold"></span></h4>
                             <button onclick="loadColabs()" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1 rounded-lg border border-slate-700 font-semibold">Actualizar lista</button>
@@ -2575,8 +2581,8 @@
         var EVERY = 10 * 60 * 1000;
         // Dos fuentes: si la primera falla, se usa la segunda
         var SOURCES = [
-            { u: 'https://ve.dolarapi.com/v1/dolares/oficial', p: function (j) { return parseFloat(j.promedio != null ? j.promedio : (j.venta != null ? j.venta : j.compra)); } },
-            { u: 'https://pydolarvenezuela-api.vercel.app/api/v1/dollar?page=bcv', p: function (j) { var m = j && j.monitors && j.monitors.usd; return m ? parseFloat(m.price) : NaN; } }
+            { n: 'DolarApi', u: 'https://ve.dolarapi.com/v1/dolares/oficial', p: function (j) { return parseFloat(j.promedio != null ? j.promedio : (j.venta != null ? j.venta : j.compra)); } },
+            { n: 'PyDolarVenezuela', u: 'https://pydolarvenezuela-api.vercel.app/api/v1/dollar?page=bcv', p: function (j) { var m = j && j.monitors && j.monitors.usd; return m ? parseFloat(m.price) : NaN; } }
         ];
         var $ = function (id) { return document.getElementById(id); };
         var w = $('bcvWidget'); if (!w) return;
@@ -2604,17 +2610,18 @@
         async function load() {
             if (busy) return; busy = true; btnR.classList.add('kv-spin');
             try {
-                var v = NaN;
+                var v = NaN, usedName = '';
                 for (var k = 0; k < SOURCES.length && !(v > 0); k++) {
                     try {
                         var r = await fetch(SOURCES[k].u, { cache: 'no-store' });
                         if (!r.ok) continue;
                         v = SOURCES[k].p(await r.json());
+                        if (v > 0) usedName = SOURCES[k].n;
                     } catch (e2) {}
                 }
                 if (!(v > 0)) throw new Error('sin fuente disponible');
                 var changed = !last || last.rate !== v;
-                last = { rate: v, fetched: Date.now() };
+                last = { rate: v, fetched: Date.now(), src: usedName };
                 off = false;
                 try { localStorage.setItem(KEY, JSON.stringify(last)); } catch (e) {}
                 paint();
@@ -2637,6 +2644,7 @@
         load();
 
         window.kvGetRate = function () { return last ? last.rate : null; };
+        window.kvBcvInfo = function () { return last ? { rate: last.rate, fetched: last.fetched, src: last.src || '', off: off } : null; };
         window.kvRefreshRate = load;
 
         // Aviso de solicitudes pendientes: se refresca solo cada minuto para el administrador
@@ -3459,6 +3467,158 @@
             } catch (e) { alert('Error al generar el PDF: ' + (e.message || e)); }
             holders.forEach(function (h) { if (h.parentNode) h.parentNode.removeChild(h); });
         };
+    })();
+    </script>
+
+    <script>
+    /* Panel de administrador: secciones, resumen, tabla de montos con confirmación y estado del sistema (no modifica funciones existentes) */
+    (function () {
+        var $ = function (id) { return document.getElementById(id); };
+        var esc = function (v) { return escapeHTML(v); };
+        var TIERS = [300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200];
+        var VERSION = '1.0.0';
+        var SECS = [['resumen', 'Resumen', 'chart'], ['colaboradores', 'Colaboradores', 'users'], ['montos', 'Montos', 'dollar'], ['publicidad', 'Publicidad', 'mega'], ['sistema', 'Sistema', 'gear']];
+        var cur = 'resumen', lastPending = 0;
+        function pd(ymd) { var a = String(ymd || '').split('-').map(Number); return a.length === 3 && a[0] ? new Date(a[0], a[1] - 1, a[2]) : null; }
+        function mondayOf(d) { var x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return x; }
+        function ago(ts) { var m = Math.round((Date.now() - ts) / 60000); return m < 1 ? 'hace un momento' : (m < 60 ? 'hace ' + m + ' min' : 'hace ' + Math.round(m / 60) + ' h'); }
+
+        // ---------- 1) Estructura con secciones ----------
+        var sec = $('adminSection'), grid = sec ? sec.querySelector(':scope > .grid') : null;
+        if (!sec || !grid) return;
+        var lay = document.createElement('div'); lay.id = 'admLayout'; lay.className = 'flex flex-col lg:flex-row gap-6';
+        var nav = document.createElement('nav'); nav.id = 'admNav'; nav.className = 'flex lg:flex-col gap-2 overflow-x-auto lg:overflow-visible lg:w-52 flex-none pb-1'; nav.setAttribute('aria-label', 'Secciones del panel');
+        nav.innerHTML = SECS.map(function (x) { return '<button type="button" data-sec="' + x[0] + '" class="adm-tab flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition whitespace-nowrap"><i class="kv-i kv-i-' + x[2] + '"></i><span>' + x[1] + '</span>' + (x[0] === 'colaboradores' ? '<span id="admTabBadge" class="hidden kv-badge">0</span>' : '') + '</button>'; }).join('');
+        var main = document.createElement('div'); main.id = 'admMain'; main.className = 'flex-1 min-w-0';
+        sec.insertBefore(lay, grid); lay.appendChild(nav); lay.appendChild(main); main.appendChild(grid);
+
+        var AC = 'bg-red-600 text-white shadow-lg shadow-red-600/20', IC = 'bg-slate-800 text-slate-300 hover:bg-slate-700';
+        window.admShow = function (name) {
+            cur = name; try { sessionStorage.setItem('kv_adm_sec', name); } catch (e) {}
+            Array.prototype.forEach.call(nav.querySelectorAll('.adm-tab'), function (b) {
+                var on = b.getAttribute('data-sec') === name;
+                b.className = 'adm-tab flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition whitespace-nowrap ' + (on ? AC : IC);
+            });
+            Array.prototype.forEach.call(grid.children, function (c) { var d = c.getAttribute('data-sec'); c.style.display = (d === name) ? '' : 'none'; });
+            if (name === 'resumen') loadSummary(); else if (name === 'sistema') runStatus(); else if (name === 'montos') baselineIfNeeded();
+        };
+        nav.addEventListener('click', function (e) { var b = e.target.closest('button[data-sec]'); if (b) admShow(b.getAttribute('data-sec')); });
+
+        // ---------- 2) Resumen con indicadores ----------
+        var card = function (id, label, hint) { return '<div class="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-4 border border-slate-800 shadow-lg"><span class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">' + label + '</span><div id="' + id + '" class="text-3xl font-black text-white mt-1 tabular-nums">-</div><span class="text-[10px] text-slate-500">' + hint + '</span></div>'; };
+        var pS = document.createElement('div'); pS.setAttribute('data-sec', 'resumen'); pS.className = 'lg:col-span-2 space-y-3';
+        pS.innerHTML = '<div class="grid grid-cols-2 xl:grid-cols-5 gap-3">' + card('sm_act', 'Colaboradores activos', 'cuentas aprobadas') + card('sm_pen', 'Solicitudes pendientes', 'por revisar') + card('sm_hoy', 'Registros de hoy', 'guardados hoy') + card('sm_tk', 'Tickets de la semana', 'lunes a domingo') + card('sm_ef', 'Efectividad promedio', 'jornadas de reparto de la semana') + '</div><div class="flex items-center justify-between text-[11px] text-slate-400"><span id="sm_upd">Cargando...</span><button type="button" id="sm_btn" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1 rounded-lg border border-slate-700 font-semibold">Actualizar</button></div>';
+        grid.insertBefore(pS, grid.firstChild);
+        var sumBusy = false, sumAt = 0;
+        function loadSummary(force) {
+            if (!currentUser || !currentUser.isAdmin || sumBusy) return;
+            if (!force && Date.now() - sumAt < 20000) return;
+            sumBusy = true;
+            $('sm_pen').textContent = lastPending;
+            var q; try { q = Promise.all([db.collection('usuarios').where('approved', '==', true).get(), db.collection('historial_jornadas').get()]); } catch (e0) { q = Promise.reject(e0); }
+            q.then(function (res) {
+                var now = new Date(), t0 = new Date(now.getFullYear(), now.getMonth(), now.getDate()), mon = mondayOf(now), nxt = new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + 7);
+                var hoy = 0, tk = 0, sum = 0, n = 0;
+                res[1].forEach(function (d) {
+                    var h = d.data() || {};
+                    (h.registros || []).forEach(function (r) {
+                        var ts = r.timestamp ? new Date(r.timestamp) : null;
+                        if (ts && ts >= t0) hoy++;
+                        if (ts && ts >= mon && ts < nxt && r.ticket) tk++;
+                        var fd = pd(r.fecha);
+                        if (fd && fd >= mon && fd < nxt && (parseFloat(r.cargaInicial) || 0) > 0) { sum += parseFloat(r.efectividad) || 0; n++; }
+                    });
+                    (h.cierres || []).forEach(function (c) { var ts = c.generadoEn ? new Date(c.generadoEn) : null; if (ts && ts >= mon && ts < nxt && c.ticket) tk++; });
+                });
+                $('sm_act').textContent = res[0].size; $('sm_hoy').textContent = hoy; $('sm_tk').textContent = tk;
+                $('sm_ef').textContent = n ? (sum / n).toFixed(1) + '%' : '-';
+                sumAt = Date.now(); $('sm_upd').textContent = 'Actualizado ' + ago(sumAt);
+            }).catch(function () { $('sm_upd').textContent = 'No se pudo cargar el resumen.'; }).then(function () { sumBusy = false; });
+        }
+        $('sm_btn').addEventListener('click', function () { loadSummary(true); });
+        setInterval(function () { if (cur === 'resumen' && !document.hidden && !sec.classList.contains('hidden')) loadSummary(true); }, 60000);
+        var upb = window.updatePendingBadge;
+        window.updatePendingBadge = function (n) {
+            upb(n); lastPending = n;
+            var b = $('admTabBadge'); if (b) { b.textContent = n > 9 ? '9+' : String(n); b.classList.toggle('hidden', n === 0); }
+            if ($('sm_pen')) $('sm_pen').textContent = n;
+        };
+
+        // ---------- 4 y 5) Tabla única de montos con confirmación de cambios ----------
+        var roles = [['ent_', 'Entregadores'], ['ayu_', 'Ayudantes']];
+        var tl = function (t) { return t < 1200 ? t + '–' + (t + 99) : '1200 o más'; };
+        var pM = document.createElement('div'); pM.setAttribute('data-sec', 'montos'); pM.className = 'lg:col-span-2 bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-4 shadow-xl';
+        pM.innerHTML = '<div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 border-b border-slate-800 pb-3"><h4 class="text-sm font-extrabold text-white">Montos por nivel (USD)</h4><span id="mtDirty" class="hidden text-[11px] font-bold text-amber-300 bg-amber-500/10 border border-amber-500/30 rounded-lg px-3 py-1">Tienes cambios sin guardar</span></div>' +
+            '<div class="overflow-x-auto"><table class="mt-table w-full text-xs"><thead><tr class="text-left text-[10px] uppercase tracking-wider text-slate-400"><th>Cajas netas</th><th>Entregador (Chófer)</th><th>Ayudante</th></tr></thead><tbody id="mtBody"></tbody>' +
+            '<tfoot><tr class="border-t border-slate-800"><td class="font-bold text-slate-300">Bono de efectividad semanal<br><span class="text-[10px] text-slate-500 font-normal">monto único, se paga con 97% o más</span></td><td colspan="2" id="mtBono"></td></tr></tfoot></table></div>' +
+            '<div class="flex flex-col sm:flex-row gap-2"><button type="button" id="mtSave" class="flex-1 bg-red-600 hover:bg-red-500 text-white text-xs font-bold py-3 rounded-xl transition shadow-lg shadow-red-600/30 uppercase tracking-wider"><i class="kv-i kv-i-save"></i> Guardar cambios</button><button type="button" id="mtReset" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold px-5 py-3 rounded-xl border border-slate-700 uppercase tracking-wider">Descartar cambios</button></div>';
+        grid.appendChild(pM);
+        var body = $('mtBody');
+        TIERS.forEach(function (t) {
+            var tr = document.createElement('tr'); tr.className = 'border-t border-slate-800';
+            tr.innerHTML = '<td class="font-bold text-slate-300 whitespace-nowrap">' + tl(t) + '</td><td data-c="ent_' + t + '"></td><td data-c="ayu_' + t + '"></td>';
+            body.appendChild(tr);
+            roles.forEach(function (r) { var inp = $(r[0] + t); if (inp) tr.querySelector('[data-c="' + r[0] + t + '"]').appendChild(inp); });
+        });
+        var efe = $('efe_monto'); if (efe) $('mtBono').appendChild(efe);
+        var IDS = []; TIERS.forEach(function (t) { IDS.push('ent_' + t); IDS.push('ayu_' + t); }); IDS.push('efe_monto');
+        var base = null, dirty = false;
+        var val = function (id) { var e = $(id); return Math.round((parseFloat(e && e.value) || 0) * 100) / 100; };
+        function snapshot() { var o = {}; IDS.forEach(function (id) { o[id] = val(id); }); return o; }
+        function name(id) { if (id === 'efe_monto') return 'Bono de efectividad'; var r = roles.filter(function (x) { return id.indexOf(x[0]) === 0; })[0]; return r[1] + ' ' + tl(parseInt(id.split('_')[1])); }
+        function diffs() { return base ? IDS.filter(function (id) { return val(id) !== base[id]; }) : []; }
+        function refreshDirty() {
+            var d = diffs(); dirty = d.length > 0;
+            IDS.forEach(function (id) { var e = $(id); if (e) e.style.borderColor = d.indexOf(id) >= 0 ? '#f59e0b' : ''; });
+            $('mtDirty').classList.toggle('hidden', !dirty);
+            if (dirty) $('mtDirty').textContent = 'Tienes ' + d.length + ' cambio' + (d.length > 1 ? 's' : '') + ' sin guardar';
+        }
+        function baselineIfNeeded() { if (!base) { base = snapshot(); refreshDirty(); } }
+        body.addEventListener('input', refreshDirty); if (efe) efe.addEventListener('input', refreshDirty);
+        window.addEventListener('beforeunload', function (e) { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
+        var la = window.launchAppSession;
+        window.launchAppSession = async function (a) { await la(a); base = snapshot(); refreshDirty(); if (a) admShow(cur === 'resumen' ? 'resumen' : cur); };
+        $('mtReset').addEventListener('click', function () { if (!base) return; IDS.forEach(function (id) { var e = $(id); if (e) e.value = base[id]; }); refreshDirty(); calculateRealTime(); });
+        $('mtSave').addEventListener('click', async function () {
+            baselineIfNeeded();
+            var d = diffs(); if (!d.length) { alert('No hay cambios para guardar.'); return; }
+            var lines = d.slice(0, 12).map(function (id) { return '• ' + name(id) + ': $' + base[id].toFixed(2) + ' → $' + val(id).toFixed(2); });
+            if (d.length > 12) lines.push('• y ' + (d.length - 12) + ' cambio(s) más');
+            var warn = [];
+            roles.forEach(function (r) { for (var i = 1; i < TIERS.length; i++) if (val(r[0] + TIERS[i]) < val(r[0] + TIERS[i - 1])) warn.push('Atención: ' + r[1] + ' ' + tl(TIERS[i]) + ' ($' + val(r[0] + TIERS[i]).toFixed(2) + ') es menor que el nivel anterior ($' + val(r[0] + TIERS[i - 1]).toFixed(2) + ').'); });
+            var msg = 'Vas a guardar estos cambios:\n\n' + lines.join('\n') + (warn.length ? '\n\n' + warn.slice(0, 3).join('\n') : '') + '\n\n¿Confirmar?';
+            if (!(await kvConfirm(msg))) return;
+            try {
+                var payload = {}; IDS.forEach(function (id) { payload[id] = val(id); });
+                await db.collection('config').doc('incentivos').set(payload, { merge: true });
+                base = snapshot(); refreshDirty(); calculateRealTime();
+                alert('¡Montos guardados exitosamente!');
+            } catch (e) { alert('Error al guardar los montos: ' + (e.code || e.message)); }
+        });
+
+        // ---------- 15) Estado del sistema ----------
+        var pY = document.createElement('div'); pY.setAttribute('data-sec', 'sistema'); pY.className = 'lg:col-span-2 bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-4 shadow-xl';
+        var row = function (id, label) { return '<div class="flex items-start gap-3 bg-slate-950 p-3 rounded-xl border border-slate-800"><span id="' + id + '_d" class="sys-dot mt-1" style="background:#64748b"></span><div class="min-w-0"><div class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">' + label + '</div><div id="' + id + '" class="text-xs text-slate-200 break-words">Comprobando...</div></div></div>'; };
+        pY.innerHTML = '<div class="flex justify-between items-center border-b border-slate-800 pb-3"><h4 class="text-sm font-extrabold text-white">Estado del sistema</h4><button type="button" id="sys_btn" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1 rounded-lg border border-slate-700 font-semibold">Probar ahora</button></div><div class="grid grid-cols-1 sm:grid-cols-2 gap-3">' + row('sys_fb', 'Base de datos (Firebase)') + row('sys_au', 'Sesión del administrador') + row('sys_bcv', 'Tasa oficial BCV') + row('sys_ver', 'Versión de la app') + '</div>';
+        grid.appendChild(pY);
+        function setRow(id, ok, txt) { $(id).textContent = txt; $(id + '_d').style.background = ok === true ? '#22c55e' : (ok === false ? '#ef4444' : '#f59e0b'); }
+        function runStatus() {
+            var u = firebase.auth().currentUser;
+            setRow('sys_au', !!u, u ? 'Activa: ' + u.email : 'Sin sesión de Firebase');
+            setRow('sys_ver', true, 'Versión ' + VERSION);
+            var bi = window.kvBcvInfo ? kvBcvInfo() : null;
+            if (!bi) setRow('sys_bcv', null, 'Aún sin datos de la tasa');
+            else setRow('sys_bcv', !bi.off, 'Bs. ' + Number(bi.rate).toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + (bi.src ? ' · fuente: ' + bi.src : '') + ' · ' + (bi.off ? 'sin conexión, ' : '') + 'actualizada ' + ago(bi.fetched));
+            setRow('sys_fb', null, 'Comprobando...');
+            var t0 = performance.now();
+            db.collection('config').doc('incentivos').get().then(function () { setRow('sys_fb', true, 'Conectado · respuesta en ' + Math.round(performance.now() - t0) + ' ms'); }).catch(function (e) { setRow('sys_fb', false, 'Sin respuesta: ' + (e.code || e.message)); });
+        }
+        $('sys_btn').addEventListener('click', runStatus);
+
+        // Al abrir el Centro de Mando se muestra la sección activa
+        var sw = window.switchAppTab;
+        window.switchAppTab = function (t) { sw(t); if (t === 'admin') { var s0 = 'resumen'; try { s0 = sessionStorage.getItem('kv_adm_sec') || 'resumen'; } catch (e) {} admShow(s0); } };
+        admShow('resumen');
     })();
     </script>
 </body>
