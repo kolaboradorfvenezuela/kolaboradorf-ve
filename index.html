@@ -559,6 +559,16 @@
         .mt-table input { margin-top: 0 !important; min-width: 92px; }
         .sys-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex: none; }
 
+        /* Avisos para todos y modo mantenimiento */
+        .kv-av { display: none; align-items: flex-start; gap: 10px; border-radius: 16px; padding: 12px 16px; font-size: 12px; font-weight: 700; box-shadow: 0 6px 18px rgba(0,0,0,.25); }
+        .kv-av-info { background: rgba(14,165,233,.12); border: 1px solid rgba(14,165,233,.45); color: #bae6fd; }
+        .kv-av-warn { background: rgba(245,158,11,.12); border: 1px solid rgba(245,158,11,.45); color: #fde68a; }
+        .kv-av-urgent { background: rgba(220,38,38,.15); border: 1px solid rgba(239,68,68,.5); color: #fecaca; }
+        body.light-mode .kv-av-info { color: #075985; } body.light-mode .kv-av-warn { color: #92400e; } body.light-mode .kv-av-urgent { color: #991b1b; }
+        .kv-av button { margin-left: auto; background: none; border: 0; color: inherit; font-size: 18px; line-height: 1; cursor: pointer; padding: 0 4px; }
+        #kvMaint { position: fixed; inset: 0; z-index: 95; display: none; align-items: center; justify-content: center; flex-direction: column; padding: 24px; background: rgba(3,7,18,.95); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); text-align: center; color: #e2e8f0; }
+        #kvMaint h2 { font-size: 22px; font-weight: 900; margin: 10px 0 6px; } #kvMaint p { font-size: 13px; max-width: 420px; color: #cbd5e1; }
+
         /* Accesibilidad: sin movimiento si el usuario lo pide */
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
@@ -1543,6 +1553,7 @@
                 try {
                     await db.collection("config").doc("publicidad").set({ imageUrl: base64String }, { merge: true });
                     alert("¡Publicidad actualizada y publicada con éxito para todos los colaboradores!");
+                    window.kvLog && kvLog("Publicidad", "Publicó una imagen publicitaria");
                     fileInput.value = '';
                     loadGlobalPublicidad();
                 } catch (error) {
@@ -1557,6 +1568,7 @@
             try {
                 await db.collection("config").doc("publicidad").set({ imageUrl: "" }, { merge: true });
                 alert("Publicidad eliminada.");
+                window.kvLog && kvLog("Publicidad", "Eliminó la imagen publicitaria");
                 loadGlobalPublicidad();
             } catch (error) {
                 alert("Error al eliminar: " + error.message);
@@ -1798,6 +1810,7 @@
             try {
                 await db.collection("usuarios").doc(email).update({ approved: true });
                 alert("¡Acceso concedido exitosamente a " + email + "!");
+                window.kvOnApproval && kvOnApproval(email, true);
                 loadPendingApprovals();
             } catch (e) { alert("Error al aprobar: " + e.message); }
         }
@@ -1807,6 +1820,7 @@
             try {
                 await db.collection("usuarios").doc(email).delete();
                 alert("Solicitud rechazada.");
+                window.kvOnApproval && kvOnApproval(email, false);
                 loadPendingApprovals();
             } catch (e) { alert("Error al rechazar: " + e.message); }
         }
@@ -2992,6 +3006,7 @@
             try {
                 await db.collection('usuarios').doc(email).update(susp ? { approved: false, suspendido: true } : { approved: true, suspendido: firebase.firestore.FieldValue.delete() });
                 u.suspendido = susp; renderColabs();
+                window.kvLog && kvLog(susp ? 'Suspensión' : 'Reactivación', (u.name || email) + ' (' + email + ')');
                 alert(susp ? 'Colaborador suspendido con éxito.' : 'Colaborador reactivado con éxito.');
             } catch (e) { alert('Error al actualizar el colaborador: ' + (e.code || e.message)); }
         };
@@ -3175,9 +3190,9 @@
         function startWatch() {
             stopWatch();
             if (!currentUser || !currentUser.isAdmin) return;
-            unsub = db.collection('contadores').doc('tickets').onSnapshot(function (s) {
+            try { unsub = db.collection('contadores').doc('tickets').onSnapshot(function (s) {
                 var el = $('ticketTotal'); if (el) el.textContent = Number(s.exists ? (s.data().total || 0) : 0).toLocaleString('es-VE');
-            }, function () { var el = $('ticketTotal'); if (el) el.textContent = '-'; });
+            }, function () { var el = $('ticketTotal'); if (el) el.textContent = '-'; }); } catch (e) {}
         }
         var la = window.launchAppSession;
         window.launchAppSession = async function (a) { await la(a); startWatch(); };
@@ -3477,7 +3492,7 @@
         var esc = function (v) { return escapeHTML(v); };
         var TIERS = [300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200];
         var VERSION = '1.0.0';
-        var SECS = [['resumen', 'Resumen', 'chart'], ['colaboradores', 'Colaboradores', 'users'], ['montos', 'Montos', 'dollar'], ['publicidad', 'Publicidad', 'mega'], ['sistema', 'Sistema', 'gear']];
+        var SECS = [['resumen', 'Resumen', 'chart'], ['colaboradores', 'Colaboradores', 'users'], ['montos', 'Montos', 'dollar'], ['avisos', 'Avisos', 'bell'], ['publicidad', 'Publicidad', 'mega'], ['sistema', 'Sistema', 'gear']];
         var cur = 'resumen', lastPending = 0;
         function pd(ymd) { var a = String(ymd || '').split('-').map(Number); return a.length === 3 && a[0] ? new Date(a[0], a[1] - 1, a[2]) : null; }
         function mondayOf(d) { var x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return x; }
@@ -3592,6 +3607,7 @@
                 var payload = {}; IDS.forEach(function (id) { payload[id] = val(id); });
                 await db.collection('config').doc('incentivos').set(payload, { merge: true });
                 base = snapshot(); refreshDirty(); calculateRealTime();
+                window.kvLog && kvLog('Montos', lines.join(' ').replace(/• /g, '').slice(0, 300));
                 alert('¡Montos guardados exitosamente!');
             } catch (e) { alert('Error al guardar los montos: ' + (e.code || e.message)); }
         });
@@ -3619,6 +3635,149 @@
         var sw = window.switchAppTab;
         window.switchAppTab = function (t) { sw(t); if (t === 'admin') { var s0 = 'resumen'; try { s0 = sessionStorage.getItem('kv_adm_sec') || 'resumen'; } catch (e) {} admShow(s0); } };
         admShow('resumen');
+    })();
+    </script>
+
+    <script>
+    /* Panel de administrador, etapa 2: avisos para todos, correo al aprobar/rechazar, bitácora y modo mantenimiento (no modifica funciones existentes) */
+    (function () {
+        var $ = function (id) { return document.getElementById(id); };
+        var esc = function (v) { return escapeHTML(v); };
+        var grid = document.querySelector('#admMain > .grid'); if (!grid) return;
+        var aviso = null, maint = null, unsubAv = null;
+        var today = function () { return ymdLocal(new Date()); };
+        var fmtTs = function (ts) { try { return new Date(ts).toLocaleString('es-VE', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }); } catch (e) { return ts; } };
+        var CARD = 'bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-3 shadow-xl lg:col-span-2';
+        var INP = 'w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-600';
+        function addPane(sec, html) { var d = document.createElement('div'); d.setAttribute('data-sec', sec); d.className = CARD; d.style.display = 'none'; d.innerHTML = html; grid.appendChild(d); return d; }
+
+        // ---------- 12) Bitácora de acciones ----------
+        window.kvLog = function (accion, detalle) {
+            try {
+                if (!currentUser || !currentUser.isAdmin) return;
+                db.collection('bitacora').add({ ts: new Date().toISOString(), accion: String(accion).slice(0, 40), detalle: String(detalle || '').slice(0, 300), por: currentUser.email })
+                    .then(function () { var b = $('bitList'); if (b && b.offsetParent !== null) loadBit(); }).catch(function () {});
+            } catch (e) {}
+        };
+        function loadBit() {
+            var box = $('bitList'); if (!box) return;
+            var q; try { q = db.collection('bitacora').orderBy('ts', 'desc').limit(20).get(); } catch (e0) { q = Promise.reject(e0); }
+            q.then(function (snap) {
+                var rows = []; snap.forEach(function (d) { rows.push(d.data()); });
+                box.innerHTML = rows.length ? rows.map(function (r) { return '<div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800 text-[11px] flex flex-wrap gap-x-3 gap-y-0.5"><span class="text-slate-500 tabular-nums">' + esc(fmtTs(r.ts)) + '</span><b class="text-red-400">' + esc(r.accion) + '</b><span class="text-slate-300 break-words min-w-0">' + esc(r.detalle) + '</span></div>'; }).join('') : '<p class="text-xs text-slate-500 text-center py-4">Todavía no hay acciones registradas.</p>';
+            }).catch(function () { box.innerHTML = '<p class="text-xs text-amber-400 text-center py-4">No se pudo cargar la bitácora.</p>'; });
+        }
+        var pB = addPane('sistema', '<div class="flex justify-between items-center border-b border-slate-800 pb-3"><h4 class="text-sm font-extrabold text-white">Bitácora de acciones <span class="text-[10px] text-slate-400 font-bold">(últimas 20)</span></h4><button type="button" id="bitBtn" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1 rounded-lg border border-slate-700 font-semibold">Actualizar</button></div><div id="bitList" class="space-y-1.5"></div>');
+        $('bitBtn').addEventListener('click', loadBit);
+
+        // ---------- 8) Correo automático al aprobar o rechazar ----------
+        window.kvOnApproval = async function (email, ok) {
+            var name = email;
+            if (ok) { try { var d = await db.collection('usuarios').doc(email).get(); if (d.exists && d.data().name) name = d.data().name; } catch (e) {} }
+            kvLog(ok ? 'Aprobación' : 'Rechazo', email);
+            try {
+                await emailjs.send('service_p63esgd', 'template_dl48xbt', {
+                    email: email, to_email: email, name: name, colaborador_nombre: name,
+                    cargo_colaborador: ok ? 'Cuenta aprobada' : 'Solicitud no aprobada', anos_servicio: 'N/A', fecha: today(),
+                    nro_ruta: ok ? 'APROBACIÓN DE CUENTA' : 'SOLICITUD NO APROBADA',
+                    total_entregado: ok ? '¡TU CUENTA FUE APROBADA!' : 'TU SOLICITUD NO FUE APROBADA',
+                    productos_pendientes: ok ? 'Ya puedes iniciar sesión en Kolaboradorf VE con tu correo y tu contraseña.' : 'Tu solicitud de acceso no fue aprobada. Si crees que es un error, comunícate con el administrador.'
+                });
+                alert('¡Correo de aviso enviado con éxito a ' + email + '!');
+            } catch (e) { alert('No se pudo enviar el correo de aviso a ' + email + '.'); }
+        };
+
+        // ---------- 7) Aviso para todos ----------
+        var pA = addPane('avisos', '<h4 class="text-sm font-extrabold text-white border-b border-slate-800 pb-3">Aviso para todos los colaboradores</h4><p class="text-xs text-slate-400">Aparece como un cartel en la parte de arriba de la pantalla de todos, hasta la fecha de vencimiento. Cada persona puede cerrarlo, y un aviso nuevo vuelve a aparecer.</p>' +
+            '<textarea id="avTexto" maxlength="240" rows="3" placeholder="Ej. Lunes feriado: la semana se cierra el jueves." class="' + INP + ' resize-none"></textarea><div class="text-[10px] text-slate-500 text-right"><span id="avCount">0</span>/240</div>' +
+            '<div class="grid grid-cols-1 sm:grid-cols-2 gap-3"><div><label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">Tipo</label><select id="avTipo" class="' + INP + '"><option value="info">Información</option><option value="warn">Importante</option><option value="urgent">Urgente</option></select></div><div><label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">Mostrar hasta</label><input type="date" id="avHasta" class="' + INP + '"></div></div>' +
+            '<div class="flex gap-2"><button type="button" id="avPub" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-3 rounded-xl uppercase tracking-wider"><i class="kv-i kv-i-send"></i> Publicar aviso</button><button type="button" id="avDel" class="bg-red-600/20 hover:bg-red-600/40 text-red-300 border border-red-500/30 text-xs font-bold px-5 py-3 rounded-xl uppercase tracking-wider">Quitar aviso</button></div><div id="avCur" class="text-[11px] text-slate-400"></div>');
+        function plusDays(n) { var d = new Date(); d.setDate(d.getDate() + n); return ymdLocal(d); }
+        $('avHasta').value = plusDays(2);
+        $('avTexto').addEventListener('input', function () { $('avCount').textContent = $('avTexto').value.length; });
+        function renderAvAdmin() {
+            var c = $('avCur'); if (!c) return;
+            var t = today(), a = aviso;
+            if (!a || !a.activo || !a.texto) { c.textContent = 'No hay ningún aviso publicado.'; return; }
+            var vig = (!a.hasta || t <= a.hasta) && (!a.desde || t >= a.desde);
+            c.innerHTML = '<b class="' + (vig ? 'text-emerald-400' : 'text-amber-400') + '">' + (vig ? 'Aviso vigente' : 'Aviso vencido') + '</b> (hasta ' + esc(a.hasta || '-') + '): ' + esc(a.texto);
+        }
+        $('avPub').addEventListener('click', async function () {
+            var texto = $('avTexto').value.trim(), hasta = $('avHasta').value, tipo = $('avTipo').value;
+            if (texto.length < 5) { alert('Escriba el texto del aviso.'); return; }
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(hasta) || hasta < today() || hasta > plusDays(90)) { alert('La fecha de vencimiento no es válida: debe ser desde hoy y hasta 90 días.'); return; }
+            if (!(await kvConfirm('¿Publicar este aviso para todos los colaboradores?\n\n' + texto + '\n\nSe mostrará hasta el ' + hasta + '.'))) return;
+            try {
+                await db.collection('config').doc('aviso').set({ activo: true, texto: texto, tipo: tipo, desde: today(), hasta: hasta, id: Date.now(), por: currentUser.email });
+                kvLog('Aviso', 'Publicó: ' + texto.slice(0, 120)); $('avTexto').value = ''; $('avCount').textContent = '0';
+                alert('¡Aviso publicado exitosamente!');
+            } catch (e) { alert('Error al publicar el aviso: ' + (e.code || e.message)); }
+        });
+        $('avDel').addEventListener('click', async function () {
+            if (!aviso || !aviso.activo) { alert('No hay ningún aviso publicado.'); return; }
+            if (!(await kvConfirm('¿Quitar el aviso actual de la pantalla de todos?'))) return;
+            try { await db.collection('config').doc('aviso').set({ activo: false, id: Date.now() }, { merge: true }); kvLog('Aviso', 'Quitó el aviso'); alert('Aviso eliminado.'); }
+            catch (e) { alert('Error al quitar el aviso: ' + (e.code || e.message)); }
+        });
+        var mv = $('mainAppView'), av = document.createElement('div');
+        av.id = 'kvAviso'; av.setAttribute('role', 'status'); av.innerHTML = '<i class="kv-i kv-i-bell" style="margin-top:2px"></i><span id="kvAvisoTx"></span><button type="button" aria-label="Cerrar aviso">&times;</button>';
+        if (mv) mv.insertBefore(av, mv.firstChild);
+        function renderAviso() {
+            var a = aviso, t = today();
+            var ok = a && a.activo && a.texto && (!a.desde || t >= a.desde) && (!a.hasta || t <= a.hasta);
+            var seen = false; try { seen = a && localStorage.getItem('kv_aviso_visto') === String(a.id); } catch (e) {}
+            if (!ok || seen) { av.style.display = 'none'; return; }
+            av.className = 'kv-av kv-av-' + (a.tipo === 'urgent' || a.tipo === 'warn' ? a.tipo : 'info'); av.style.display = 'flex';
+            $('kvAvisoTx').textContent = a.texto;
+        }
+        av.querySelector('button').addEventListener('click', function () { try { localStorage.setItem('kv_aviso_visto', String(aviso && aviso.id)); } catch (e) {} av.style.display = 'none'; });
+        function startAv() { stopAv(); try { unsubAv = db.collection('config').doc('aviso').onSnapshot(function (s) { aviso = s.exists ? s.data() : null; renderAviso(); renderAvAdmin(); }, function () {}); } catch (e) {} }
+        function stopAv() { if (unsubAv) { unsubAv(); unsubAv = null; } aviso = null; renderAviso(); }
+        setInterval(renderAviso, 60000);
+
+        // ---------- 13) Modo mantenimiento ----------
+        var DEF = 'Estamos actualizando la aplicación. Vuelve en unos minutos.';
+        addPane('sistema', '<div class="flex justify-between items-center border-b border-slate-800 pb-3"><h4 class="text-sm font-extrabold text-white">Modo mantenimiento</h4><span id="mtSt" class="text-[11px] font-bold text-emerald-400">Desactivado</span></div><p class="text-xs text-slate-400">Mientras está activo, los colaboradores no pueden entrar y quienes ya están dentro ven una pantalla de mantenimiento que se quita sola al desactivarlo. Tú, como administrador, sigues entrando normal.</p><input type="text" id="mtMsg" maxlength="140" class="' + INP + '" value="' + DEF + '"><button type="button" id="mtTog" class="w-full bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold py-3 rounded-xl uppercase tracking-wider">Activar mantenimiento</button>');
+        var ov = document.createElement('div'); ov.id = 'kvMaint';
+        var tk = document.querySelector('.kv-truck-wrap'); ov.innerHTML = (tk ? '<div class="kv-truck-wrap" style="width:240px">' + tk.innerHTML + '</div>' : '') + '<h2>Mantenimiento en curso</h2><p id="kvMaintTx"></p><p style="font-size:11px;opacity:.7;margin-top:10px">Esta pantalla se cerrará sola cuando termine.</p>';
+        document.body.appendChild(ov);
+        var note = document.createElement('div'); note.id = 'kvMaintNote'; note.className = 'kv-av kv-av-warn'; note.style.marginBottom = '16px';
+        var au = $('authView'); if (au) au.insertBefore(note, au.firstChild);
+        function inApp() { var m = $('mainAppView'), p = $('pendingView'); return (m && !m.classList.contains('hidden')) || (p && !p.classList.contains('hidden')); }
+        function applyMaint() {
+            var on = !!(maint && maint.activo), admin = !!(currentUser && currentUser.isAdmin), msg = (maint && maint.mensaje) || DEF;
+            ov.style.display = (on && !admin && inApp()) ? 'flex' : 'none'; $('kvMaintTx').textContent = msg;
+            note.style.display = on ? 'flex' : 'none'; note.textContent = 'Mantenimiento en curso: ' + msg;
+            var st = $('mtSt'); if (st) { st.textContent = on ? 'ACTIVO' : 'Desactivado'; st.className = 'text-[11px] font-bold ' + (on ? 'text-amber-400' : 'text-emerald-400'); $('mtTog').textContent = on ? 'Desactivar mantenimiento' : 'Activar mantenimiento'; }
+        }
+        try { db.collection('config').doc('mantenimiento').onSnapshot(function (s) { maint = s.exists ? s.data() : null; applyMaint(); }, function () {}); } catch (e) {}
+        setInterval(applyMaint, 3000);
+        $('mtTog').addEventListener('click', async function () {
+            var on = !(maint && maint.activo), msg = $('mtMsg').value.trim() || DEF;
+            if (!(await kvConfirm(on ? '¿Activar el modo mantenimiento?\n\nLos colaboradores no podrán entrar hasta que lo desactives.' : '¿Desactivar el modo mantenimiento?'))) return;
+            try {
+                await db.collection('config').doc('mantenimiento').set({ activo: on, mensaje: msg, desde: new Date().toISOString(), por: currentUser.email });
+                kvLog('Mantenimiento', on ? 'Activó el modo mantenimiento' : 'Desactivó el modo mantenimiento');
+                alert(on ? 'Modo mantenimiento activado con éxito.' : 'Modo mantenimiento desactivado con éxito.');
+            } catch (e) { alert('Error al cambiar el modo mantenimiento: ' + (e.code || e.message)); }
+        });
+        var hl = window.handleLogin;
+        window.handleLogin = async function (ev) {
+            try {
+                var mail = String(($('loginEmail') || {}).value || '').trim().toLowerCase();
+                if (maint && maint.activo && mail !== ADMIN_EMAIL) { if (ev && ev.preventDefault) ev.preventDefault(); alert(maint.mensaje || DEF); return; }
+            } catch (e) {}
+            return hl.apply(this, arguments);
+        };
+
+        // ---------- Enganches de sesión ----------
+        var la = window.launchAppSession;
+        window.launchAppSession = async function (a) { await la(a); startAv(); applyMaint(); };
+        var lo = window.logoutApp;
+        window.logoutApp = async function () { stopAv(); var r = await lo.apply(this, arguments); applyMaint(); return r; };
+        var as = window.admShow;
+        window.admShow = function (n) { as(n); if (n === 'sistema') loadBit(); if (n === 'avisos') renderAvAdmin(); };
+        applyMaint();
     })();
     </script>
 </body>
