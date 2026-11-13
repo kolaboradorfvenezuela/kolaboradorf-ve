@@ -569,6 +569,18 @@
         #kvMaint { position: fixed; inset: 0; z-index: 95; display: none; align-items: center; justify-content: center; flex-direction: column; padding: 24px; background: rgba(3,7,18,.95); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); text-align: center; color: #e2e8f0; }
         #kvMaint h2 { font-size: 22px; font-weight: 900; margin: 10px 0 6px; } #kvMaint p { font-size: 13px; max-width: 420px; color: #cbd5e1; }
 
+        /* Temas del logo (el logo original nunca se pierde: sin tema todo queda igual) */
+        @keyframes kvIconSway { 0%, 100% { transform: rotate(-5deg) scale(1); } 50% { transform: rotate(5deg) scale(1.08); } }
+        #kvLogoIcon { display: none; width: 38px; height: 38px; flex: none; }
+        #kvLogoIcon svg { width: 100%; height: 100%; display: block; animation: kvIconSway 2.6s ease-in-out infinite; }
+        #kvLogoBar { display: none; height: 3px; border-radius: 3px; margin-top: 5px; }
+        #kvLogoSay { display: none; font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--kv-th-a, #fecaca); margin-top: 2px; }
+        body[data-kv-theme] #kvLogoIcon { display: block; }
+        body[data-kv-theme] header h1 { background-image: linear-gradient(105deg, #ffffff 0%, #ffffff 34%, var(--kv-th-a) 43%, #ffffff 50%, var(--kv-th-a) 57%, #ffffff 66%, #ffffff 100%); }
+        body[data-kv-theme] header h1 span { -webkit-text-fill-color: var(--kv-th-b); }
+        .kv-h2-ico { display: inline-block; width: .85em; height: .85em; vertical-align: -.08em; margin-right: .3em; }
+        .kv-h2-ico svg { width: 100%; height: 100%; display: block; }
+
         /* Accesibilidad: sin movimiento si el usuario lo pide */
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
@@ -3492,7 +3504,7 @@
         var esc = function (v) { return escapeHTML(v); };
         var TIERS = [300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200];
         var VERSION = '1.0.0';
-        var SECS = [['resumen', 'Resumen', 'chart'], ['colaboradores', 'Colaboradores', 'users'], ['montos', 'Montos', 'dollar'], ['avisos', 'Avisos', 'bell'], ['publicidad', 'Publicidad', 'mega'], ['sistema', 'Sistema', 'gear']];
+        var SECS = [['resumen', 'Resumen', 'chart'], ['colaboradores', 'Colaboradores', 'users'], ['montos', 'Montos', 'dollar'], ['avisos', 'Avisos', 'bell'], ['temas', 'Temas', 'flag'], ['publicidad', 'Publicidad', 'mega'], ['sistema', 'Sistema', 'gear']];
         var cur = 'resumen', lastPending = 0;
         function pd(ymd) { var a = String(ymd || '').split('-').map(Number); return a.length === 3 && a[0] ? new Date(a[0], a[1] - 1, a[2]) : null; }
         function mondayOf(d) { var x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return x; }
@@ -3778,6 +3790,122 @@
         var as = window.admShow;
         window.admShow = function (n) { as(n); if (n === 'sistema') loadBit(); if (n === 'avisos') renderAvAdmin(); };
         applyMaint();
+    })();
+    </script>
+
+    <script>
+    /* Temas del logo (administrador) + horas de entrada y salida opcionales (no modifica funciones existentes) */
+    (function () {
+        var $ = function (id) { return document.getElementById(id); };
+        var esc = function (v) { return escapeHTML(v); };
+        var FLAG = '<rect x="2" y="6" width="2" height="30" rx="1" fill="#e5e7eb"/><rect x="5" y="8" width="31" height="7" fill="#facc15"/><rect x="5" y="15" width="31" height="7" fill="#2563eb"/><rect x="5" y="22" width="31" height="7" fill="#dc2626"/><g fill="#fff"><circle cx="10" cy="18.5" r=".9"/><circle cx="13.5" cy="17.4" r=".9"/><circle cx="17" cy="16.9" r=".9"/><circle cx="20.5" cy="16.7" r=".9"/><circle cx="24" cy="16.9" r=".9"/><circle cx="27.5" cy="17.4" r=".9"/><circle cx="31" cy="18.5" r=".9"/></g>';
+        var FB = 'linear-gradient(90deg,#facc15 0 33%,#2563eb 33% 66%,#dc2626 66%)';
+        var T = {
+            anonuevo: { n: 'Año Nuevo', f: '1 de enero', say: '¡Feliz Año Nuevo!', a: '#fde68a', b: '#fbbf24', bar: 'linear-gradient(90deg,transparent,#fbbf24,transparent)', ico: '<g stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round"><path d="M20 5v8M20 27v8M5 20h8M27 20h8M9 9l5.5 5.5M25.500 25.500L31 31M31 9l-5.500 5.500M14.500 25.500L9 31"/></g><circle cx="20" cy="20" r="3" fill="#fff"/><circle cx="7" cy="33" r="1.500" fill="#f472b6"/><circle cx="34" cy="6" r="1.500" fill="#22d3ee"/>' },
+            carnaval: { n: 'Carnaval', f: 'Lunes y martes de Carnaval (fecha móvil)', say: '¡Felices Carnavales!', a: '#f9a8d4', b: '#67e8f9', bar: 'linear-gradient(90deg,#f472b6,#a855f7,#22d3ee,#fbbf24)', ico: '<path d="M4 18c0-6 7-9 16-9s16 3 16 9c0 6-4 9-8 9-3 0-4-3-8-3s-5 3-8 3c-4 0-8-3-8-9z" fill="#a855f7"/><circle cx="14" cy="18" r="3" fill="#fff"/><circle cx="26" cy="18" r="3" fill="#fff"/><path d="M33 9l4-4M7 8L3 4M20 6V1" stroke="#fbbf24" stroke-width="2.500" stroke-linecap="round"/>' },
+            semanasanta: { n: 'Semana Santa', f: 'Jueves y Viernes Santo (fecha móvil)', say: 'Semana Santa', a: '#ddd6fe', b: '#c4b5fd', bar: 'linear-gradient(90deg,#7c3aed,#c4b5fd,#7c3aed)', ico: '<rect x="17" y="4" width="6" height="32" rx="2" fill="#a78bfa"/><rect x="8" y="12" width="24" height="6" rx="2" fill="#a78bfa"/><path d="M4 35c6-2 8-8 6-14M36 35c-6-2-8-8-6-14" stroke="#fbbf24" stroke-width="2.500" fill="none" stroke-linecap="round"/>' },
+            abril19: { n: 'Declaración de la Independencia', f: '19 de abril', say: '19 de Abril · Independencia', a: '#fde68a', b: '#93c5fd', bar: FB, ico: FLAG },
+            trabajador: { n: 'Día del Trabajador', f: '1 de mayo', say: '¡Feliz Día del Trabajador!', a: '#fde68a', b: '#fbbf24', bar: 'linear-gradient(90deg,#fbbf24,#ffffff,#fbbf24)', ico: '<circle cx="20" cy="20" r="9" fill="none" stroke="#fbbf24" stroke-width="5"/><g stroke="#fbbf24" stroke-width="5" stroke-linecap="round"><path d="M20 3v5M20 32v5M3 20h5M32 20h5M8 8l3.500 3.500M28.500 28.500L32 32M32 8l-3.500 3.500M11.500 28.500L8 32"/></g><circle cx="20" cy="20" r="3" fill="#fff"/>' },
+            carabobo: { n: 'Batalla de Carabobo y Día del Ejército', f: '24 de junio', say: 'Batalla de Carabobo', a: '#fde68a', b: '#93c5fd', bar: FB, ico: FLAG + '<path d="M3 38c6 1 10-2 12-6M37 38c-6 1-10-2-12-6" stroke="#4ade80" stroke-width="2" fill="none" stroke-linecap="round"/>' },
+            julio5: { n: 'Día de la Independencia', f: '5 de julio', say: '¡Viva el 5 de Julio!', a: '#fde68a', b: '#93c5fd', bar: FB, ico: FLAG + '<path d="M33 3v4M31 5h4" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/>' },
+            natalicio: { n: 'Natalicio del Libertador', f: '24 de julio', say: 'Natalicio del Libertador', a: '#fde68a', b: '#93c5fd', bar: FB, ico: FLAG + '<path d="M6 38c-3-4-3-8 0-12M36 38c3-4 3-8 0-12" stroke="#4ade80" stroke-width="2.500" fill="none" stroke-linecap="round"/>' },
+            resistencia: { n: 'Día de la Resistencia Indígena', f: '12 de octubre', say: 'Resistencia Indígena', a: '#bbf7d0', b: '#fcd34d', bar: 'linear-gradient(90deg,#16a34a,#f59e0b,#b45309)', ico: '<circle cx="20" cy="23" r="8" fill="#f59e0b"/><g stroke="#16a34a" stroke-width="3" stroke-linecap="round"><path d="M20 4v7M7 11l5 5M33 11l-5 5M3 25h6M31 25h6"/></g>' },
+            navidad: { n: 'Navidad', f: '24 y 25 de diciembre', say: '¡Feliz Navidad!', a: '#86efac', b: '#fef08a', bar: 'repeating-linear-gradient(90deg,#dc2626 0 14px,#16a34a 14px 28px,#fbbf24 28px 42px)', ico: '<path d="M6 31C8 15 20 7 31 13c-4 2-6 10 4 18z" fill="#dc2626"/><rect x="4" y="30" width="32" height="7" rx="3.500" fill="#fff"/><circle cx="32" cy="12" r="4.500" fill="#fff"/><circle cx="9" cy="8" r="1.500" fill="#bae6fd"/><circle cx="14" cy="4" r="1" fill="#bae6fd"/>' },
+            findeano: { n: 'Fin de Año', f: '31 de diciembre', say: '¡Feliz Fin de Año!', a: '#fde68a', b: '#fbbf24', bar: 'linear-gradient(90deg,transparent,#fbbf24,transparent)', ico: '<circle cx="20" cy="20" r="15" fill="none" stroke="#fbbf24" stroke-width="3"/><path d="M20 10v10l7 4" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="35" cy="6" r="1.500" fill="#fbbf24"/><circle cx="5" cy="34" r="1.500" fill="#fbbf24"/>' },
+            embotellador: { n: 'Día del Embotellador', f: 'Fecha especial de la industria (la eliges tú)', say: '¡Feliz Día del Embotellador!', a: '#fecaca', b: '#ffffff', bar: 'linear-gradient(90deg,#dc2626,#ffffff,#dc2626)', ico: '<rect x="15" y="2" width="10" height="4" rx="1" fill="#e5e7eb"/><path d="M17 6h6v5c0 3 6 4 6 10v14a3 3 0 0 1-3 3H14a3 3 0 0 1-3-3V21c0-6 6-7 6-10z" fill="#dc2626"/><path d="M12 22h16v9H12z" fill="#fff" opacity=".92"/>' }
+        };
+        var ORDER = ['anonuevo', 'carnaval', 'semanasanta', 'abril19', 'trabajador', 'carabobo', 'julio5', 'natalicio', 'resistencia', 'navidad', 'findeano', 'embotellador'];
+        window.kvThemes = T;
+        var svg = function (inner) { return '<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' + inner + '</svg>'; };
+
+        // ---- Estructura del logo (se crea una sola vez; sin tema queda invisible) ----
+        var h1 = document.querySelector('header h1'), wrap = h1 ? h1.parentNode : null, outer = wrap ? wrap.parentNode : null;
+        if (!h1 || !outer) return;
+        var ico = document.createElement('span'); ico.id = 'kvLogoIcon'; outer.insertBefore(ico, wrap);
+        var bar = document.createElement('div'); bar.id = 'kvLogoBar'; wrap.appendChild(bar);
+        var say = document.createElement('div'); say.id = 'kvLogoSay'; wrap.appendChild(say);
+        function applyTheme(id) {
+            var t = T[id], b = document.body, root = document.documentElement.style;
+            Array.prototype.forEach.call(document.querySelectorAll('.kv-h2-ico'), function (e) { e.parentNode.removeChild(e); });
+            if (!t) {
+                delete b.dataset.kvTheme; ico.innerHTML = ''; bar.style.display = 'none'; say.style.display = 'none';
+                root.removeProperty('--kv-th-a'); root.removeProperty('--kv-th-b');
+                try { localStorage.removeItem('kv_tema'); } catch (e) {}
+                return;
+            }
+            b.dataset.kvTheme = id; ico.innerHTML = svg(t.ico);
+            bar.style.background = t.bar; bar.style.display = 'block'; say.textContent = t.say; say.style.display = 'block';
+            root.setProperty('--kv-th-a', t.a); root.setProperty('--kv-th-b', t.b);
+            Array.prototype.forEach.call(document.querySelectorAll('h2.brand-heavy'), function (h) { var s = document.createElement('span'); s.className = 'kv-h2-ico'; s.innerHTML = svg(t.ico); h.insertBefore(s, h.firstChild); });
+            try { localStorage.setItem('kv_tema', id); } catch (e) {}
+            markActive();
+        }
+        try { var c = localStorage.getItem('kv_tema'); if (c && T[c]) applyTheme(c); } catch (e) {}
+        try { db.collection('config').doc('tema').onSnapshot(function (s) { var d = s.exists ? s.data() : null; applyTheme(d && d.id !== 'normal' ? d.id : null); markActive(); }, function () {}); } catch (e) {}
+
+        // ---- Panel del administrador: sección Temas ----
+        var grid = document.querySelector('#admMain > .grid'); if (!grid) return;
+        var pT = document.createElement('div'); pT.setAttribute('data-sec', 'temas'); pT.style.display = 'none';
+        pT.className = 'lg:col-span-2 bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-4 shadow-xl';
+        pT.innerHTML = '<div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 border-b border-slate-800 pb-3"><div><h4 class="text-sm font-extrabold text-white">Temas del logo</h4><p class="text-xs text-slate-400 mt-0.5">Al pulsar un tema, el logo cambia al instante en los perfiles de todos. Solo cambia la decoración: el logo siempre se mantiene.</p></div><button type="button" id="thOrig" class="bg-red-600 hover:bg-red-500 text-white text-xs font-bold px-5 py-2.5 rounded-xl uppercase tracking-wider whitespace-nowrap">Logo original</button></div>' +
+            '<p class="text-xs text-slate-300">Tema activo: <b id="thCur" class="text-white">Logo original</b></p><div id="thGrid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3"></div>';
+        grid.appendChild(pT);
+        $('thGrid').innerHTML = ORDER.map(function (id) {
+            var t = T[id];
+            return '<button type="button" data-t="' + id + '" class="th-card text-left flex items-center gap-3 bg-slate-950 p-3 rounded-xl border border-slate-800 hover:border-red-600 transition"><span style="width:44px;height:44px;flex:none;display:block">' + svg(t.ico) + '</span><span class="min-w-0"><b class="block text-xs text-white">' + esc(t.n) + '</b><span class="block text-[10px] text-slate-400">' + esc(t.f) + '</span><span class="th-on hidden text-[10px] font-bold text-emerald-400">Activo ahora</span></span></button>';
+        }).join('');
+        function markActive() {
+            var id = document.body.dataset.kvTheme || '';
+            Array.prototype.forEach.call(document.querySelectorAll('#thGrid .th-card'), function (b) {
+                var on = b.getAttribute('data-t') === id;
+                b.style.borderColor = on ? '#dc2626' : ''; b.querySelector('.th-on').classList.toggle('hidden', !on);
+            });
+            var cur = $('thCur'); if (cur) cur.textContent = id && T[id] ? T[id].n : 'Logo original';
+        }
+        async function setTheme(id) {
+            var prev = document.body.dataset.kvTheme || null;
+            applyTheme(id === 'normal' ? null : id);
+            try {
+                await db.collection('config').doc('tema').set({ id: id, nombre: id === 'normal' ? 'Logo original' : T[id].n, ts: new Date().toISOString(), por: currentUser ? currentUser.email : '' });
+                window.kvLog && kvLog('Tema', id === 'normal' ? 'Volvió al logo original' : 'Aplicó el tema: ' + T[id].n);
+                alert(id === 'normal' ? 'Logo original restaurado con éxito en todos los perfiles.' : 'Tema "' + T[id].n + '" aplicado con éxito en todos los perfiles.');
+            } catch (e) { applyTheme(prev); alert('Error al cambiar el tema: ' + (e.code || e.message)); }
+        }
+        $('thGrid').addEventListener('click', function (e) { var b = e.target.closest('button[data-t]'); if (b) setTheme(b.getAttribute('data-t')); });
+        $('thOrig').addEventListener('click', function () { setTheme('normal'); });
+        markActive();
+
+        // ---- Horas de entrada y salida: se muestran u ocultan desde el panel ----
+        var hrBox = $('inputHoraEntrada') ? $('inputHoraEntrada').closest('.grid') : null, showHoras = false;
+        try { showHoras = localStorage.getItem('kv_horas') === '1'; } catch (e) {}
+        function applyHoras() {
+            if (hrBox) hrBox.style.display = showHoras ? '' : 'none';
+            var t = $('hrTog'); if (t) { t.textContent = showHoras ? 'Ocultar horas' : 'Mostrar horas'; t.className = 'text-xs font-bold px-5 py-2.5 rounded-xl uppercase tracking-wider text-white ' + (showHoras ? 'bg-amber-600 hover:bg-amber-500' : 'bg-emerald-600 hover:bg-emerald-500'); }
+            var st = $('hrSt'); if (st) { st.textContent = showHoras ? 'Visibles' : 'Ocultas'; st.className = 'text-[11px] font-bold ' + (showHoras ? 'text-emerald-400' : 'text-amber-400'); }
+        }
+        var pH = document.createElement('div'); pH.setAttribute('data-sec', 'sistema'); pH.style.display = 'none';
+        pH.className = 'lg:col-span-2 bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-3 shadow-xl';
+        pH.innerHTML = '<div class="flex justify-between items-center border-b border-slate-800 pb-3"><h4 class="text-sm font-extrabold text-white">Campos del formulario de jornada</h4></div><div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3"><div><div class="text-xs font-bold text-slate-200">Horas de entrada y salida</div><p class="text-[11px] text-slate-400">Hoy no se usan en ningún cálculo. Estado actual: <b id="hrSt">Ocultas</b>. Cuando tengan una función, las vuelves a mostrar desde aquí.</p></div><button type="button" id="hrTog"></button></div>';
+        grid.appendChild(pH);
+        $('hrTog').addEventListener('click', async function () {
+            var next = !showHoras;
+            try {
+                await db.collection('config').doc('ajustes').set({ mostrarHoras: next }, { merge: true });
+                showHoras = next; try { localStorage.setItem('kv_horas', next ? '1' : '0'); } catch (e) {} applyHoras();
+                window.kvLog && kvLog('Ajustes', next ? 'Mostró las horas de entrada y salida' : 'Ocultó las horas de entrada y salida');
+                alert(next ? 'Las horas de entrada y salida ya se muestran a todos.' : 'Las horas de entrada y salida quedaron ocultas para todos.');
+            } catch (e) { alert('Error al cambiar el ajuste: ' + (e.code || e.message)); }
+        });
+        applyHoras();
+        var unsubSet = null;
+        function startSet() {
+            if (unsubSet) { unsubSet(); unsubSet = null; }
+            try { unsubSet = db.collection('config').doc('ajustes').onSnapshot(function (s) { var d = s.exists ? s.data() : null; showHoras = !!(d && d.mostrarHoras); try { localStorage.setItem('kv_horas', showHoras ? '1' : '0'); } catch (e) {} applyHoras(); }, function () {}); } catch (e) {}
+        }
+        var la = window.launchAppSession;
+        window.launchAppSession = async function (a) { await la(a); startSet(); markActive(); };
+        var lo = window.logoutApp;
+        window.logoutApp = async function () { if (unsubSet) { unsubSet(); unsubSet = null; } return lo.apply(this, arguments); };
     })();
     </script>
 </body>
