@@ -3601,6 +3601,7 @@
             if (dirty) $('mtDirty').textContent = 'Tienes ' + d.length + ' cambio' + (d.length > 1 ? 's' : '') + ' sin guardar';
         }
         function baselineIfNeeded() { if (!base) { base = snapshot(); refreshDirty(); } }
+        window.kvMontosBase = function () { baselineIfNeeded(); return base; };
         body.addEventListener('input', refreshDirty); if (efe) efe.addEventListener('input', refreshDirty);
         window.addEventListener('beforeunload', function (e) { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
         var la = window.launchAppSession;
@@ -3840,8 +3841,23 @@
             try { localStorage.setItem('kv_tema', id); } catch (e) {}
             markActive();
         }
-        try { var c = localStorage.getItem('kv_tema'); if (c && T[c]) applyTheme(c); } catch (e) {}
-        try { db.collection('config').doc('tema').onSnapshot(function (s) { var d = s.exists ? s.data() : null; applyTheme(d && d.id !== 'normal' ? d.id : null); markActive(); }, function () {}); } catch (e) {}
+var manualId = null, sched = [], curSch = false;
+        function pickTheme() {
+            var t = ymdLocal(new Date()), best = null;
+            sched.forEach(function (x) { if (T[x.tema] && x.desde <= t && t <= x.hasta && (!best || x.desde >= best.desde)) best = x; });
+            return best ? { id: best.tema, sch: true } : { id: manualId, sch: false };
+        }
+        function refresh() {
+            var p = pickTheme(); curSch = p.sch;
+            if (p.id !== (document.body.dataset.kvTheme || null)) applyTheme(p.id);
+            try { localStorage.setItem('kv_tema_m', manualId || ''); } catch (e) {}
+            markActive();
+        }
+        try { var c = localStorage.getItem('kv_tema_m'); if (c && T[c]) manualId = c; var sp = JSON.parse(localStorage.getItem('kv_tema_prog') || '[]'); if (Array.isArray(sp)) sched = sp; } catch (e) {}
+        refresh();
+        try { db.collection('config').doc('tema').onSnapshot(function (s) { var d = s.exists ? s.data() : null; manualId = (d && d.id !== 'normal' && T[d.id]) ? d.id : null; refresh(); }, function () {}); } catch (e) {}
+        try { db.collection('config').doc('temasProgramados').onSnapshot(function (s) { var d = s.exists ? s.data() : null; sched = (d && Array.isArray(d.items)) ? d.items : []; try { localStorage.setItem('kv_tema_prog', JSON.stringify(sched)); } catch (e) {} refresh(); if (window.__kvRenderSched) window.__kvRenderSched(); }, function () {}); } catch (e) {}
+        setInterval(refresh, 60000);
 
         // ---- Panel del administrador: sección Temas ----
         var grid = document.querySelector('#admMain > .grid'); if (!grid) return;
@@ -3860,20 +3876,85 @@
                 var on = b.getAttribute('data-t') === id;
                 b.style.borderColor = on ? '#dc2626' : ''; b.querySelector('.th-on').classList.toggle('hidden', !on);
             });
-            var cur = $('thCur'); if (cur) cur.textContent = id && T[id] ? T[id].n : 'Logo original';
+            var cur = $('thCur'); if (cur) cur.textContent = (id && T[id] ? T[id].n : 'Logo original') + (id ? (curSch ? ' · por programación' : ' · manual') : '');
         }
         async function setTheme(id) {
-            var prev = document.body.dataset.kvTheme || null;
-            applyTheme(id === 'normal' ? null : id);
+            var prev = manualId;
+            manualId = id === 'normal' ? null : id; refresh();
             try {
                 await db.collection('config').doc('tema').set({ id: id, nombre: id === 'normal' ? 'Logo original' : T[id].n, ts: new Date().toISOString(), por: currentUser ? currentUser.email : '' });
                 window.kvLog && kvLog('Tema', id === 'normal' ? 'Volvió al logo original' : 'Aplicó el tema: ' + T[id].n);
                 alert(id === 'normal' ? 'Logo original restaurado con éxito en todos los perfiles.' : 'Tema "' + T[id].n + '" aplicado con éxito en todos los perfiles.');
-            } catch (e) { applyTheme(prev); alert('Error al cambiar el tema: ' + (e.code || e.message)); }
+            } catch (e) { manualId = prev; refresh(); alert('Error al cambiar el tema: ' + (e.code || e.message)); }
         }
         $('thGrid').addEventListener('click', function (e) { var b = e.target.closest('button[data-t]'); if (b) setTheme(b.getAttribute('data-t')); });
         $('thOrig').addEventListener('click', function () { setTheme('normal'); });
         markActive();
+
+        // ---- Programar temas con fecha de inicio y de fin (se activan y se quitan solos) ----
+        function easter(y) { var a = y % 19, b = Math.floor(y / 100), c2 = y % 100, d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30, i = Math.floor(c2 / 4), k = c2 % 4, l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451), mo = Math.floor((h + l - 7 * m + 114) / 31), da = ((h + l - 7 * m + 114) % 31) + 1; return new Date(y, mo - 1, da); }
+        var addD = function (d, n) { return new Date(d.getFullYear(), d.getMonth(), d.getDate() + n); };
+        var FIX = { anonuevo: [1, 1, 1, 1], trabajador: [5, 1, 5, 1], abril19: [4, 19, 4, 19], carabobo: [6, 24, 6, 24], julio5: [7, 5, 7, 5], natalicio: [7, 24, 7, 24], resistencia: [10, 12, 10, 12], navidad: [12, 24, 12, 25], findeano: [12, 31, 12, 31] };
+        function nextRange(id) {
+            var now = new Date(), t = ymdLocal(now), y = now.getFullYear();
+            for (var k = 0; k < 2; k++) {
+                var yy = y + k, r = null, f = FIX[id], e;
+                if (f) r = [new Date(yy, f[0] - 1, f[1]), new Date(yy, f[2] - 1, f[3])];
+                else if (id === 'semanasanta') { e = easter(yy); r = [addD(e, -3), addD(e, -2)]; }
+                else if (id === 'carnaval') { e = easter(yy); r = [addD(e, -48), addD(e, -47)]; }
+                else return null;
+                if (ymdLocal(r[1]) >= t) return [ymdLocal(r[0]), ymdLocal(r[1])];
+            }
+            return null;
+        }
+        window.kvNextRange = nextRange;
+        var INP2 = 'w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-600';
+        var pS = document.createElement('div'); pS.setAttribute('data-sec', 'temas'); pS.style.display = 'none';
+        pS.className = 'lg:col-span-2 bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-4 shadow-xl';
+        pS.innerHTML = '<div class="border-b border-slate-800 pb-3"><h4 class="text-sm font-extrabold text-white">Programar temas por fecha</h4><p class="text-xs text-slate-400 mt-0.5">Elige un tema y desde qué día hasta qué día se muestra. Se activa y se quita solo, sin que tengas que entrar. Al terminar, el logo vuelve al tema que tengas elegido arriba (o al original).</p></div>' +
+            '<div class="grid grid-cols-1 sm:grid-cols-4 gap-3"><div><label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">Tema</label><select id="scTema" class="' + INP2 + '">' + ORDER.map(function (id) { return '<option value="' + id + '">' + esc(T[id].n) + '</option>'; }).join('') + '</select></div>' +
+            '<div><label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">Desde</label><input type="date" id="scDesde" class="' + INP2 + '"></div><div><label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">Hasta (inclusive)</label><input type="date" id="scHasta" class="' + INP2 + '"></div>' +
+            '<div class="flex items-end"><button type="button" id="scAdd" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-2.5 rounded-xl uppercase tracking-wider">Programar</button></div></div>' +
+            '<p id="scHint" class="text-[11px] text-slate-500"></p><div id="scList" class="space-y-2"></div><button type="button" id="scClean" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1 rounded-lg border border-slate-700 font-semibold">Quitar los finalizados</button>';
+        grid.appendChild(pS);
+        function fillDefaults() {
+            var id = $('scTema').value, r = nextRange(id);
+            $('scDesde').value = r ? r[0] : ''; $('scHasta').value = r ? r[1] : '';
+            $('scHint').textContent = r ? 'Fechas sugeridas para la próxima vez que cae este feriado. Puedes cambiarlas.' : 'Este tema no tiene fecha fija: escribe tú las fechas.';
+        }
+        $('scTema').addEventListener('change', fillDefaults); fillDefaults();
+        function schedSave(items) { return db.collection('config').doc('temasProgramados').set({ items: items, ts: new Date().toISOString(), por: currentUser ? currentUser.email : '' }); }
+        window.__kvRenderSched = function () {
+            var box = $('scList'); if (!box) return;
+            var t = ymdLocal(new Date()), rows = sched.slice().sort(function (a, b) { return String(a.desde).localeCompare(String(b.desde)); });
+            box.innerHTML = rows.length ? rows.map(function (x) {
+                var st = t < x.desde ? ['Próximo', '#60a5fa'] : (t > x.hasta ? ['Finalizado', '#94a3b8'] : ['Activo ahora', '#22c55e']);
+                return '<div class="flex items-center gap-3 bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs"><span style="width:34px;height:34px;flex:none;display:block">' + svg((T[x.tema] || { ico: '' }).ico) + '</span><div class="min-w-0 flex-1"><b class="text-white">' + esc((T[x.tema] || { n: x.tema }).n) + '</b><div class="text-[11px] text-slate-400">' + esc(x.desde) + ' al ' + esc(x.hasta) + '</div></div><b style="color:' + st[1] + '" class="text-[11px] whitespace-nowrap">' + st[0] + '</b><button type="button" data-i="' + esc(x.id) + '" class="sc-del text-red-300 hover:text-red-200 text-lg leading-none px-2" aria-label="Quitar">&times;</button></div>';
+            }).join('') : '<p class="text-xs text-slate-500 text-center py-3">No hay temas programados.</p>';
+        };
+        window.__kvRenderSched();
+        $('scAdd').addEventListener('click', async function () {
+            var tema = $('scTema').value, d = $('scDesde').value, h = $('scHasta').value;
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(d) || !/^\d{4}-\d{2}-\d{2}$/.test(h)) { alert('Escriba las dos fechas: desde y hasta.'); return; }
+            if (h < d) { alert('La fecha final no puede ser anterior a la inicial.'); return; }
+            if (h < ymdLocal(new Date())) { alert('La fecha final ya pasó: elija fechas desde hoy en adelante.'); return; }
+            if (sched.length >= 60) { alert('Hay demasiados temas programados: quite los finalizados primero.'); return; }
+            var items = sched.concat([{ id: String(Date.now()), tema: tema, desde: d, hasta: h }]);
+            try { await schedSave(items); window.kvLog && kvLog('Tema', 'Programó ' + T[tema].n + ' del ' + d + ' al ' + h); alert('¡Tema programado con éxito! Se activará solo el ' + d + ' y se quitará después del ' + h + '.'); }
+            catch (e) { alert('Error al programar el tema: ' + (e.code || e.message)); }
+        });
+        $('scList').addEventListener('click', async function (e) {
+            var b = e.target.closest('button.sc-del'); if (!b) return;
+            var id = b.getAttribute('data-i'), x = sched.filter(function (y) { return y.id === id; })[0]; if (!x) return;
+            if (!(await kvConfirm('¿Quitar la programación de "' + (T[x.tema] || { n: x.tema }).n + '" (' + x.desde + ' al ' + x.hasta + ')?'))) return;
+            try { await schedSave(sched.filter(function (y) { return y.id !== id; })); window.kvLog && kvLog('Tema', 'Quitó la programación de ' + (T[x.tema] || { n: x.tema }).n); alert('Programación eliminada.'); }
+            catch (er) { alert('Error al quitar la programación: ' + (er.code || er.message)); }
+        });
+        $('scClean').addEventListener('click', async function () {
+            var t = ymdLocal(new Date()), keep = sched.filter(function (x) { return x.hasta >= t; });
+            if (keep.length === sched.length) { alert('No hay temas finalizados para quitar.'); return; }
+            try { await schedSave(keep); alert('Se quitaron los temas finalizados.'); } catch (e) { alert('Error al limpiar: ' + (e.code || e.message)); }
+        });
 
         // ---- Horas de entrada y salida: se muestran u ocultan desde el panel ----
         var hrBox = $('inputHoraEntrada') ? $('inputHoraEntrada').closest('.grid') : null, showHoras = false;
@@ -3906,6 +3987,39 @@
         window.launchAppSession = async function (a) { await la(a); startSet(); markActive(); };
         var lo = window.logoutApp;
         window.logoutApp = async function () { if (unsubSet) { unsubSet(); unsubSet = null; } return lo.apply(this, arguments); };
+    })();
+    </script>
+
+    <script>
+    /* Ajuste porcentual de los montos (no modifica funciones existentes) */
+    (function () {
+        var $ = function (id) { return document.getElementById(id); };
+        var pane = document.querySelector('#admMain > .grid > [data-sec="montos"]'); if (!pane) return;
+        var TIERS = [300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200];
+        var INP = 'w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-600';
+        var box = document.createElement('div'); box.className = 'bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3';
+        box.innerHTML = '<div><div class="text-xs font-extrabold text-white">Ajuste por porcentaje</div><p class="text-[11px] text-slate-400">Sube o baja los montos de golpe. Se calcula sobre los montos guardados; luego revisa la tabla y pulsa Guardar cambios. Si prefieres, también puedes cambiar los montos uno por uno, como siempre.</p></div>' +
+            '<div class="grid grid-cols-1 sm:grid-cols-4 gap-3"><div><label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">Porcentaje (+ sube, - baja)</label><input type="number" step="0.1" id="pcVal" placeholder="Ej. 10 o -5" class="' + INP + '"></div>' +
+            '<div><label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">Aplicar a</label><select id="pcTgt" class="' + INP + '"><option value="both">Entregadores y Ayudantes</option><option value="ent">Solo Entregadores (Chóferes)</option><option value="ayu">Solo Ayudantes</option></select></div>' +
+            '<label class="flex items-end gap-2 text-xs text-slate-300 pb-2"><input type="checkbox" id="pcBono" checked class="w-4 h-4 cursor-pointer"> Incluir el bono de efectividad</label>' +
+            '<div class="flex items-end"><button type="button" id="pcApply" class="w-full bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold py-2.5 rounded-xl uppercase tracking-wider">Aplicar porcentaje</button></div></div>';
+        pane.insertBefore(box, pane.children[1] || null);
+        $('pcApply').addEventListener('click', function () {
+            var raw = parseFloat($('pcVal').value);
+            if (!isFinite(raw) || raw === 0) { alert('Escriba un porcentaje distinto de cero. Por ejemplo 10 o -5.'); return; }
+            if (raw < -90 || raw > 300) { alert('El porcentaje debe estar entre -90 y 300.'); return; }
+            var base = window.kvMontosBase && kvMontosBase(); if (!base) return;
+            var tgt = $('pcTgt').value, f = 1 + raw / 100, ids = [];
+            TIERS.forEach(function (t) { if (tgt !== 'ayu') ids.push('ent_' + t); if (tgt !== 'ent') ids.push('ayu_' + t); });
+            if ($('pcBono').checked) ids.push('efe_monto');
+            var n = 0;
+            ids.forEach(function (id) {
+                var e = $(id); if (!e || typeof base[id] !== 'number') return;
+                e.value = (Math.round(base[id] * f * 100) / 100).toFixed(2);
+                e.dispatchEvent(new Event('input', { bubbles: true })); n++;
+            });
+            alert('Ajuste de ' + (raw > 0 ? '+' : '') + raw + '% aplicado a ' + n + ' montos. Revisa la tabla y pulsa "Guardar cambios".');
+        });
     })();
     </script>
 </body>
