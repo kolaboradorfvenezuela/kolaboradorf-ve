@@ -4022,5 +4022,135 @@ var manualId = null, sched = [], curSch = false;
         });
     })();
     </script>
+
+    <script>
+    /* Parte 1 (A): simulador de ganancias, aviso del día de cobro y control de errores al escribir (no modifica funciones existentes) */
+    (function () {
+        var $ = function (id) { return document.getElementById(id); };
+        var TIERS = [300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200];
+        var role = function () { return (currentUser && currentUser.role) || 'Ayudante'; };
+        var tl = function (t) { return t < 1200 ? t + '–' + (t + 99) : '1200 o más'; };
+        var money = function (n) { return '$' + Number(n).toFixed(2); };
+
+        // ---------- 1) Simulador "¿cuánto ganaría?" ----------
+        var lp = $('lvlPanel');
+        if (lp) {
+            var sp = document.createElement('div'); sp.id = 'simPanel';
+            sp.className = 'bg-slate-900/90 backdrop-blur-xl p-4 rounded-2xl border border-slate-800 shadow-lg space-y-3';
+            sp.innerHTML = '<div class="flex justify-between items-center"><span class="text-[10px] font-extrabold text-red-400 uppercase tracking-wider">Simulador: ¿cuánto ganaría?</span><span class="text-[10px] text-slate-500">Cajas netas = carga − devueltas − pepitos</span></div>' +
+                '<div class="flex gap-2"><input type="number" id="simCajas" min="0" inputmode="numeric" placeholder="Cajas netas del día (ej. 450)" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-600"><button type="button" id="simClear" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-bold px-4 rounded-xl border border-slate-700">Limpiar</button></div>' +
+                '<div id="simChips" class="flex flex-wrap gap-1.5">' + TIERS.map(function (t) { return '<button type="button" data-v="' + t + '" class="text-[10px] font-bold px-2.5 py-1 rounded-full border border-slate-700 text-slate-300 hover:border-red-500">' + t + '</button>'; }).join('') + '</div>' +
+                '<div id="simOut" class="grid grid-cols-1 sm:grid-cols-3 gap-2" style="display:none"><div class="bg-slate-950 rounded-xl border border-slate-800 p-3 text-center"><div class="text-[9px] font-bold text-slate-400 uppercase">Nivel que alcanzas</div><div id="simLvl" class="text-lg font-black text-white"></div></div><div class="bg-slate-950 rounded-xl border border-slate-800 p-3 text-center"><div class="text-[9px] font-bold text-slate-400 uppercase">Cobras (USD)</div><div id="simUsd" class="text-lg font-black text-emerald-400"></div></div><div class="bg-slate-950 rounded-xl border border-slate-800 p-3 text-center"><div class="text-[9px] font-bold text-slate-400 uppercase">Equivale (Bs, tasa BCV)</div><div id="simBs" class="text-lg font-black text-white"></div></div></div>' +
+                '<p id="simTx" class="text-[11px] text-slate-300"></p>';
+            lp.parentNode.insertBefore(sp, lp.nextSibling);
+            window.kvSimUpdate = function () {
+                var raw = $('simCajas').value, out = $('simOut'), tx = $('simTx');
+                if (raw === '' || isNaN(parseInt(raw))) { out.style.display = 'none'; tx.textContent = 'Escribe cuántas cajas netas crees que harás y verás cuánto cobrarías.'; return; }
+                var c = Math.max(0, parseInt(raw)), idx = -1; TIERS.forEach(function (t, i) { if (c >= t) idx = i; });
+                var amt = getIncentiveByRole(c, role()), rate = window.kvGetRate ? kvGetRate() : null;
+                out.style.display = 'grid';
+                $('simLvl').textContent = idx < 0 ? 'Sin nivel' : tl(TIERS[idx]);
+                $('simUsd').textContent = money(amt);
+                $('simBs').textContent = rate ? 'Bs. ' + fmtBs(amt * rate) : 'Tasa no disponible';
+                var next = idx + 1 < TIERS.length ? TIERS[idx + 1] : null, t = '';
+                if (next) { var nAmt = getIncentiveByRole(next, role()); t = (idx < 0 ? 'Desde 300 cajas netas empiezas a ganar incentivo. ' : '') + 'Te faltan ' + (next - c) + ' cajas para subir a ' + money(nAmt) + ' (nivel ' + tl(next) + ').'; }
+                else t = '¡Nivel máximo alcanzado!';
+                if (amt > 0) {
+                    var bono = parseFloat(($('efe_monto') || {}).value) || 0;
+                    t += ' En una semana de 5 días iguales: ' + money(amt * 5) + (bono > 0 ? ' (más ' + money(bono) + ' de bono si tu efectividad semanal llega al 97%).' : '.');
+                }
+                tx.textContent = t;
+            };
+            $('simCajas').addEventListener('input', kvSimUpdate);
+            $('simClear').addEventListener('click', function () { $('simCajas').value = ''; kvSimUpdate(); });
+            $('simChips').addEventListener('click', function (e) { var b = e.target.closest('button[data-v]'); if (b) { $('simCajas').value = b.getAttribute('data-v'); kvSimUpdate(); } });
+            kvSimUpdate();
+            var cr = window.calculateRealTime;
+            window.calculateRealTime = function () { var m = cr.apply(this, arguments); kvSimUpdate(); return m; };
+        }
+
+        // ---------- 3) Aviso del día de cobro ----------
+        function due() { var t = ymdLocal(new Date()); return (typeof cachedCierres !== 'undefined' ? cachedCierres : []).filter(function (c) { return !c.cobrado && c.fechaCobro && c.fechaCobro <= t; }); }
+        function updateCobro() {
+            var ws = $('workerSection'); if (!ws) return;
+            var b = $('kvCobro');
+            if (!b) {
+                b = document.createElement('div'); b.id = 'kvCobro'; b.setAttribute('role', 'status');
+                b.className = 'flex-col sm:flex-row items-center justify-between gap-3 rounded-2xl px-5 py-3 text-xs font-bold shadow-lg';
+                b.style.cssText = 'display:none;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.5);color:#fde68a';
+                b.innerHTML = '<span><i class="kv-i kv-i-dollar"></i> <span id="kvCobroTx"></span></span><button type="button" id="kvCobroBtn" class="bg-amber-500 hover:bg-amber-400 text-slate-950 text-[11px] font-black px-4 py-1.5 rounded-lg uppercase tracking-wider">Marcar como cobrado</button>';
+                ws.insertBefore(b, ws.firstChild);
+                $('kvCobroBtn').addEventListener('click', markDue);
+            }
+            var d = due(); if (!d.length) { b.style.display = 'none'; return; }
+            var total = d.reduce(function (a, c) { return a + (Number(c.montoACobrar) || 0); }, 0), t = ymdLocal(new Date());
+            var rate = window.kvGetRate ? kvGetRate() : null;
+            $('kvCobroTx').textContent = (d.some(function (c) { return c.fechaCobro === t; }) ? 'Hoy toca cobrar: ' : 'Tienes pendiente de cobro: ') + 'tienes ' + money(total) + ' por cobrar' + (rate ? ' (Bs. ' + fmtBs(total * rate) + ')' : '') + '.';
+            b.style.display = 'flex';
+        }
+        async function markDue() {
+            var d = due(); if (!d.length) return;
+            var total = d.reduce(function (a, c) { return a + (Number(c.montoACobrar) || 0); }, 0);
+            if (!(await kvConfirm('¿Marcar como cobrado ' + money(total) + '?'))) return;
+            var t = ymdLocal(new Date());
+            var copy = cachedCierres.map(function (c) { return d.indexOf(c) >= 0 ? Object.assign({}, c, { cobrado: true, fechaCobrado: t }) : c; });
+            try {
+                await db.collection('historial_jornadas').doc(currentUser.email).set({ cierres: copy }, { merge: true });
+                cachedCierres = copy; renderCierres();
+                alert('¡Incentivo marcado como cobrado con éxito!');
+            } catch (e) { alert('Error al actualizar el incentivo.'); }
+        }
+        var rc = window.renderCierres;
+        window.renderCierres = function () { rc(); updateCobro(); };
+        setInterval(updateCobro, 5 * 60 * 1000);
+
+        // ---------- 4) Control de errores al escribir ----------
+        var F = ['inputF1', 'inputF2', 'inputG1', 'inputG2', 'inputDev', 'inputPep'];
+        window.kvCheckForm = function () {
+            var e = [], w = [], n = {};
+            F.forEach(function (id) { var raw = $(id).value; n[id] = raw === '' ? 0 : Number(raw); });
+            var ini = n.inputF1 + n.inputF2 + n.inputG1 + n.inputG2, dev = n.inputDev, pep = n.inputPep, date = $('inputFechaJornada').value;
+            if (date && date > ymdLocal(new Date())) e.push(['La fecha de la jornada no puede ser posterior a hoy.', 'inputFechaJornada']);
+            if (!$('noLoadCheck').checked) {
+                F.forEach(function (id) {
+                    var v = n[id];
+                    if (!isFinite(v) || v < 0) e.push(['Hay un valor negativo o inválido: revisa ese campo.', id]);
+                    else if (v !== Math.floor(v)) e.push(['Escribe solo cajas completas, sin decimales.', id]);
+                    else if (v > 20000) e.push(['El número ' + v + ' parece un error de digitación. Revísalo.', id]);
+                });
+                if (dev > ini) e.push(['Las devueltas (' + dev + ') no pueden ser mayores que la carga inicial (' + ini + ').', 'inputDev']);
+                else if (pep > ini) e.push(['Los pepitos (' + pep + ') no pueden ser mayores que la carga inicial (' + ini + ').', 'inputPep']);
+                if (!e.length) {
+                    if (ini === 0) w.push('No escribiste ninguna carga. Si hoy no tuviste carga, marca "No tengo carga asignada hoy (Exprés)".');
+                    if (ini > 2000) w.push('La carga inicial es de ' + ini + ' cajas, mucho más de lo normal.');
+                    if (dev + pep > ini) w.push('Devueltas más pepitos (' + (dev + pep) + ') superan la carga: tus cajas pagadas quedarían en 0.');
+                    if (ini > 0 && ((ini - dev) / ini) * 100 < 50) w.push('Tu efectividad del día sería de ' + (((ini - dev) / ini) * 100).toFixed(1) + '%.');
+                }
+            }
+            return { e: e, w: w };
+        };
+        var lf = $('loadFields');
+        if (lf) {
+            var hint = document.createElement('p'); hint.id = 'errHint'; hint.className = 'text-[11px] font-semibold min-h-[16px]'; lf.appendChild(hint);
+            var live = function () {
+                var r = kvCheckForm(), bad = r.e.map(function (x) { return x[1]; });
+                F.concat(['inputFechaJornada']).forEach(function (id) { var el = $(id); if (el) el.style.borderColor = bad.indexOf(id) >= 0 ? '#ef4444' : ''; });
+                hint.style.color = r.e.length ? '#f87171' : '#fbbf24';
+                hint.textContent = r.e.length ? r.e[0][0] : (r.w.length ? 'Atención: ' + r.w[0] : '');
+            };
+            F.concat(['inputFechaJornada', 'noLoadCheck']).forEach(function (id) { var el = $(id); if (el) el.addEventListener(id === 'noLoadCheck' ? 'change' : 'input', live); });
+        }
+        var sd = window.saveDailyRecord;
+        window.saveDailyRecord = async function () {
+            var r = kvCheckForm();
+            if (r.e.length) { alert('No se pudo guardar: ' + r.e[0][0]); var f = $(r.e[0][1]); if (f && f.focus) f.focus(); return; }
+            if (r.w.length && !(await kvConfirm('Revisa antes de guardar:\n\n• ' + r.w.join('\n• ') + '\n\n¿Guardar de todos modos?'))) return;
+            return sd.apply(this, arguments);
+        };
+
+        var la = window.launchAppSession;
+        window.launchAppSession = async function (a) { await la(a); if (window.kvSimUpdate) kvSimUpdate(); updateCobro(); };
+    })();
+    </script>
 </body>
 </html>
