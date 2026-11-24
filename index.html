@@ -4164,11 +4164,241 @@ var manualId = null, sched = [], curSch = false;
             var r = kvCheckForm();
             if (r.e.length) { alert('No se pudo guardar: ' + r.e[0][0]); var f = $(r.e[0][1]); if (f && f.focus) f.focus(); return; }
             if (r.w.length && !(await kvConfirm('Revisa antes de guardar:\n\n• ' + r.w.join('\n• ') + '\n\n¿Guardar de todos modos?'))) return;
+            if (window.kvTrySaveOffline && await kvTrySaveOffline()) return;
             return sd.apply(this, arguments);
         };
 
         var la = window.launchAppSession;
         window.launchAppSession = async function (a) { await la(a); if (window.kvSimUpdate) kvSimUpdate(); updateCobro(); };
+    })();
+    </script>
+
+    <script>
+    /* Parte 1 (B): historial de semanas, respaldo, ayuda y tutorial, guardado sin señal (no modifica funciones existentes) */
+    (function () {
+        var $ = function (id) { return document.getElementById(id); };
+        var esc = function (v) { return escapeHTML(v); };
+        var pd = function (y) { var a = String(y || '').split('-').map(Number); return a.length === 3 && a[0] ? new Date(a[0], a[1] - 1, a[2]) : null; };
+        var mondayOf = function (d) { var x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return x; };
+        var ymd = function (d) { return ymdLocal(d); };
+        var MES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+        var money = function (n) { return '$' + Number(n).toFixed(2); };
+
+        // ---------- 2) Mi historial de semanas ----------
+        var ec = $('effChart') ? $('effChart').closest('.rounded-2xl') : null;
+        if (ec) {
+            var card = document.createElement('div');
+            card.className = 'bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-3 shadow-xl';
+            card.innerHTML = '<div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 border-b border-slate-800 pb-3"><h4 class="text-sm font-extrabold text-white">Mi historial de semanas</h4><span id="wkHistMonth" class="text-[11px] font-bold text-emerald-400"></span></div><div id="wkHistChart"></div><p id="wkHistCaption" class="text-[11px] text-slate-400 text-center min-h-[16px]">Toca una barra para ver el detalle de esa semana.</p>';
+            ec.parentNode.insertBefore(card, ec.nextSibling);
+        }
+        window.kvRenderWeeks = function () {
+            var box = $('wkHistChart'); if (!box) return;
+            var recs = (typeof cachedUserRecords !== 'undefined' && cachedUserRecords) || [], cie = (typeof cachedCierres !== 'undefined' && cachedCierres) || [];
+            var mon0 = mondayOf(new Date()), W = [], i;
+            for (i = 7; i >= 0; i--) { var m = new Date(mon0.getFullYear(), mon0.getMonth(), mon0.getDate() - 7 * i); W.push({ mon: m, key: ymd(m), usd: 0, ef: null, st: 'Sin datos', has: false }); }
+            W.forEach(function (w) {
+                var end = new Date(w.mon.getFullYear(), w.mon.getMonth(), w.mon.getDate() + 7);
+                var c = cie.filter(function (x) { var d = pd(x.hasta); return d && d >= w.mon && d < end; })[0];
+                var rs = recs.filter(function (r) { var d = pd(r.fecha); return d && d >= w.mon && d < end; });
+                if (c) { w.usd = Number(c.montoACobrar) || 0; w.ef = parseFloat(c.efectividadPromedio); w.st = c.cobrado ? 'Cobrado' : 'Generado'; w.has = true; }
+                else if (rs.length) {
+                    var u = 0, sm = 0, n = 0; rs.forEach(function (r) { u += parseFloat(r.incentivoDiarioUSD) || 0; if ((parseFloat(r.cargaInicial) || 0) > 0) { sm += parseFloat(r.efectividad) || 0; n++; } });
+                    w.usd = u; w.ef = n ? sm / n : null; w.st = w.key === ymd(mon0) ? 'En curso' : 'Sin generar'; w.has = true;
+                }
+            });
+            // total del mes (cada semana cuenta en el mes de su viernes)
+            var now = new Date(), tm = 0, pm = 0, pmDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+            W.forEach(function (w) { var f = new Date(w.mon.getFullYear(), w.mon.getMonth(), w.mon.getDate() + 4); if (f.getFullYear() === now.getFullYear() && f.getMonth() === now.getMonth()) tm += w.usd; else if (f.getFullYear() === pmDate.getFullYear() && f.getMonth() === pmDate.getMonth()) pm += w.usd; });
+            $('wkHistMonth').textContent = 'Este mes (' + MES[now.getMonth()] + '): ' + money(tm) + ' · mes anterior (' + MES[pmDate.getMonth()] + '): ' + money(pm);
+            if (!W.some(function (w) { return w.has; })) { box.innerHTML = '<p class="text-xs text-slate-400 text-center py-8">Aún no hay semanas para graficar. Guarda tus jornadas y genera tu incentivo.</p>'; return; }
+            var Wd = 600, H = 250, pl = 46, pr = 40, pt = 26, pb = 40, iw = Wd - pl - pr, ih = H - pt - pb;
+            var maxU = Math.max.apply(null, W.map(function (w) { return w.usd; }).concat([10])); maxU = Math.ceil(maxU / 10) * 10;
+            var efs = W.filter(function (w) { return w.ef != null; }).map(function (w) { return w.ef; });
+            var eMin = Math.max(0, Math.floor(Math.min.apply(null, efs.concat([97])) - 3)), eMax = 100;
+            var slot = iw / 8, bw = Math.min(30, slot * .55);
+            var X = function (k) { return pl + slot * k + slot / 2; }, YU = function (v) { return pt + ih - (v / maxU) * ih; }, YE = function (v) { return pt + (eMax - v) / (eMax - eMin) * ih; };
+            var svg = '<svg viewBox="0 0 ' + Wd + ' ' + H + '" width="100%" role="img" aria-label="Dólares y efectividad por semana" style="max-height:290px">';
+            [0, .5, 1].forEach(function (f) { var v = maxU * f; svg += '<line x1="' + pl + '" y1="' + YU(v) + '" x2="' + (Wd - pr) + '" y2="' + YU(v) + '" style="stroke:var(--kv-grid)"/><text x="' + (pl - 6) + '" y="' + (YU(v) + 4) + '" text-anchor="end" font-size="10" style="fill:var(--kv-axis)">$' + Math.round(v) + '</text>'; });
+            svg += '<line x1="' + pl + '" y1="' + YE(97) + '" x2="' + (Wd - pr) + '" y2="' + YE(97) + '" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="5 4"/><text x="' + (Wd - pr + 4) + '" y="' + (YE(97) + 3) + '" font-size="9" font-weight="700" fill="#f59e0b">97%</text>';
+            W.forEach(function (w, k) {
+                var tip = 'Semana del ' + pd(w.key).toLocaleDateString('es-VE', { day: 'numeric', month: 'long' }) + ' · ' + money(w.usd) + (w.ef != null ? ' · efectividad ' + w.ef.toFixed(1) + '%' : '') + ' · ' + w.st;
+                var h = (w.usd / maxU) * ih;
+                svg += '<g><rect x="' + (X(k) - bw / 2).toFixed(1) + '" y="' + YU(w.usd).toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + Math.max(h, w.has ? 2 : 0).toFixed(1) + '" rx="4" fill="#dc2626" opacity="' + (w.st === 'En curso' ? '.55' : '.95') + '" data-tip="' + esc(tip) + '" style="cursor:pointer"><title>' + esc(tip) + '</title></rect>' +
+                    (w.has ? '<text x="' + X(k).toFixed(1) + '" y="' + (YU(w.usd) - 5).toFixed(1) + '" text-anchor="middle" font-size="10" font-weight="700" style="fill:var(--kv-axis)">' + (w.usd >= 100 ? Math.round(w.usd) : w.usd.toFixed(0)) + '</text>' : '') +
+                    '<text x="' + X(k).toFixed(1) + '" y="' + (H - 18) + '" text-anchor="middle" font-size="10" style="fill:var(--kv-axis)">' + String(w.mon.getDate()).padStart(2, '0') + '/' + String(w.mon.getMonth() + 1).padStart(2, '0') + '</text></g>';
+            });
+            var pts = []; W.forEach(function (w, k) { if (w.ef != null) pts.push([X(k), YE(Math.min(100, Math.max(eMin, w.ef))), w]); });
+            if (pts.length > 1) svg += '<polyline fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linejoin="round" points="' + pts.map(function (q) { return q[0].toFixed(1) + ',' + q[1].toFixed(1); }).join(' ') + '"/>';
+            pts.forEach(function (q) { svg += '<circle cx="' + q[0].toFixed(1) + '" cy="' + q[1].toFixed(1) + '" r="5" fill="' + (q[2].ef >= 97 ? '#22c55e' : '#f59e0b') + '" stroke="#fff" stroke-width="1.5"/>'; });
+            box.innerHTML = svg + '</svg><div class="flex justify-center gap-4 text-[10px] text-slate-400"><span><b style="color:#dc2626">■</b> Dólares de la semana</span><span><b style="color:#38bdf8">●</b> Efectividad (meta 97%)</span></div>';
+        };
+        document.addEventListener('click', function (e) { var r = e.target.closest ? e.target.closest('#wkHistChart rect[data-tip]') : null; if (r && $('wkHistCaption')) $('wkHistCaption').textContent = r.getAttribute('data-tip'); });
+        var rsd = window.renderScreenDashboardChart; window.renderScreenDashboardChart = function (r) { rsd(r); kvRenderWeeks(); };
+        var rcs = window.renderCierres; window.renderCierres = function () { rcs(); kvRenderWeeks(); };
+
+        // ---------- 5) Descargar mi respaldo ----------
+        function download(name, text, mime) { var b = new Blob([text], { type: mime }), a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = name; document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 800); }
+        async function collect() {
+            var email = currentUser.email, perfil = {}, h = {};
+            try { var d = await (currentUser.isAdmin ? db.collection('config').doc('adminPerfil') : db.collection('usuarios').doc(email)).get(); perfil = d.exists ? d.data() : {}; } catch (e) {}
+            try { var hd = await db.collection('historial_jornadas').doc(email).get(); h = hd.exists ? hd.data() : {}; } catch (e) {}
+            delete perfil.password;
+            return { app: 'Kolaboradorf VE', generado: new Date().toISOString(), correo: email, perfil: perfil, registros: h.registros || cachedUserRecords || [], incentivos_semanales: h.cierres || cachedCierres || [] };
+        }
+        var sm = $('settingsModal');
+        if (sm && sm.firstElementChild) {
+            var bk = document.createElement('div'); bk.className = 'space-y-3 bg-slate-950 p-4 rounded-2xl border border-slate-800 shadow-inner';
+            bk.innerHTML = '<h4 class="text-[11px] font-extrabold text-red-400 uppercase tracking-wider">Mi información</h4><p class="text-[11px] text-slate-400">Descarga una copia de todo lo que tienes guardado: tu perfil, tus jornadas y tus incentivos semanales.</p><div class="grid grid-cols-1 sm:grid-cols-2 gap-2"><button type="button" id="bkJson" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-bold py-2.5 rounded-xl border border-slate-700 uppercase tracking-wider">Respaldo completo (JSON)</button><button type="button" id="bkCsv" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-bold py-2.5 rounded-xl border border-slate-700 uppercase tracking-wider">Mis jornadas (Excel/CSV)</button></div>';
+            sm.firstElementChild.appendChild(bk);
+            $('bkJson').addEventListener('click', async function () { try { var d = await collect(); download('respaldo_kolaboradorf_' + ymd(new Date()) + '.json', JSON.stringify(d, null, 2), 'application/json'); alert('¡Respaldo descargado con éxito!'); } catch (e) { alert('Error al preparar el respaldo.'); } });
+            $('bkCsv').addEventListener('click', async function () {
+                try {
+                    var d = await collect(), q = function (v) { return '"' + String(v == null ? '' : v).replace(/"/g, '""').replace(/[\r\n]+/g, ' ') + '"'; };
+                    var rows = [['Fecha', 'Ruta', 'Ticket', 'Carga inicial', 'Carga neta', 'Devueltas', 'Pepitos', 'Asignación de vacíos', 'Botellas vendidas', 'Efectividad %', 'Incentivo USD', 'Pendientes']];
+                    d.registros.forEach(function (r) { var e = r.entradas || {}; rows.push([r.fecha, r.ruta, r.ticket || '', r.cargaInicial, r.cargaNetaDia, e.dev != null ? e.dev : '', e.pep != null ? e.pep : '', r.vacios || 0, r.ventaBotella || 0, r.efectividad, r.incentivoDiarioUSD, r.productosPendientes || '']); });
+                    download('jornadas_kolaboradorf_' + ymd(new Date()) + '.csv', '\ufeff' + rows.map(function (r) { return r.map(q).join(';'); }).join('\r\n'), 'text/csv;charset=utf-8');
+                    alert('¡Jornadas descargadas con éxito!');
+                } catch (e) { alert('Error al preparar el archivo.'); }
+            });
+        }
+
+        // ---------- 6) Ayuda, recorrido guiado y preguntas frecuentes ----------
+        var FAQ = [
+            ['¿Cómo se calcula mi incentivo del día?', 'Se toma tu carga neta (carga − devueltas − pepitos − introducciones de vacío − botellas vendidas) y se ubica en un nivel: 300–399, 400–499, y así hasta 1200 o más. El monto de cada nivel lo define el administrador según tu cargo.'],
+            ['¿Cómo se calcula la efectividad?', 'Cada día: (carga − devueltas) ÷ carga. Los pepitos, las introducciones de vacío y las botellas vendidas cuentan como entregados. La efectividad de la semana es el promedio de tus días de reparto, y con 97% o más cobras el bono de efectividad.'],
+            ['¿Qué es un día Exprés?', 'Es un día sin carga asignada. Marca "No tengo carga asignada hoy": ese día no suma ni resta en tu efectividad.'],
+            ['¿Qué son la asignación de vacíos y la venta de botella?', 'Cada introducción de vacío (plástico con 6 botellas de 1.25, o con 24 de 350) cuenta como 1 caja, y cada botella vendida por la compañía cuenta como 1 caja. Se restan de tus cajas pagadas, pero cuentan como entregadas. Si no se entregan, anótalas en Devueltas.'],
+            ['¿Cuándo cobro?', 'Al terminar tu semana de lunes a viernes, pulsa "Generar incentivo de la semana". Lo trabajado en una semana se cobra el jueves de la semana siguiente. Luego puedes marcarlo como cobrado.'],
+            ['¿Por qué no me deja guardar mi jornada?', 'La app te avisa si hay un error probable: devueltas mayores que la carga, números negativos o absurdos, una fecha futura, o un día que ya tiene registro. Lee el mensaje rojo debajo del formulario.'],
+            ['¿Qué es el ticket?', 'Es un número único que recibe cada jornada guardada y cada incentivo semanal generado. No se repite nunca.'],
+            ['¿Puedo corregir un registro?', 'Sí: en el histórico pulsa Editar o Borrar. No se pueden modificar los registros de una semana que ya cerraste con "Generar incentivo".'],
+            ['¿Cómo cambio mi nombre, cargo, fecha de ingreso, correo o contraseña?', 'En Configuración. El cambio de correo se verifica con un código que te llega al nuevo correo.'],
+            ['¿Qué pasa si me quedo sin internet?', 'Tu jornada queda guardada en el teléfono y se envía sola cuando vuelva la señal. Verás un aviso con los registros pendientes.'],
+            ['¿Puedo descargar mi información?', 'Sí: en Configuración, sección "Mi información", puedes bajar un respaldo completo o tus jornadas para Excel.']
+        ];
+        var hm = document.createElement('div'); hm.id = 'kvHelp'; hm.className = 'fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-4';
+        hm.style.cssText = 'display:none;z-index:60';
+        hm.innerHTML = '<div class="bg-slate-900 rounded-3xl max-w-xl w-full p-6 border border-slate-800 shadow-2xl flex flex-col max-h-[90vh] overflow-y-auto space-y-4"><div class="flex justify-between items-center border-b border-slate-800 pb-3"><h3 class="text-base font-black text-white">Ayuda</h3><button type="button" id="kvHelpX" class="text-slate-400 hover:text-white text-xl leading-none px-2" aria-label="Cerrar">&times;</button></div>' +
+            '<button type="button" id="kvTourBtn" class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider">Hacer el recorrido guiado</button><h4 class="text-[11px] font-extrabold text-red-400 uppercase tracking-wider">Preguntas frecuentes</h4><div class="space-y-2">' +
+            FAQ.map(function (f) { return '<details class="bg-slate-950 rounded-xl border border-slate-800 p-3"><summary class="text-xs font-bold text-slate-200 cursor-pointer">' + esc(f[0]) + '</summary><p class="text-[11px] text-slate-400 mt-2 leading-relaxed">' + esc(f[1]) + '</p></details>'; }).join('') + '</div></div>';
+        document.body.appendChild(hm);
+        window.kvOpenHelp = function () { hm.style.display = 'flex'; };
+        function closeHelp() { hm.style.display = 'none'; }
+        $('kvHelpX').addEventListener('click', closeHelp); hm.addEventListener('click', function (e) { if (e.target === hm) closeHelp(); });
+        var sb = document.querySelector('#authHeaderControls button[onclick="openSettings()"]');
+        if (sb) { var hb = document.createElement('button'); hb.type = 'button'; hb.id = 'kvHelpBtn'; hb.className = sb.className; hb.setAttribute('aria-label', 'Ayuda'); hb.innerHTML = '<span>Ayuda</span>'; hb.addEventListener('click', kvOpenHelp); sb.parentNode.insertBefore(hb, sb); }
+
+        var STEPS = [
+            { s: function () { return $('weekSummary'); }, t: 'Tu semana de un vistazo', x: 'Los círculos marcan tus días de lunes a viernes: se activan solos cuando guardas tu jornada. El medidor muestra tu efectividad de la semana frente a la meta del 97%.' },
+            { s: function () { return document.querySelector('#operationalContainer > div:first-child'); }, t: 'Registra tu jornada', x: 'Escribe tu carga, devueltas y pepitos. Si hubo introducciones de vacío o venta de botella, anótalas. Si hoy no tuviste carga, marca Exprés. La app te avisa si ves un posible error.' },
+            { s: function () { return $('lvlPanel'); }, t: 'Tu siguiente nivel', x: 'Mientras escribes, ves cuántas cajas te faltan para subir de nivel. Debajo, el simulador te dice cuánto cobrarías con unas cajas, en dólares y en bolívares.' },
+            { s: function () { var e = $('globalIncentivoSemanalBadge'); return e ? e.closest('.rounded-2xl') : null; }, t: 'Genera tu incentivo de la semana', x: 'Al terminar la semana pulsa "Generar incentivo de la semana". Se calcula tu total y la fecha de cobro, que es el jueves siguiente.' },
+            { s: function () { return document.querySelector('#authHeaderControls button[onclick="openSettings()"]'); }, t: 'Tu perfil y tu información', x: 'En Configuración cambias tus datos y puedes descargar un respaldo. En Ayuda encuentras este recorrido y las preguntas frecuentes.' }
+        ];
+        var tour = document.createElement('div'); tour.id = 'kvTour'; tour.style.cssText = 'display:none;position:fixed;inset:0;z-index:85;pointer-events:none';
+        tour.innerHTML = '<div id="kvTourHole" style="position:fixed;border-radius:14px;border:2px solid #f87171;box-shadow:0 0 0 9999px rgba(3,7,18,.78);transition:all .25s ease"></div><div id="kvTourCard" style="position:fixed;pointer-events:auto;width:min(340px,calc(100vw - 24px));background:#0f172a;border:1px solid rgba(248,113,113,.5);border-radius:16px;padding:16px;color:#e2e8f0;box-shadow:0 20px 50px rgba(0,0,0,.6)"><div id="kvTourN" style="font-size:10px;font-weight:800;color:#f87171;letter-spacing:.1em;text-transform:uppercase"></div><div id="kvTourT" style="font-size:15px;font-weight:900;margin:4px 0"></div><div id="kvTourX" style="font-size:12px;line-height:1.5;color:#cbd5e1"></div><div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end"><button type="button" id="kvTourSkip" style="font-size:11px;color:#94a3b8;background:none;border:0;cursor:pointer;margin-right:auto">Saltar</button><button type="button" id="kvTourPrev" style="font-size:11px;font-weight:800;padding:8px 14px;border-radius:10px;border:1px solid #334155;background:#1e293b;color:#e2e8f0;cursor:pointer">Anterior</button><button type="button" id="kvTourNext" style="font-size:11px;font-weight:800;padding:8px 14px;border-radius:10px;border:0;background:#dc2626;color:#fff;cursor:pointer">Siguiente</button></div></div>';
+        document.body.appendChild(tour);
+        var ti = 0, tourKey = function () { return 'kv_tour_' + (currentUser && currentUser.email); };
+        var vis = function (i) { var e = STEPS[i].s(); return e && e.offsetParent !== null ? e : null; };
+        function place(el, i) {
+            var r = el.getBoundingClientRect(), hole = $('kvTourHole'), c = $('kvTourCard'), pad = 6;
+            hole.style.left = (r.left - pad) + 'px'; hole.style.top = (r.top - pad) + 'px'; hole.style.width = (r.width + pad * 2) + 'px'; hole.style.height = (r.height + pad * 2) + 'px';
+            $('kvTourN').textContent = 'Paso ' + (i + 1) + ' de ' + STEPS.length; $('kvTourT').textContent = STEPS[i].t; $('kvTourX').textContent = STEPS[i].x;
+            $('kvTourPrev').style.display = i === 0 ? 'none' : ''; $('kvTourNext').textContent = i === STEPS.length - 1 ? 'Entendido' : 'Siguiente';
+            var ch = c.offsetHeight || 190, below = innerHeight - r.bottom, top = (below > ch + 20) ? r.bottom + 14 : Math.max(10, r.top - ch - 14);
+            if (top + ch > innerHeight - 8) top = Math.max(10, innerHeight - ch - 10);
+            c.style.top = top + 'px'; c.style.left = Math.min(Math.max(12, r.left), innerWidth - c.offsetWidth - 12) + 'px';
+        }
+        function show(i, dir) {
+            while (i >= 0 && i < STEPS.length && !vis(i)) i += dir;
+            if (i < 0 || i >= STEPS.length) { endTour(); return; }
+            ti = i; var el = vis(i); el.scrollIntoView({ behavior: 'instant', block: 'center' }); place(el, i); setTimeout(function () { var e2 = vis(i); if (e2) place(e2, i); }, 120);
+        }
+        function endTour() { tour.style.display = 'none'; try { localStorage.setItem(tourKey(), '1'); } catch (e) {} }
+        window.kvStartTour = function () { closeHelp(); tour.style.display = 'block'; show(0, 1); };
+        $('kvTourBtn').addEventListener('click', kvStartTour);
+        $('kvTourNext').addEventListener('click', function () { if (ti >= STEPS.length - 1) endTour(); else show(ti + 1, 1); });
+        $('kvTourPrev').addEventListener('click', function () { show(ti - 1, -1); });
+        $('kvTourSkip').addEventListener('click', endTour);
+        addEventListener('resize', function () { if (tour.style.display === 'block') show(ti, 1); });
+        var raf = 0;
+        addEventListener('scroll', function () { if (tour.style.display !== 'block' || raf) return; raf = requestAnimationFrame(function () { raf = 0; var e = vis(ti); if (e) place(e, ti); }); }, { passive: true });
+
+        // ---------- 7) Guardado sin señal ----------
+        var QK = function () { return 'kv_cola_' + (currentUser && currentUser.email); };
+        function qGet() { try { return JSON.parse(localStorage.getItem(QK()) || '[]'); } catch (e) { return []; } }
+        function qSet(a) { try { localStorage.setItem(QK(), JSON.stringify(a)); } catch (e) {} renderQ(); }
+        function probe() {
+            return new Promise(function (res) {
+                if (navigator.onLine === false) { res(false); return; }
+                var done = false, fin = function (v) { if (!done) { done = true; clearTimeout(t); res(v); } }, t = setTimeout(function () { fin(false); }, 6000);
+                try { db.collection('contadores').doc('tickets').get({ source: 'server' }).then(function () { fin(true); }).catch(function () { fin(false); }); } catch (e) { fin(false); }
+            });
+        }
+        function renderQ() {
+            var ws = $('workerSection'); if (!ws || !currentUser) return;
+            var b = $('kvCola');
+            if (!b) {
+                b = document.createElement('div'); b.id = 'kvCola'; b.setAttribute('role', 'status');
+                b.className = 'flex-col sm:flex-row items-center justify-between gap-3 rounded-2xl px-5 py-3 text-xs font-bold shadow-lg';
+                b.style.cssText = 'display:none;background:rgba(14,165,233,.12);border:1px solid rgba(14,165,233,.5);color:#bae6fd';
+                b.innerHTML = '<span id="kvColaTx"></span><button type="button" id="kvColaBtn" class="bg-sky-500 hover:bg-sky-400 text-slate-950 text-[11px] font-black px-4 py-1.5 rounded-lg uppercase tracking-wider">Enviar ahora</button>';
+                ws.insertBefore(b, ws.firstChild); $('kvColaBtn').addEventListener('click', function () { syncQ(true); });
+            }
+            var q = qGet(); if (!q.length) { b.style.display = 'none'; return; }
+            $('kvColaTx').textContent = 'Sin señal: tienes ' + q.length + ' registro' + (q.length > 1 ? 's' : '') + ' guardado' + (q.length > 1 ? 's' : '') + ' en este teléfono, pendiente' + (q.length > 1 ? 's' : '') + ' de enviar (' + q.map(function (r) { return r.fecha + ' · ruta ' + r.ruta; }).join(', ') + '). Se enviará' + (q.length > 1 ? 'n' : '') + ' solo cuando vuelva la conexión.';
+            b.style.display = 'flex';
+        }
+        function resetForm() {
+            ['inputRuta', 'inputProductosPendientes', 'inputHoraEntrada', 'inputHoraSalida'].forEach(function (id) { var e = $(id); if (e) e.value = ''; });
+            ['inputF1', 'inputF2', 'inputG1', 'inputG2', 'inputDev', 'inputPep', 'inputVac', 'inputVta'].forEach(function (id) { var e = $(id); if (e) e.value = '0'; });
+            $('noLoadCheck').checked = false; toggleNoLoad(); calculateRealTime();
+        }
+        window.kvTrySaveOffline = async function () {
+            if (await probe()) return false;
+            var m = calculateRealTime(), fecha = $('inputFechaJornada').value || new Date().toISOString().split('T')[0], q = qGet();
+            if (cachedUserRecords.some(function (r) { return r.fecha === fecha; }) || q.some(function (r) { return r.fecha === fecha; })) { alert('No se pudo guardar: ya tienes un registro (o uno pendiente de enviar) con la fecha ' + fecha + '.'); return true; }
+            var g = function (id) { return parseInt($(id).value) || 0; };
+            q.push({ ruta: $('inputRuta').value.trim() || 'Sin Ruta', fecha: fecha, productosPendientes: $('inputProductosPendientes').value.trim(), userRole: currentUser.role, cargaInicial: m.cargaInicial, cargaNetaDia: m.cargaNetaDia, incentivoDiarioUSD: m.incentivoDiarioUSD.toFixed(2), efectividad: m.efectividad.toFixed(1), isQualified: m.efectividad >= 97, vacios: g('inputVac'), ventaBotella: g('inputVta'), colaboradorNombre: currentUser.name, entradas: { f1: g('inputF1'), f2: g('inputF2'), g1: g('inputG1'), g2: g('inputG2'), dev: g('inputDev'), pep: g('inputPep'), vac: g('inputVac'), vta: g('inputVta') }, timestamp: new Date().toISOString() });
+            qSet(q); resetForm();
+            alert('Sin conexión: tu registro quedó guardado en este teléfono y se enviará solo cuando vuelva la señal.');
+            return true;
+        };
+        var syncing = false;
+        async function syncQ(manual) {
+            if (syncing || !currentUser || !currentUser.email) return;
+            var q = qGet(); if (!q.length) return;
+            if (!(await probe())) { if (manual) alert('Todavía no hay conexión. Se enviará solo cuando vuelva la señal.'); return; }
+            syncing = true; var ok = 0, dups = [];
+            try {
+                while (q.length) {
+                    var rec = q[0], ref = db.collection('historial_jornadas').doc(currentUser.email), doc = await ref.get(), regs = (doc.exists && doc.data().registros) || [];
+                    if (regs.some(function (r) { return r.fecha === rec.fecha; })) dups.push(rec.fecha);
+                    else { rec.ticket = await kvNextTicket(); regs.unshift(rec); await ref.set({ registros: regs }, { merge: true }); ok++; }
+                    q.shift(); qSet(q);
+                }
+            } catch (e) { alert('No se pudieron enviar todos los registros pendientes. Se intentará de nuevo.'); }
+            syncing = false;
+            if (ok && typeof loadUserHistory === 'function') { try { await loadUserHistory(); } catch (e) {} }
+            if (ok) alert('¡Se enviaron ' + ok + ' registro' + (ok > 1 ? 's' : '') + ' pendiente' + (ok > 1 ? 's' : '') + ' con éxito!');
+            if (dups.length) alert('No se enviaron los pendientes de ' + dups.join(', ') + ' porque ya existía un registro en esas fechas.');
+        }
+        addEventListener('online', function () { syncQ(false); });
+        setInterval(function () { syncQ(false); }, 30000);
+
+        var la = window.launchAppSession;
+        window.launchAppSession = async function (a) {
+            await la(a); kvRenderWeeks(); renderQ(); syncQ(false);
+            var tryTour = function (n) {
+                var seen = false; try { seen = localStorage.getItem(tourKey()) === '1'; } catch (e) {}
+                if (seen || tour.style.display === 'block') return;
+                var m = $('mainAppView');
+                if (m && !m.classList.contains('hidden') && $('empresaModal').classList.contains('hidden')) kvStartTour();
+                else if (n < 20) setTimeout(function () { tryTour(n + 1); }, 3000);
+            };
+            setTimeout(function () { tryTour(0); }, 2500);
+        };
     })();
     </script>
 </body>
