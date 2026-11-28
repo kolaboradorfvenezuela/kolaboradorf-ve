@@ -581,6 +581,14 @@
         .kv-h2-ico { display: inline-block; width: .85em; height: .85em; vertical-align: -.08em; margin-right: .3em; }
         .kv-h2-ico svg { width: 100%; height: 100%; display: block; }
 
+        /* Interruptores (toggle) */
+        .kv-sw { position: relative; display: inline-block; width: 46px; height: 26px; flex: none; }
+        .kv-sw input { opacity: 0; width: 0; height: 0; }
+        .kv-sw span { position: absolute; inset: 0; background: #475569; border-radius: 26px; cursor: pointer; transition: .2s; }
+        .kv-sw span::before { content: ""; position: absolute; width: 20px; height: 20px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: .2s; }
+        .kv-sw input:checked + span { background: #16a34a; }
+        .kv-sw input:checked + span::before { transform: translateX(20px); }
+
         /* Accesibilidad: sin movimiento si el usuario lo pide */
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
@@ -1545,8 +1553,10 @@
             const imgElement = document.getElementById('globalPublicidadImg');
             try {
                 const doc = await db.collection("config").doc("publicidad").get();
-                if (doc.exists && doc.data().imageUrl) {
-                    imgElement.src = doc.data().imageUrl;
+                const dd = doc.exists ? doc.data() : {};
+                const hoyP = new Date(), hoyS = hoyP.getFullYear() + '-' + String(hoyP.getMonth() + 1).padStart(2, '0') + '-' + String(hoyP.getDate()).padStart(2, '0');
+                if (doc.exists && dd.imageUrl && (!dd.desde || hoyS >= dd.desde) && (!dd.hasta || hoyS <= dd.hasta)) {
+                    imgElement.src = dd.imageUrl;
                     container.classList.remove('hidden');
                 } else {
                     container.classList.add('hidden');
@@ -1653,7 +1663,7 @@
                     const doc = await docRef.get();
 
                     if (!doc.exists) {
-                        if (signedIn) await firebase.auth().signOut();
+                        if (signedIn) { try { await firebase.auth().currentUser.delete(); } catch (delErr) { await firebase.auth().signOut(); } }
                         alert("El correo electrónico no se encuentra registrado.");
                         return;
                     }
@@ -1812,6 +1822,7 @@
                         <div>
                             <strong class="text-white text-sm font-extrabold">${escapeHTML(user.name || 'Sin Nombre')}</strong>
                             <p class="text-[11px] text-slate-400">${escapeHTML(userEmailId)} — <span class="text-red-400 uppercase font-bold">${escapeHTML(user.role || 'Ayudante')}</span></p>
+                            <p class="text-[11px] text-slate-500">Ingreso: ${escapeHTML(user.fechaIngreso || '-')} · Rubro: ${escapeHTML(user.empresa || 'Sin registrar')} · Solicitó: ${escapeHTML(user.createdAt ? new Date(user.createdAt).toLocaleDateString('es-VE') : '-')}</p>
                         </div>
                         <div class="flex gap-2 w-full sm:w-auto">
                             <button data-email="${escapeHTML(userEmailId)}" onclick="approveUser(this.dataset.email)" class="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg transition shadow">Dar Acceso</button>
@@ -3562,19 +3573,21 @@
             var q; try { q = Promise.all([db.collection('usuarios').where('approved', '==', true).get(), db.collection('historial_jornadas').get()]); } catch (e0) { q = Promise.reject(e0); }
             q.then(function (res) {
                 var now = new Date(), t0 = new Date(now.getFullYear(), now.getMonth(), now.getDate()), mon = mondayOf(now), nxt = new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + 7);
-                var hoy = 0, tk = 0, sum = 0, n = 0;
+                var hoy = 0, tk = 0, sum = 0, n = 0, act = {};
                 res[1].forEach(function (d) {
                     var h = d.data() || {};
                     (h.registros || []).forEach(function (r) {
                         var ts = r.timestamp ? new Date(r.timestamp) : null;
+                        if (ts) { var ky = ymdLocal(ts), o = act[ky] || (act[ky] = { r: 0, t: 0 }); o.r++; if (r.ticket) o.t++; }
                         if (ts && ts >= t0) hoy++;
                         if (ts && ts >= mon && ts < nxt && r.ticket) tk++;
                         var fd = pd(r.fecha);
                         if (fd && fd >= mon && fd < nxt && (parseFloat(r.cargaInicial) || 0) > 0) { sum += parseFloat(r.efectividad) || 0; n++; }
                     });
-                    (h.cierres || []).forEach(function (c) { var ts = c.generadoEn ? new Date(c.generadoEn) : null; if (ts && ts >= mon && ts < nxt && c.ticket) tk++; });
+                    (h.cierres || []).forEach(function (c) { var ts = c.generadoEn ? new Date(c.generadoEn) : null; if (ts && ts >= mon && ts < nxt && c.ticket) tk++; if (ts && c.ticket) { var k2 = ymdLocal(ts), o2 = act[k2] || (act[k2] = { r: 0, t: 0 }); o2.t++; } });
                 });
                 $('sm_act').textContent = res[0].size; $('sm_hoy').textContent = hoy; $('sm_tk').textContent = tk;
+                if (window.kvRenderActivity) kvRenderActivity(act);
                 $('sm_ef').textContent = n ? (sum / n).toFixed(1) + '%' : '-';
                 sumAt = Date.now(); $('sm_upd').textContent = 'Actualizado ' + ago(sumAt);
             }).catch(function () { $('sm_upd').textContent = 'No se pudo cargar el resumen.'; }).then(function () { sumBusy = false; });
@@ -3636,6 +3649,7 @@
             try {
                 var payload = {}; IDS.forEach(function (id) { payload[id] = val(id); });
                 await db.collection('config').doc('incentivos').set(payload, { merge: true });
+                window.kvLogMontos && kvLogMontos(d.map(function (id) { return { c: name(id), a: base[id], d: val(id) }; }));
                 base = snapshot(); refreshDirty(); calculateRealTime();
                 window.kvLog && kvLog('Montos', lines.join(' ').replace(/• /g, '').slice(0, 300));
                 alert('¡Montos guardados exitosamente!');
@@ -4399,6 +4413,199 @@ var manualId = null, sched = [], curSch = false;
             };
             setTimeout(function () { tryTour(0); }, 2500);
         };
+    })();
+    </script>
+
+    <script>
+    /* Entrega C: acceso (registro y olvido de contraseña), eliminar cuentas, aprobar en bloque, historial de montos, actividad y publicidad segura (no modifica funciones existentes) */
+    (function () {
+        var $ = function (id) { return document.getElementById(id); };
+        var esc = function (v) { return escapeHTML(v); };
+        var grid = document.querySelector('#admMain > .grid'); if (!grid) return;
+        var today = function () { return ymdLocal(new Date()); };
+        var CARD = 'bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-800 space-y-3 shadow-xl lg:col-span-2';
+        var INP = 'w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-600';
+        function addPane(sec, html) { var d = document.createElement('div'); d.setAttribute('data-sec', sec); d.className = CARD; d.style.display = 'none'; d.innerHTML = html; grid.appendChild(d); return d; }
+
+        // ---------- Acceso: registro y olvido de contraseña ----------
+        var acc = { registroActivo: true, olvidoActivo: true };
+        function applyAcceso() {
+            var reg = document.querySelector('#loginForm button[onclick="switchAuthMode(\'register\')"]'), forg = document.querySelector('#loginForm button[onclick="switchAuthMode(\'forgot\')"]');
+            if (reg) reg.style.display = acc.registroActivo ? '' : 'none';
+            if (forg) forg.style.display = acc.olvidoActivo ? '' : 'none';
+            var lf = $('loginForm'), note = $('kvAccNote');
+            if (lf && !note) { note = document.createElement('p'); note.id = 'kvAccNote'; note.className = 'text-[11px] text-amber-300 text-center'; lf.insertBefore(note, lf.lastElementChild); }
+            if (note) { var t = []; if (!acc.registroActivo) t.push('El registro de cuentas nuevas está cerrado por ahora.'); if (!acc.olvidoActivo) t.push('La recuperación de contraseña está desactivada: si la olvidaste, comunícate con el administrador.'); note.textContent = t.join(' '); note.style.display = t.length ? 'block' : 'none'; }
+            if (!acc.registroActivo && ($('registerForm') && !$('registerForm').classList.contains('hidden') || $('verifyCodeForm') && !$('verifyCodeForm').classList.contains('hidden'))) switchAuthMode('login');
+            if (!acc.olvidoActivo && $('forgotForm') && !$('forgotForm').classList.contains('hidden')) switchAuthMode('login');
+        }
+        function updSw() {
+            [['swReg', 'registroActivo', 'swRegSt'], ['swOlv', 'olvidoActivo', 'swOlvSt']].forEach(function (x) {
+                var e = $(x[0]); if (e) e.checked = !!acc[x[1]];
+                var t = $(x[2]); if (t) { t.textContent = acc[x[1]] ? 'Activado' : 'DESACTIVADO'; t.className = 'text-[11px] font-bold ' + (acc[x[1]] ? 'text-emerald-400' : 'text-amber-400'); }
+            });
+        }
+        try { db.collection('config').doc('acceso').onSnapshot(function (s) { var d = s.exists ? s.data() : {}; acc.registroActivo = d.registroActivo !== false; acc.olvidoActivo = d.olvidoActivo !== false; applyAcceso(); updSw(); }, function () {}); } catch (e) {}
+        var sam = window.switchAuthMode;
+        window.switchAuthMode = function (m) {
+            if (m === 'register' && !acc.registroActivo) { alert('El registro de cuentas nuevas está cerrado por ahora.'); m = 'login'; }
+            else if ((m === 'forgot' || m === 'reset') && !acc.olvidoActivo) { alert('La recuperación de contraseña está desactivada. Comunícate con el administrador.'); m = 'login'; }
+            return sam(m);
+        };
+        async function cleanOrphan() {
+            try {
+                var d = pendingVerificationData; if (!d || $('inputVerificationCode').value.trim() !== generatedVerificationCode) return;
+                await firebase.auth().signInWithEmailAndPassword(d.email, d.pass);
+                var doc = await db.collection('usuarios').doc(d.email).get();
+                if (!doc.exists) await firebase.auth().currentUser.delete(); else await firebase.auth().signOut();
+            } catch (e) {}
+        }
+        var hr = window.handleRegister, hv = window.handleVerifyCode, hf = window.handleForgotRequest;
+        window.handleRegister = function (ev) { if (!acc.registroActivo) { if (ev && ev.preventDefault) ev.preventDefault(); alert('El registro de cuentas nuevas está cerrado por ahora.'); return; } return hr.apply(this, arguments); };
+        window.handleVerifyCode = async function (ev) { if (!acc.registroActivo) { if (ev && ev.preventDefault) ev.preventDefault(); alert('El registro de cuentas nuevas está cerrado por ahora.'); return; } await cleanOrphan(); return hv.apply(this, arguments); };
+        window.handleForgotRequest = function (ev) { if (!acc.olvidoActivo) { if (ev && ev.preventDefault) ev.preventDefault(); alert('La recuperación de contraseña está desactivada. Comunícate con el administrador.'); return; } return hf.apply(this, arguments); };
+        var sw = function (id, key, label, desc) { return '<div class="flex items-center justify-between gap-4 bg-slate-950 p-3 rounded-xl border border-slate-800"><div class="min-w-0"><div class="text-xs font-bold text-slate-200">' + label + ' <span id="' + id + 'St" class="text-[11px] font-bold"></span></div><p class="text-[11px] text-slate-400">' + desc + '</p></div><label class="kv-sw"><input type="checkbox" id="' + id + '" checked aria-label="' + label + '"><span></span></label></div>'; };
+        addPane('sistema', '<div class="border-b border-slate-800 pb-3"><h4 class="text-sm font-extrabold text-white">Acceso a la aplicación</h4><p class="text-xs text-slate-400 mt-0.5">Para frenar los registros innecesarios. Al desactivar, la opción desaparece de la pantalla de acceso para todos.</p></div>' +
+            sw('swReg', 'registroActivo', 'Registro de cuentas nuevas', 'Desactivado: nadie puede crear una cuenta nueva (tampoco se envían códigos de verificación).') +
+            sw('swOlv', 'olvidoActivo', 'Olvido de contraseña', 'Desactivado: nadie puede recuperar su contraseña hasta que lo vuelvas a activar.'));
+        async function setAcc(key, val, input, label) {
+            try { var o = {}; o[key] = val; await db.collection('config').doc('acceso').set(o, { merge: true }); acc[key] = val; updSw(); window.kvLog && kvLog('Acceso', label + (val ? ' activado' : ' desactivado')); alert(label + (val ? ' activado con éxito.' : ' desactivado con éxito.')); }
+            catch (e) { input.checked = !val; alert('Error al cambiar el ajuste: ' + (e.code || e.message)); }
+        }
+        $('swReg').addEventListener('change', function () { setAcc('registroActivo', this.checked, this, 'El registro'); });
+        $('swOlv').addEventListener('change', function () { setAcc('olvidoActivo', this.checked, this, 'El olvido de contraseña'); });
+        applyAcceso(); updSw();
+
+        // ---------- Eliminar cuentas por completo ----------
+        var rcl = window.renderColabs;
+        window.renderColabs = function () {
+            rcl();
+            Array.prototype.forEach.call(document.querySelectorAll('#colabList > div'), function (row) {
+                var v = row.querySelector('button[onclick^="viewColab"]'); if (!v || row.querySelector('.kv-del')) return;
+                var b = document.createElement('button'); b.type = 'button'; b.className = 'kv-del text-[10px] bg-red-700/30 hover:bg-red-700/50 text-red-200 border border-red-600/40 px-3 py-1.5 rounded-lg font-semibold';
+                b.textContent = 'Eliminar cuenta'; b.setAttribute('data-email', v.getAttribute('data-email')); v.parentNode.appendChild(b);
+            });
+        };
+        $('colabList').addEventListener('click', async function (e) {
+            var b = e.target.closest('button.kv-del'); if (!b) return;
+            var em = b.getAttribute('data-email'), row = b.closest('#colabList > div'), nm = (row && row.querySelector('strong') ? row.querySelector('strong').textContent : em);
+            if (!(await kvConfirm('¿Eliminar la cuenta de ' + nm + ' (' + em + ')?\n\nSe borra TODA su información: perfil, jornadas, incentivos y tickets. No se puede deshacer.\n\nSi esa persona intenta entrar, verá que no está registrada y tendrá que registrarse de nuevo.'))) return;
+            try {
+                await db.collection('historial_jornadas').doc(em).delete();
+                await db.collection('usuarios').doc(em).delete();
+                window.kvLog && kvLog('Eliminación de cuenta', nm + ' (' + em + ')');
+                alert('Cuenta eliminada con éxito: se borró toda su información.');
+                if (window.loadColabs) loadColabs(); if (window.loadPendingApprovals) loadPendingApprovals(); if ($('sm_btn')) $('sm_btn').click();
+            } catch (er) { alert('Error al eliminar la cuenta: ' + (er.code || er.message)); }
+        });
+
+        // ---------- Aprobar todos ----------
+        var pl = $('pendingApprovalsList');
+        if (pl) {
+            var row = document.createElement('div'); row.className = 'flex justify-end';
+            row.innerHTML = '<button type="button" id="apAll" class="bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold px-4 py-1.5 rounded-lg uppercase tracking-wider">Aprobar todos</button>';
+            pl.parentNode.insertBefore(row, pl);
+            $('apAll').addEventListener('click', async function () {
+                var arr = [];
+                try { var snap = await db.collection('usuarios').where('approved', '==', false).get(); snap.forEach(function (d) { var u = d.data() || {}; if (!u.suspendido) arr.push({ id: d.id, name: u.name || d.id }); }); } catch (e) { alert('Error al leer las solicitudes.'); return; }
+                if (!arr.length) { alert('No hay solicitudes pendientes.'); return; }
+                if (!(await kvConfirm('¿Aprobar a ' + arr.length + ' persona' + (arr.length > 1 ? 's' : '') + '?\n\n' + arr.slice(0, 8).map(function (x) { return '• ' + x.name; }).join('\n') + (arr.length > 8 ? '\n• y ' + (arr.length - 8) + ' más' : '') + '\n\nSe les enviará un correo de aviso a cada una.'))) return;
+                var ok = 0;
+                for (var i = 0; i < arr.length; i++) {
+                    try { await db.collection('usuarios').doc(arr[i].id).update({ approved: true }); ok++; if (window.kvOnApproval) await kvOnApproval(arr[i].id, true); } catch (e) {}
+                }
+                if (window.loadPendingApprovals) loadPendingApprovals();
+                alert('¡' + ok + ' cuenta' + (ok > 1 ? 's' : '') + ' aprobada' + (ok > 1 ? 's' : '') + ' con éxito!');
+            });
+        }
+
+        // ---------- Historial de cambios de montos ----------
+        addPane('montos', '<div class="flex justify-between items-center border-b border-slate-800 pb-3"><h4 class="text-sm font-extrabold text-white">Historial de cambios de montos <span class="text-[10px] text-slate-400 font-bold">(últimos 20)</span></h4><button type="button" id="mhBtn" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1 rounded-lg border border-slate-700 font-semibold">Actualizar</button></div><div class="overflow-x-auto"><table class="w-full text-xs"><thead><tr class="text-left text-[10px] uppercase tracking-wider text-slate-400"><th class="py-1 pr-3">Fecha</th><th class="py-1 pr-3">Quién</th><th class="py-1">Cambios (antes → ahora)</th></tr></thead><tbody id="mhBody"></tbody></table></div>');
+        function loadMh() {
+            var tb = $('mhBody'); if (!tb) return;
+            var q; try { q = db.collection('historial_montos').orderBy('ts', 'desc').limit(20).get(); } catch (e) { q = Promise.reject(e); }
+            q.then(function (snap) {
+                var rows = []; snap.forEach(function (d) { rows.push(d.data()); });
+                tb.innerHTML = rows.length ? rows.map(function (r) {
+                    return '<tr class="border-t border-slate-800 align-top"><td class="py-2 pr-3 text-slate-400 whitespace-nowrap tabular-nums">' + esc(new Date(r.ts).toLocaleString('es-VE', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' })) + '</td><td class="py-2 pr-3 text-slate-300 break-all">' + esc(r.por) + '</td><td class="py-2 text-slate-200">' + (r.cambios || []).map(function (c) { return '<div>' + esc(c.c) + ': <span class="text-slate-400">$' + Number(c.a).toFixed(2) + '</span> → <b class="text-emerald-400">$' + Number(c.d).toFixed(2) + '</b></div>'; }).join('') + '</td></tr>';
+                }).join('') : '<tr><td colspan="3" class="py-4 text-center text-slate-500">Todavía no hay cambios de montos registrados.</td></tr>';
+            }).catch(function () { tb.innerHTML = '<tr><td colspan="3" class="py-4 text-center text-amber-400">No se pudo cargar el historial.</td></tr>'; });
+        }
+        $('mhBtn').addEventListener('click', loadMh);
+        window.kvLogMontos = function (ch) {
+            try { db.collection('historial_montos').add({ ts: new Date().toISOString(), por: currentUser.email, cambios: ch.slice(0, 40).map(function (c) { return { c: String(c.c), a: c.a, d: c.d }; }) }).then(loadMh).catch(function () {}); } catch (e) {}
+        };
+
+        // ---------- Gráfico de actividad (30 días) ----------
+        var pAct = addPane('resumen', '<div class="border-b border-slate-800 pb-3"><h4 class="text-sm font-extrabold text-white">Actividad de los últimos 30 días</h4></div><div id="actChart"></div><p id="actCap" class="text-[11px] text-slate-400 text-center min-h-[16px]">Toca una barra para ver el detalle de ese día.</p>');
+        window.kvRenderActivity = function (act) {
+            var box = $('actChart'); if (!box) return;
+            var days = [], i; for (i = 29; i >= 0; i--) { var d = new Date(); d.setDate(d.getDate() - i); days.push(d); }
+            var data = days.map(function (d) { var o = act[ymdLocal(d)] || { r: 0, t: 0 }; return { d: d, r: o.r, t: o.t }; });
+            var max = Math.max.apply(null, data.map(function (x) { return Math.max(x.r, x.t); }).concat([5])); max = Math.ceil(max / 5) * 5;
+            var W = 640, H = 230, pl = 36, pr = 12, pt = 16, pb = 34, iw = W - pl - pr, ih = H - pt - pb, slot = iw / 30, bw = Math.max(4, slot * .6);
+            var X = function (k) { return pl + slot * k + slot / 2; }, Y = function (v) { return pt + ih - (v / max) * ih; };
+            var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" role="img" aria-label="Registros y tickets por día" style="max-height:260px">';
+            [0, .5, 1].forEach(function (f) { var v = max * f; svg += '<line x1="' + pl + '" y1="' + Y(v) + '" x2="' + (W - pr) + '" y2="' + Y(v) + '" style="stroke:var(--kv-grid)"/><text x="' + (pl - 5) + '" y="' + (Y(v) + 4) + '" text-anchor="end" font-size="10" style="fill:var(--kv-axis)">' + Math.round(v) + '</text>'; });
+            data.forEach(function (x, k) {
+                var tip = x.d.toLocaleDateString('es-VE', { weekday: 'long', day: 'numeric', month: 'long' }) + ': ' + x.r + ' registro' + (x.r === 1 ? '' : 's') + ' · ' + x.t + ' ticket' + (x.t === 1 ? '' : 's');
+                svg += '<rect x="' + (X(k) - bw / 2).toFixed(1) + '" y="' + Y(x.r).toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + Math.max((x.r / max) * ih, x.r ? 1.5 : 0).toFixed(1) + '" rx="2" fill="#dc2626" data-tip="' + esc(tip) + '" style="cursor:pointer"><title>' + esc(tip) + '</title></rect>';
+                if (k % 5 === 0 || k === 29) svg += '<text x="' + X(k).toFixed(1) + '" y="' + (H - 14) + '" text-anchor="middle" font-size="10" style="fill:var(--kv-axis)">' + String(x.d.getDate()).padStart(2, '0') + '/' + String(x.d.getMonth() + 1).padStart(2, '0') + '</text>';
+            });
+            svg += '<polyline fill="none" stroke="#38bdf8" stroke-width="2" stroke-linejoin="round" points="' + data.map(function (x, k) { return X(k).toFixed(1) + ',' + Y(x.t).toFixed(1); }).join(' ') + '"/>';
+            box.innerHTML = svg + '</svg><div class="flex justify-center gap-4 text-[10px] text-slate-400"><span><b style="color:#dc2626">■</b> Registros guardados</span><span><b style="color:#38bdf8">●</b> Tickets emitidos</span></div>';
+        };
+        document.addEventListener('click', function (e) { var r = e.target.closest ? e.target.closest('#actChart rect[data-tip]') : null; if (r && $('actCap')) $('actCap').textContent = r.getAttribute('data-tip'); });
+
+        // ---------- Publicidad segura: comprime, muestra vista previa y admite fechas ----------
+        var fi = $('adminAdImageFile');
+        if (fi) {
+            var box2 = fi.parentNode, extra = document.createElement('div'); extra.className = 'space-y-2';
+            extra.innerHTML = '<div id="adPrev" style="display:none"><img id="adPrevImg" alt="Vista previa" class="rounded-lg border border-slate-800" style="max-height:150px"><p id="adPrevInfo" class="text-[11px] text-slate-400 mt-1"></p></div>' +
+                '<div class="grid grid-cols-2 gap-2"><div><label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">Mostrar desde</label><input type="date" id="adDesde" class="' + INP + '"></div><div><label class="block text-[10px] font-bold text-slate-300 uppercase mb-1">Hasta (opcional)</label><input type="date" id="adHasta" class="' + INP + '"></div></div><p id="adCur" class="text-[11px] text-slate-400"></p>';
+            box2.insertBefore(extra, box2.querySelector('.flex.gap-2') || null);
+            $('adDesde').value = today();
+            fi.addEventListener('change', function () {
+                var f = fi.files && fi.files[0]; window.__adData = null; $('adPrev').style.display = 'none'; if (!f) return;
+                var img = new Image(), url = URL.createObjectURL(f);
+                img.onload = function () {
+                    URL.revokeObjectURL(url);
+                    var sc = Math.min(1, 720 / img.width), w = Math.round(img.width * sc), h = Math.round(img.height * sc), c = document.createElement('canvas'); c.width = w; c.height = h;
+                    var x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, w, h); x.drawImage(img, 0, 0, w, h);
+                    var q = .85, out = c.toDataURL('image/jpeg', q); while (out.length * .75 > 350 * 1024 && q > .4) { q -= .1; out = c.toDataURL('image/jpeg', q); }
+                    var kb = Math.round(out.length * .75 / 1024);
+                    if (kb > 700) { alert('La imagen sigue siendo muy pesada (' + kb + ' KB). Elige una más sencilla.'); return; }
+                    window.__adData = out; window.__adKB = kb; $('adPrevImg').src = out;
+                    $('adPrevInfo').textContent = 'Lista para publicar: ' + w + '×' + h + ' px · ' + kb + ' KB (original: ' + Math.round(f.size / 1024) + ' KB).'; $('adPrev').style.display = 'block';
+                };
+                img.onerror = function () { URL.revokeObjectURL(url); alert('No se pudo leer esa imagen. Prueba con otra.'); };
+                img.src = url;
+            });
+            window.uploadAndSaveAdminAd = async function () {
+                if (!window.__adData) { alert('Seleccione una imagen para la publicidad.'); return; }
+                var d = $('adDesde').value, h = $('adHasta').value;
+                if (h && d && h < d) { alert('La fecha final no puede ser anterior a la inicial.'); return; }
+                if (h && h < today()) { alert('La fecha final ya pasó: elige una desde hoy.'); return; }
+                try {
+                    await db.collection('config').doc('publicidad').set({ imageUrl: window.__adData, desde: d || '', hasta: h || '', pesoKB: window.__adKB, ts: new Date().toISOString() });
+                    window.kvLog && kvLog('Publicidad', 'Publicó una imagen (' + window.__adKB + ' KB) ' + (d ? 'desde ' + d : '') + (h ? ' hasta ' + h : ''));
+                    alert('¡Publicidad publicada exitosamente!');
+                    fi.value = ''; window.__adData = null; $('adPrev').style.display = 'none'; if (window.loadGlobalPublicidad) loadGlobalPublicidad(); loadAd();
+                } catch (e) { alert('Error al guardar la publicidad: ' + (e.code || e.message)); }
+            };
+        }
+        function loadAd() {
+            var c = $('adCur'); if (!c) return;
+            db.collection('config').doc('publicidad').get().then(function (d) {
+                var a = d.exists ? d.data() : null, t = today();
+                if (!a || !a.imageUrl) { c.textContent = 'No hay publicidad publicada.'; return; }
+                var vig = (!a.desde || t >= a.desde) && (!a.hasta || t <= a.hasta);
+                c.innerHTML = '<b class="' + (vig ? 'text-emerald-400' : 'text-amber-400') + '">' + (vig ? 'Publicidad vigente' : 'Publicidad fuera de fecha') + '</b>' + (a.desde ? ' desde ' + esc(a.desde) : '') + (a.hasta ? ' hasta ' + esc(a.hasta) : ' sin fecha de fin') + (a.pesoKB ? ' · ' + esc(a.pesoKB) + ' KB' : '');
+            }).catch(function () {});
+        }
+
+        var as = window.admShow;
+        window.admShow = function (n) { as(n); if (n === 'montos') loadMh(); if (n === 'publicidad') loadAd(); };
     })();
     </script>
 </body>
